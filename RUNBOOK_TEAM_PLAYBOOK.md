@@ -111,7 +111,7 @@ Every PR triggers:
 
 ### What Not to Touch
 
-See your decision log for protected areas (if you keep one — see the `RUNBOOK_DECISION_LOG.md` template in the the `ai-product-builder` library folder).
+See your decision log for protected areas (if you keep one — see the `RUNBOOK_DECISION_LOG.md` template in the `ai-product-builder` library folder).
 
 ---
 

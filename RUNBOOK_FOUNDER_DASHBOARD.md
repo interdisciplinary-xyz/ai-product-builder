@@ -8,7 +8,7 @@
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the **row STRUCTURE** (`metric → surface → look for → action threshold`) and the **four sections** (acquisition / activation / retention / revenue), then replace every «placeholder» with your product's actual surfaces. KPI **definitions** are deferred to `METRICS.md` — this doc renders values and action thresholds, it does not redefine what each metric means.
 >
-> **Pairs with:** `RUNBOOK_DAILY_RITUAL.md` (the daily walk that uses this doc), `RUNBOOK_WEEKLY_RETRO.md` (the Monday review), `RUNBOOK_DECISION_THRESHOLDS.md` (kill / iterate / expand bands), `METRICS.md` (KPI definitions), `MANAGER_FOUNDER_OPS.md` (the cadence this is the dashboard layer of).
+> **Pairs with:** `RUNBOOK_DAILY_RITUAL.md` (the daily walk that uses this doc), `RUNBOOK_WEEKLY_RETRO.md` (the Friday retro cadence — filled & committed each Friday using this dashboard's week-over-week numbers), `RUNBOOK_DECISION_THRESHOLDS.md` (kill / iterate / expand bands), `METRICS.md` (KPI definitions), `MANAGER_FOUNDER_OPS.md` (the cadence this is the dashboard layer of).
 >
 > **Local definitions to provide per repo** (replace inline or define once in `.claude/CLAUDE.md`):
 > - `«PROJECT»` — the product this dashboard surfaces

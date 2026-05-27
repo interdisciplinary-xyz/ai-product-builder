@@ -17,6 +17,7 @@
 > - `«PRICING_MODEL»` — pricing basis and current tier per service (per-token, per-MAU, per-transaction, per-event, flat, free)
 > - `«COST_SUMMARY»` (concept group) — the Cost Summary table: one row per service filling `«COST_MODEL»`, `«COST_DRIVER»`, `«RISK_LEVEL»`
 > - `«TECH_STACK»` — runtime/hosting facts referenced (deploy platform, DB, CMS, framework) needed to describe self-hosted services
+> - `«PROJECT»` — the product whose third-party stack this catalogs (typically **inherited** from `.claude/CLAUDE.md`); referenced in the overview line and section headers
 
 Overview of external services used across the «PROJECT» platform, organized by cost model for monitoring usage and maintenance costs.
 
