@@ -86,8 +86,8 @@ These three commands are the day-one contract:
 
 ```bash
 «PKG_MGR» install      # already done in §1, but re-runnable
-«PKG_MGR» «QUALITY_CMD»  # aggregate: format + lint + types + unit + (i18n + build, depending on repo)
-«PKG_MGR» «BUILD_CMD»    # production build — catches server-only / barrel-leak issues
+«QUALITY_CMD»  # aggregate: format + lint + types + unit + (i18n + build, depending on repo)
+«BUILD_CMD»    # production build — catches server-only / barrel-leak issues
 ```
 
 If `«QUALITY_CMD»` is green and `«BUILD_CMD»` is green, **you are on the happy path**. Move on to §3.
@@ -180,8 +180,8 @@ Tick this on your first day:
 
 - [ ] `nvm use` reports Node `«NODE_VERSION»`.
 - [ ] `«PKG_MGR» install` runs clean.
-- [ ] `«PKG_MGR» «QUALITY_CMD»` exits 0.
-- [ ] `«PKG_MGR» «BUILD_CMD»` exits 0.
+- [ ] `«QUALITY_CMD»` exits 0.
+- [ ] `«BUILD_CMD»` exits 0.
 - [ ] Dev server starts and the home page renders.
 - [ ] Reading-order docs (1–6 in §3) skimmed.
 - [ ] `«E2E_CMD» «E2E_DOMAIN_FILTER»` passes for `«ANY_DOMAIN»`.

@@ -57,7 +57,7 @@ Closes #
 
 <!-- How a reviewer (or future-you) can verify this works. Be specific.
      Examples of the shape we want:
-       - [ ] Run `«PKG_MGR» «QUALITY_CMD:unit» src/path/to/spec.ts` — N tests passing
+       - [ ] Run `«QUALITY_CMD:unit» src/path/to/spec.ts` — N tests passing
        - [ ] Visit `/route/under/test` — verify X renders, Y doesn't
        - [ ] Trigger a «PAYMENTS» event via CLI — verify an error-monitor event with `tags.context = '«PAYMENTS»_webhook'`
      Prefer concrete commands + observable outcomes over prose. -->
@@ -88,10 +88,10 @@ These shared surfaces are kept honest at PR time — the Design System, the API 
 
 ### Quality gates
 
-- [ ] `«PKG_MGR» «QUALITY_CMD:types» && «PKG_MGR» «QUALITY_CMD:lint» && «PKG_MGR» «QUALITY_CMD:unit»` clean locally
+- [ ] `«QUALITY_CMD:types» && «QUALITY_CMD:lint» && «QUALITY_CMD:unit»` clean locally
 - [ ] `«QUALITY_CMD:i18n»` clean («LOCALES» parity, e.g. en, pl)
-- [ ] `«PKG_MGR» «QUALITY_CMD:build»` succeeds (catches `'server-only'` / barrel-leak issues that don't show up in unit tests)
-- [ ] Pre-push hook gates passed (i18n + types + lint + format + unit). E2e remains in CI on push to «TRUNK» as the authoritative gate; run `«PKG_MGR» «QUALITY_CMD:e2e»` locally when working on flows that touch the smoke suite.
+- [ ] `«QUALITY_CMD:build»` succeeds (catches `'server-only'` / barrel-leak issues that don't show up in unit tests)
+- [ ] Pre-push hook gates passed (i18n + types + lint + format + unit). E2e remains in CI on push to «TRUNK» as the authoritative gate; run `«QUALITY_CMD:e2e»` locally when working on flows that touch the smoke suite.
 - [ ] Error-monitor tags follow the canonical taxonomy: `tags.domain` is one of «ERROR_TAXONOMY» (e.g. `payments` / `plans` / `auth` / `cms` / `analytics`); `tags.step` describes the branch within the route handler
 
 ### Hygiene
@@ -186,7 +186,7 @@ First **aggregate slice** of «one-line theme». N issues partial, M close-ready
 |---|---|
 | **Branch** | `scope/v«X.Y.Z»` |
 | **HEAD** | `«sha»` |
-| **Local quality gate** | `«PKG_MGR» «QUALITY_CMD»` ✅ · «N» unit tests |
+| **Local quality gate** | `«QUALITY_CMD»` ✅ · «N» unit tests |
 | **CI policy on `scope/**`** | «describe — e.g. "skipped; run locally before merge"» |
 | **Review threads** | All threads resolved ✅ / pending |
 | **Matrix** | [`docs/plans/«DATE»-scope-v«X.Y.Z»-open-issues-matrix.md`](«MATRIX_PATH») |
@@ -236,7 +236,7 @@ Does **not** close 🟡 partial or ⏳ deferred issues.
 
 ### Acceptance (scope aggregate)
 
-- [ ] `«PKG_MGR» «QUALITY_CMD»` clean locally (types + lint + format + unit + i18n + routing)
+- [ ] `«QUALITY_CMD»` clean locally (types + lint + format + unit + i18n + routing)
 - [ ] OpenAPI / route docs synced for any new/changed routes
 - [ ] All review threads on this PR resolved
 - [ ] Matrix doc reflects the verdicts for every milestone issue

@@ -65,12 +65,12 @@ Only the commands a contributor or agent runs **daily**. Anything used once per 
 «PKG_MGR» «start:dev»           # local dev server (port «PORT»)
 
 # Quality gate (must be clean before pushing)
-«PKG_MGR» «QUALITY_CMD»          # aggregate: format + lint + types + unit + i18n + build
-«PKG_MGR» «QUALITY_CMD:types»    # tsc --noEmit
-«PKG_MGR» «QUALITY_CMD:lint»     # ESLint
-«PKG_MGR» «QUALITY_CMD:unit»     # unit tests
-«PKG_MGR» «E2E_CMD»              # e2e tests (Playwright / Cypress / …)
-«PKG_MGR» «BUILD_CMD»            # production build (catches server-only / barrel-leak issues)
+«QUALITY_CMD»          # aggregate: format + lint + types + unit + i18n + build
+«QUALITY_CMD:types»    # tsc --noEmit
+«QUALITY_CMD:lint»     # ESLint
+«QUALITY_CMD:unit»     # unit tests
+«E2E_CMD»              # e2e tests (Playwright / Cypress / …)
+«BUILD_CMD»            # production build (catches server-only / barrel-leak issues)
 ```
 
 ## Architecture

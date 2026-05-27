@@ -10,17 +10,17 @@
 >
 > **Local definitions to provide per repo** (replace the product content; define product facts in the repo's `.claude/CLAUDE.md` or fill them inline):
 > - `«NODE_VERSION»` / `«PKG_MGR»` — Node version (`nvm use`) and package manager (npm/pnpm/yarn)
-> - `«DEV_COMMANDS»` — install + dev-server commands and local URLs/ports (incl. any local-domain wrapper)
-> - `«BRANCH_STRATEGY»` — branch model + commit convention (e.g. conventional commits)
+> - `«DEV_COMMANDS»` (concept group) — install + dev-server commands; expands to the body token `«LOCAL_URLS»` (the local web/admin URLs and ports, incl. any local-domain wrapper)
+> - `«BRANCH_STRATEGY»` (concept group) — branch model + commit convention; expands to body tokens `«MAIN_BRANCH»`, `«FEATURE_BRANCH_PATTERN»`, `«COMMIT_CONVENTION»`, `«COMMIT_LINT_TOOL»`
 > - `«GIT_HOOKS»` (concept group) — pre-commit / pre-push behavior; expands to the body tokens `«GIT_HOOKS_PRECOMMIT»` (lint-staged, commitlint) and `«GIT_HOOKS_PREPUSH»` (test gates)
 > - `«CI_CHECKS»` — what each PR runs (unit, type, E2E, perf)
-> - `«LINT_CONFIG»` — linter/formatter setup and key rules
-> - `«API_CLIENT»` — client/server data-access conventions for this repo
-> - `«DOMAIN_OWNERSHIP»` — the module/domain map and allowed dependency edges
-> - `«FILE_NAMING»` — naming/folder conventions
+> - `«LINT_CONFIG»` (concept group) — linter/formatter setup; expands to body tokens `«LINT_PRESET»`, `«LINT_KEY_RULES»`, `«LINT_STAGED_TOOL»`
+> - `«API_CLIENT»` (concept group) — client/server data-access; expands to body tokens `«CLIENT_API_CONVENTION»`, `«SERVER_API_CONVENTION»`
+> - `«DOMAIN_OWNERSHIP»` (concept group) — module/domain map; expands to body tokens `«DOMAIN»` (one row per domain), `«OWNER_CONCERN»` (per-domain ownership), `«ALLOWED_DEPS»` (allowed dependency edges)
+> - `«FILE_NAMING»` (concept group) — naming/folder conventions; expands to body tokens `«COMPONENT_NAMING»`, `«TEST_NAMING»`, `«CONSTANTS_NAMING»`, `«BARREL_NAMING»`
 > - `«TEST_SETUP»` (concept group) — testing framework + locations; expands to the body tokens `«TEST_SETUP_UNIT»` (unit framework, colocation, mocking), `«TEST_SETUP_E2E»` (E2E framework, base URL, CI runner, skipped suites), and `«TEST_SETUP_TYPES»` (type-check strictness + command)
-> - `«ENV_SETUP»` — required env vars, validation approach, and the "do not automate `.env`" rule
-> - `«DEPLOY_TARGET»` — deploy platform and build specifics (output mode, custom server, source maps, external packages)
+> - `«ENV_SETUP»` (concept group) — required env vars + validation; expands to body tokens `«ENV_VAR_1»` and `«PURPOSE»` (one row per env var)
+> - `«DEPLOY_TARGET»` (concept group) — deploy platform + build specifics; expands to body tokens `«DEPLOY»`, `«BUILD_OUTPUT_MODE»`, `«SOURCEMAP_HANDLING»`, `«EXTERNAL_PACKAGES»`
 
 ## Development Workflow
 

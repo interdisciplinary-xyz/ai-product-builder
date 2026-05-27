@@ -12,7 +12,7 @@ allowed-tools: Bash, Read
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders».
 >
 > **Local definitions to provide per repo** (fill the placeholders in this doc, or define once in the repo's `.claude/CLAUDE.md`):
-> - Package manager + test/quality commands — `«PKG_MGR» «QUALITY_CMD:format»` / `«QUALITY_CMD:lint»` / `«QUALITY_CMD:types»` / `«QUALITY_CMD:unit»` (or the repo's aggregate quality command).
+> - Package manager + test/quality commands — `«QUALITY_CMD:format»` / `«QUALITY_CMD:lint»` / `«QUALITY_CMD:types»` / `«QUALITY_CMD:unit»` (or the repo's aggregate quality command).
 
 Run the project test suite and report results. Execute the following checks in order:
 
@@ -20,10 +20,10 @@ For pre-deploy, see `/deploy-check`.
 
 ## Checks
 
-1. **Format check** — `«PKG_MGR» «QUALITY_CMD:format»`
-2. **Lint check** — `«PKG_MGR» «QUALITY_CMD:lint»`
-3. **Type check** — `«PKG_MGR» «QUALITY_CMD:types»`
-4. **Unit tests** — `«PKG_MGR» «QUALITY_CMD:unit»`
+1. **Format check** — `«QUALITY_CMD:format»`
+2. **Lint check** — `«QUALITY_CMD:lint»`
+3. **Type check** — `«QUALITY_CMD:types»`
+4. **Unit tests** — `«QUALITY_CMD:unit»`
 
 If a specific scope is provided: $ARGUMENTS — run only the relevant checks.
 

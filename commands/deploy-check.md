@@ -12,7 +12,7 @@ allowed-tools: Bash, Read, Grep, Glob
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders».
 >
 > **Local definitions to provide per repo** (fill the placeholders in this doc, or define once in the repo's `.claude/CLAUDE.md`):
-> - Package manager + quality/build commands — `«PKG_MGR» «QUALITY_CMD:format»` / `«QUALITY_CMD:lint»` / `«QUALITY_CMD:types»` / `«QUALITY_CMD:unit»` / `«QUALITY_CMD:build»` (or the repo's aggregate quality command).
+> - Package manager + quality/build commands — `«QUALITY_CMD:format»` / `«QUALITY_CMD:lint»` / `«QUALITY_CMD:types»` / `«QUALITY_CMD:unit»` / `«QUALITY_CMD:build»` (or the repo's aggregate quality command).
 > - Trunk branch name — `«TRUNK»` (and `origin/«TRUNK»`).
 > - Commit convention — Conventional Commits (`type(scope): description`).
 
@@ -22,11 +22,11 @@ Extends `/test` (the unit/lint/type/format subset) with build + git checks.
 
 ## Checks (run in order)
 
-1. **Format** — `«PKG_MGR» «QUALITY_CMD:format»`
-2. **Lint** — `«PKG_MGR» «QUALITY_CMD:lint»`
-3. **Type check** — `«PKG_MGR» «QUALITY_CMD:types»`
-4. **Unit tests** — `«PKG_MGR» «QUALITY_CMD:unit»`
-5. **Build** — `«PKG_MGR» «QUALITY_CMD:build»`
+1. **Format** — `«QUALITY_CMD:format»`
+2. **Lint** — `«QUALITY_CMD:lint»`
+3. **Type check** — `«QUALITY_CMD:types»`
+4. **Unit tests** — `«QUALITY_CMD:unit»`
+5. **Build** — `«QUALITY_CMD:build»`
 
 ## Additional Checks
 

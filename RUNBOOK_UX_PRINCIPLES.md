@@ -12,12 +12,12 @@
 > - `«CSS_FRAMEWORK»` / `«COMPONENT_LIB»` — styling framework + version and component primitives (e.g. utility-CSS framework, headless component lib)
 > - `«FONT»` / `«ICON_SET»` — primary typeface and icon library
 > - `«ANIMATION_APPROACH»` — animation tooling + named keyframes, plus reduced-motion stance
-> - `«VISUAL_IDENTITY»` — contrast/density rules, accent palette, emoji policy, signature layout behaviors
+> - `«VISUAL_IDENTITY»` (concept group) — contrast/density rules; expands to the body tokens `«EMOJI_POLICY»` (emoji-in-UI policy), `«ACCENT_PALETTE»` (accent/semantic colors), `«SIGNATURE_LAYOUT»` (signature layout behaviors)
 > - Copy Guidelines — the copy-rules table is generic: keep the rules as-is. The only fill slot is `«COPY_EXAMPLE»` (a domain-specific illustration). The "No moralization" row is conditional — keep only if your product surfaces scores/judgments.
 > - `«COMPONENT_DIR_CONVENTION»` — the file/folder layout for components in this repo
-> - `«BOT_OR_INTEGRATION_VOICE»` — any chat-bot/integration tone + score/threshold color mapping (omit if N/A)
-> - `«CELEBRATION_PATTERNS»` — success/reward UX specific to this product's flows (omit if N/A)
-> - `«NOTIFICATION_STYLE»` — toast/notification styling conventions
+> - `«BOT_OR_INTEGRATION_VOICE»` (concept group) — chat-bot/integration tone; expands to the body tokens `«BOT_BEHAVIOR_RULES»` (e.g. opt-in only, off in DMs) and `«SCORE_THRESHOLDS»` (e.g. red/yellow/green bands when surfacing scores) — omit the group if N/A
+> - `«CELEBRATION_PATTERNS»` (concept group) — success/reward UX; expands to the body token `«CELEBRATION_CLEANUP»` (post-event cleanup / timeout) — omit if N/A
+> - `«NOTIFICATION_STYLE»` (concept group) — toast/notification styling; expands to the body token `«ERROR_NOTIFICATION_STYLE»` (error-variant override)
 > - `«A11Y_TARGET»` — accessibility baseline (e.g. WCAG AA) and required practices
 > - `«RESPONSIVE_RULES»` — breakpoint strategy and per-section responsive behavior
 

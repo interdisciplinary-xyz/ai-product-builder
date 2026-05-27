@@ -8,7 +8,7 @@
 >
 > **Reusability:** template-ready — the audit structure (inventory → lab → bundle → offenders → roadmap → RUM cross-ref) is generic across CWV programs; the stack-specific bits (analyzer command, lighthouse runner, RUM vendor) are `«placeholders»`.
 >
-> **Pairs with:** `MANAGER_PERFORMANCE.md` (the agent playbook that produces this file), `OBSERVABILITY.md` (RUM signal — primary verdict), `QUALITY_ASSURANCE.md` §6 (build + bundle gate), `GITHUB_ACTIONS.md` (CI cadence — lighthouse runs off the PR path), `RELEASE_MANAGER.md` (manual + nightly perf cadence), `DESIGN_SYSTEM.md` (perf primitives: image, font, lazy).
+> **Pairs with:** `MANAGER_PERFORMANCE.md` (the agent playbook that produces this file), `OBSERVABILITY.md` (RUM signal — primary verdict), `QUALITY_ASSURANCE.md` §6 (build + bundle gate), `github-actions-minutes-workflow.md` (CI cadence — lighthouse runs off the PR path), `RELEASE_MANAGER.md` (manual + nightly perf cadence), `DESIGN_SYSTEM.md` (perf primitives: image, font, lazy).
 >
 > **Local definitions to provide per repo** (fill the placeholders in this doc, or define once in the repo's `.claude/CLAUDE.md`):
 > - `«PROJECT»` — the product being audited.
@@ -21,6 +21,7 @@
 > - `«LIGHTHOUSE_CMD»` — lighthouse runner (e.g. `pnpm lighthouse` / `lhci autorun`).
 > - `«RUM_DASHBOARD_URL»` — the live RUM dashboard URL (Vercel Analytics, PostHog, Datadog RUM, etc.).
 > - `«RUM_VENDOR»` — the vendor providing field data.
+> - `«LOCALES»` — supported locales (for per-locale offender breakdowns, font subsets, hreflang variants).
 
 > **Verdict (top of doc — must be dated within current release cycle):**
 >
@@ -165,6 +166,6 @@ Alert thresholds + routing live in `OBSERVABILITY.md` (the analytics pipeline + 
 - [`MANAGER_PERFORMANCE.md`](./MANAGER_PERFORMANCE.md) — the agent playbook that produces / verifies / audits this file.
 - [`OBSERVABILITY.md`](./OBSERVABILITY.md) — RUM data pipeline + alert routing (the runtime side of the perf verdict).
 - [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md) §6 — build + bundle gate (the static side of the perf verdict).
-- [`GITHUB_ACTIONS.md`](./GITHUB_ACTIONS.md) — CI cadence: bundle gate on every PR, lighthouse manual + nightly off the PR path.
+- [`github-actions-minutes-workflow.md`](./github-actions-minutes-workflow.md) — CI cadence: bundle gate on every PR, lighthouse manual + nightly off the PR path.
 - [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) — perf gate at the `release/* → «TRUNK»` promotion.
 - [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md) — perf primitives (`<Image>`, `<Font>`, `<Lazy>` wrappers).
