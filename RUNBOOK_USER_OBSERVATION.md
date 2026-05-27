@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_USER_OBSERVATION` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/USER_RESEARCH.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_USER_OBSERVATION.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the STRUCTURE (set-up + moderator mindset → observation script (5 tasks) → PMF Sean Ellis interview (4-question core + scoring + Ulysses-pact bands) → anti-patterns → post-session capture), then replace every «placeholder» with your product's facts.
 >

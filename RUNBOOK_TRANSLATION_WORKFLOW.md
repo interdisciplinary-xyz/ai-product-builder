@@ -12,7 +12,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_TRANSLATION_WORKFLOW` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/TRANSLATION_WORKFLOW.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_TRANSLATION_WORKFLOW.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — the locale matrix, translation-source format, key-naming convention, audit command, pseudo-locale rollout, new-locale checklist, formatting gotchas, and known-untranslated allowlist are all reusable; the locale list, namespace list, file paths, and audit command are `«placeholders»`.
 >

@@ -8,7 +8,7 @@ How analytics events flow through the app, what's tracked where, how to add a ne
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_OBSERVABILITY` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/OBSERVABILITY.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_OBSERVABILITY.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — the dual-emit + discriminated-union pattern is generic across analytics stacks; consent-gating, server-side measurement-protocol, and source-map upload are all vendor-agnostic. Reuse the STRUCTURE (taxonomy → dual-emit flow → consent gate → server-side path → tag taxonomy → "adding a new event" → source maps), then replace every «placeholder» with your product's facts.
 >

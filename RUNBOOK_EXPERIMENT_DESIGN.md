@@ -9,7 +9,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_EXPERIMENT_DESIGN` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/EXPERIMENTS/«N»-«slug».md` (one experiment per file). **One experiment = one hypothesis = one file.** Do not stack multiple variants of multiple bets in one experiment; if you have several, file several.
+> Canonical template — vendored at `docs/ai-product-builder/RUNBOOK_EXPERIMENT_DESIGN.md` (source of truth). Each experiment is a new instance: copy the vendored template to `docs/EXPERIMENTS/«N»-«slug».md` (one experiment per file) and fill. **One experiment = one hypothesis = one file.** Do not stack multiple variants of multiple bets in one experiment; if you have several, file several.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the EXPERIMENT SHAPE (hypothesis → variants → sample size + window → kill criteria → success criteria → guardrails → instrumentation → decision), then replace every «placeholder» with the experiment's facts.
 >

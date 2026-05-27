@@ -7,7 +7,7 @@ allowed-tools: Bash, Read, Grep, Glob
 
 > **🔧 Reuse & local setup**
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `.claude/commands/review.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/commands/review.md` (source of truth template). To activate as a slash command: copy to `.claude/commands/review.md` and fill the `«placeholders»`.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders».
 >

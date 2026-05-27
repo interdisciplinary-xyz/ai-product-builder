@@ -8,7 +8,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_GDPR_PRE_LAUNCH_CHECKLIST` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/compliance/gdpr-pre-launch-checklist.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_GDPR_PRE_LAUNCH_CHECKLIST.md` (source of truth). Fill the `«placeholders»` below in place via `/ai-init`. (Some repos additionally maintain a tracked instance at `docs/compliance/gdpr-pre-launch-checklist.md` linked from the privacy policy — copy and keep in sync if you adopt that convention.)
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders».
 >

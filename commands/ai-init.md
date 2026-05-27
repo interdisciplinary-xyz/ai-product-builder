@@ -1,5 +1,5 @@
 ---
-description: Interactively bootstrap a doc's «placeholders» by prompting the user, save answers to .claude/ai-init.local.json, optionally render to docs/<NAME>.local.md.
+description: Interactively bootstrap a doc's «placeholders» by prompting the user, save answers to .claude/ai-init.local.json, optionally render to docs/ai-product-builder/<NAME>.local.md.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -28,7 +28,7 @@ If no argument is given, list available docs (RUNBOOKs + MANAGERs in the `ai-pro
    - Secret-shaped (`*_SECRET`, `*_KEY`, `*_PASSWORD`, `*_TOKEN` without `_ENV`) → **refuse**; route to `.env.local`.
 5. **For each missing persistent token:** read repo-discoverable defaults first (`.nvmrc` → `«NODE_VERSION»`, `package.json` → `«PKG_MGR»`/`«PROJECT»`, `git symbolic-ref` → `«TRUNK»`), show the doc's description + a `PLACEHOLDERS.md` example, prompt the user (Enter accepts the default).
 6. **Save** answers to `.claude/ai-init.local.json` (pretty-printed JSON, 2-space indent). **Never delete** existing tokens — other docs may reference them.
-7. **Offer to render** the filled doc to `docs/<NAME>.local.md` (drop the `RUNBOOK_`/`MANAGER_` prefix). Default: **No**.
+7. **Offer to render** the filled doc to `docs/ai-product-builder/<NAME>.local.md` (KEEP the `RUNBOOK_`/`MANAGER_` prefix — co-located with the vendored template). Default: **No**.
 8. **Print** the `INIT Status` output block from `MANAGER_INIT.md` § "OUTPUT FORMAT".
 
 ## Don'ts

@@ -6,7 +6,7 @@ All «AI_PROVIDER» prompts used in the «PROJECT» platform, their cost profile
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_AI_PROMPT_REGISTRY` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/AI_PROMPT_REGISTRY.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_AI_PROMPT_REGISTRY.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Keep the per-prompt table format (File / Model / Max tokens / Temperature / Calls / Cost tier / Frequency) and the Cost Summary / Optimization / Safety sections, but **fill the inventory with the target product's own prompts**.
 >

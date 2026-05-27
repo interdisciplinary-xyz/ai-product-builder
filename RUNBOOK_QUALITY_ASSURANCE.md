@@ -13,7 +13,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_QUALITY_ASSURANCE` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/QUALITY_ASSURANCE.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_QUALITY_ASSURANCE.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — quality bar already abstracted with `«placeholders»` for the variable bits (audits, budgets, baselines); the exposure/severity rule is an explicit per-repo fill-in.
 >

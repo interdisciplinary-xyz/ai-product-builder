@@ -4,19 +4,22 @@ A curated library of **MANAGER playbooks** + **RUNBOOK templates** for AI-assist
 engineering. Designed for solo founders and small teams shipping with Claude Code, Cursor,
 and GitHub Copilot.
 
-> **What this is:** a hand-curated, source-of-truth library you copy *from* and run *against*
-> your repos.
+> **What this is:** a hand-curated, source-of-truth library you **vendor into each repo**
+> under `docs/ai-product-builder/` and run *against*.
 >
-> **What this is not:** a Claude Code plugin or marketplace. The naming convention
-> (`MANAGER_X` / `RUNBOOK_X`) is library-only; deployed copies in a target repo use the
-> un-prefixed name (`docs/X.md`).
+> **What this is not:** a Claude Code plugin or marketplace. **Deployment convention:** the
+> full library is mirrored at `docs/ai-product-builder/` in every consumer repo (filenames
+> preserve the `RUNBOOK_*` / `MANAGER_*` prefix — e.g. `docs/ai-product-builder/RUNBOOK_RELEASE_MANAGER.md`).
+> Placeholders are filled **in place** via `/ai-init`. A few files have additional install
+> targets (`.claude/CLAUDE.md`, `.claude/commands/*`, `.github/pull_request_template.md`) —
+> each doc's Reuse block calls those out.
 
 ## What's in it
 
 | Layer | Count | Role | Example |
 |---|:--:|---|---|
 | **`MANAGER_*`** | **25** | Agent playbook — *run it* with Claude / Cursor against a repo; the playbook creates / verifies / audits a target doc | `MANAGER_RELEASE_MANAGER`, `MANAGER_SECURITY` |
-| **`RUNBOOK_*`** | **63** | Content template — *copy it* into the repo's `docs/X.md` and fill the `«placeholders»` | `RUNBOOK_RELEASE_MANAGER.md` → `docs/RELEASE_MANAGER.md` |
+| **`RUNBOOK_*`** | **63** | Content template — vendored at `docs/ai-product-builder/RUNBOOK_X.md` in every consumer repo; fill the `«placeholders»` in place via `/ai-init` | `RUNBOOK_RELEASE_MANAGER.md` → `docs/ai-product-builder/RUNBOOK_RELEASE_MANAGER.md` |
 | **`commands/*`** | **6** | Claude Code slash-commands | `/ai-init`, `/review`, `/test`, `/deploy-check`, `/content-editor`, `/web-interface-guidelines` |
 | meta | 2 | `README.md` (this file) + `PLACEHOLDERS.md` (canonical token glossary) | — |
 

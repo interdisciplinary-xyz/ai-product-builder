@@ -7,7 +7,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_PRODUCT_MARKETING_CONTEXT` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `.claude/product-marketing-context.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_PRODUCT_MARKETING_CONTEXT.md` (source of truth template). To activate for the `copywriting` / `marketing-psychology` / `programmatic-seo` skills: copy to `.claude/product-marketing-context.md` and fill the `«placeholders»` via `/ai-init RUNBOOK_PRODUCT_MARKETING_CONTEXT`.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the section framework (product identity → what it does → capabilities → how it works → audience → brand voice → positioning → CTAs → feature/SEO table → changelog types); fill every field with the new product's facts.
 >

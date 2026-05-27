@@ -9,7 +9,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_FEATURE_SPEC` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/SPECS/«FEATURE_NAME».md` (one file per feature) and localize the items below. **Pairs with** `MANAGER_DESIGN_REVIEW.md` (the playbook that creates & audits per-feature specs).
+> Canonical template — vendored at `docs/ai-product-builder/RUNBOOK_FEATURE_SPEC.md` (source of truth). Each feature is a new instance: copy the vendored template to `docs/SPECS/«FEATURE_NAME».md` (one file per feature) and fill. **Pairs with** `MANAGER_DESIGN_REVIEW.md` (the playbook that creates & audits per-feature specs).
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the STRUCTURE (purpose statement → section table with funnel-stage verdict → proposed order → per-section spec (Job / Above-the-fold / Levers / Acceptance) → cross-cutting copy rules → out-of-scope → build plan → sign-off acceptance). The funnel framework (AIDA) is one example skeleton; substitute Jobs-To-Be-Done, AARRR, or any other structure that fits the feature.
 >

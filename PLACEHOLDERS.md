@@ -78,7 +78,7 @@ The init tool:
   secrets);
 - is **diff-aware on re-run** — only prompts for newly-added tokens; never deletes existing
   answers;
-- offers to **render a filled `docs/<NAME>.local.md`** when asked (default: no);
+- offers to **render a filled `docs/ai-product-builder/<NAME>.local.md`** when asked (default: no; co-located with the vendored template);
 - **refuses secrets** (`*_SECRET` / `*_KEY` / `*_PASSWORD` / `*_TOKEN` without `_ENV` suffix)
   and routes them to `.env.local`.
 

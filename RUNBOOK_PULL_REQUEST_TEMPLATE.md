@@ -4,7 +4,7 @@
 
 **🚀 First time?** Run `/ai-init RUNBOOK_PULL_REQUEST_TEMPLATE` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 
-Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `.github/pull_request_template.md` and localize the items below.
+Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_PULL_REQUEST_TEMPLATE.md` (source of truth template). GitHub requires the actual PR template at `.github/pull_request_template.md` — copy from the vendored doc to that location, fill the `«placeholders»`, and delete this setup block from the `.github/` copy.
 
 **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders».
 

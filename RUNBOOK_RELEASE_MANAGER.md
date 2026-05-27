@@ -18,7 +18,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_RELEASE_MANAGER` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/RELEASE_MANAGER.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_RELEASE_MANAGER.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — generic branch/CI cost-control policy already abstracted with `«placeholders»`; no product-specific names or findings embedded (the §7 blocker list is an explicit per-repo fill-in).
 >

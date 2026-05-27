@@ -2,7 +2,7 @@
 
 > **🔧 Reuse & local setup**
 >
-> **Layer:** MANAGER (agent playbook). Run this prompt with an AI agent against a repo — it **bootstraps any other doc's `«placeholders»`** by reading the doc's Reuse-block "Local definitions to provide per repo" list, asking the user interactively, and persisting answers to **`.claude/ai-init.local.json`** (committed). Optionally renders a filled `docs/<NAME>.local.md`. It is *not* copied into the repo verbatim.
+> **Layer:** MANAGER (agent playbook). Run this prompt with an AI agent against a repo — it **bootstraps any other doc's `«placeholders»`** by reading the doc's Reuse-block "Local definitions to provide per repo" list, asking the user interactively, and persisting answers to **`.claude/ai-init.local.json`** (committed). Optionally renders a filled `docs/ai-product-builder/<NAME>.local.md` (alongside the vendored template). It is *not* copied into the repo verbatim.
 >
 > **Reusability:** template-ready — generic; no product-specific content.
 >
@@ -109,7 +109,7 @@ BOOTSTRAP FLOW (first-time run)
    - Ask if the file exists. If not, offer to create with a sensible default.
 4. Save updated answers to `.claude/ai-init.local.json`. Pretty-print JSON (2-space indent).
 5. Print a 1-line summary: "Saved N new + K updated; M existing preserved."
-6. Offer to render the filled doc to `docs/<NAME>.local.md`. Default: **No**.
+6. Offer to render the filled doc to `docs/ai-product-builder/<NAME>.local.md` (alongside the vendored template). Default: **No**.
 
 _________
 
@@ -134,7 +134,7 @@ When the user confirms render:
 1. Read the target doc (`RUNBOOK_X.md` or `MANAGER_X.md`).
 2. For each token in `.claude/ai-init.local.json.tokens`, substitute `«TOKEN»` → value globally in the text.
 3. For tokens NOT in the answer file (lowercase inline-fill, unclassified, or per-invocation), **leave the `«token»` as-is** — the human fills them inline.
-4. Write the result to `docs/<NAME>.local.md` (where `<NAME>` is the deployed name — drop `RUNBOOK_`/`MANAGER_` prefix).
+4. Write the result to `docs/ai-product-builder/<NAME>.local.md` (where `<NAME>` is the **library filename WITH the `RUNBOOK_`/`MANAGER_` prefix**, e.g. `RUNBOOK_A11Y_AUDIT.local.md` — co-located with the vendored template).
 5. Append the rendered filename to `_meta.docs_rendered` in the answer file.
 
 When the rendered local doc is useful:
@@ -211,7 +211,7 @@ OUTPUT FORMAT
 - New tokens prompted + saved: «N»
 - Existing tokens preserved: «K»
 - Tokens skipped (inline-fill / per-invocation / secret-shaped): «M»
-- Render: «yes — wrote docs/<NAME>.local.md / no»
+- Render: «yes — wrote docs/ai-product-builder/<NAME>.local.md / no»
 
 ### Answer file delta
 - Added: «list of token keys»

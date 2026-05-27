@@ -7,7 +7,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_ROADMAP` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/ROADMAP.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_ROADMAP.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». The structure (vision → testable hypothesis → feature-completeness matrix → removed-from-scope → milestones with acceptance criteria/targets → out-of-scope) is generic; the example vision, hypothesis, matrix rows, and milestones are placeholders to replace.
 >

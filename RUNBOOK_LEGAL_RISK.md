@@ -6,7 +6,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_LEGAL_RISK` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/LEGAL_RISK.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_LEGAL_RISK.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse only the section framework (data processing → AI processing → regime matrix → stage risk assessment → liability areas → IP → prioritized recommendations). **Legal content must be re-derived per product and per jurisdiction** — none of the filled values carry over between products. Not legal advice — validate with counsel for the target jurisdiction.
 >

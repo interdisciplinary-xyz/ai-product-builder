@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_DATA_MODEL_GUIDE` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/DATA_MODEL_GUIDE.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_DATA_MODEL_GUIDE.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Keep the structure (source-of-truth statement, per-collection field tables, key relationships, data-integrity rules), but **fill the collections and fields with the target product's own data model**.
 >

@@ -14,7 +14,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_SESSION_MIGRATION` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/SESSION_MIGRATION.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_SESSION_MIGRATION.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — session offload/restore policy is fully generic; the only variable bits are paths and the re-verify commands, already marked with `«placeholders»`.
 >

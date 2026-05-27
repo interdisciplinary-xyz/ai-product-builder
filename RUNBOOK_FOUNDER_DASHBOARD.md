@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_FOUNDER_DASHBOARD` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/FOUNDER_DASHBOARD.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_FOUNDER_DASHBOARD.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the **row STRUCTURE** (`metric → surface → look for → action threshold`) and the **four sections** (acquisition / activation / retention / revenue), then replace every «placeholder» with your product's actual surfaces. KPI **definitions** are deferred to `METRICS.md` — this doc renders values and action thresholds, it does not redefine what each metric means.
 >

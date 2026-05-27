@@ -6,7 +6,7 @@ Manual QA scenarios for `«PROJECT»`. Run through before every release. Compani
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_SMOKE_TEST` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/SMOKE_TEST.md` and localize the items below.
+> Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_SMOKE_TEST.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`.
 >
 > **Reusability:** template-ready — the per-page row template (Page / Route / Critical elements / Action / Pass criteria) is the abstraction. Every product fills in its own pages and core flows; the structure stays.
 >
