@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_BRAND_VOICE_GUIDELINE` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/BRAND_VOICE_GUIDELINE.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/BRAND_VOICE_GUIDELINE.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the section framework (identity → positioning → tone principles → vocabulary → flow copy → UI copy rules → visual tone → messaging hierarchy → ethos → AI content rules → archetype → tagline); fill the content.
 >

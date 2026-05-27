@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_SEO_AUDIT` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/SEO_AUDIT.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/SEO_AUDIT.md` and localize the items below.
 >
 > **Reusability:** template-ready — the audit structure (metadata table → structured data → robots/sitemap → Search Console snapshot → thin content → programmatic inventory → roadmap) is generic across SEO programs; the stack-specific bits (metadata API, validator, RUM vendor) are `«placeholders»`.
 >

@@ -12,7 +12,7 @@ Umbrella runbook for the **entire** payment-processor lifecycle. Three phases, i
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_PAYMENTS_LIFECYCLE` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/PAYMENTS_LIFECYCLE.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/PAYMENTS_LIFECYCLE.md` and localize the items below.
 >
 > **Reusability:** template-ready — the three-phase lifecycle (setup → test verify → live flip with founder $-test) is generic across payment processors. The dashboard-click micro-steps differ per `«PAYMENTS»`, but the structure, the env-var hygiene, the webhook-event minimum set, the idempotency check, the signature-failure 400, and the "$5 self-test as the deliverable, not the deploy" framing are portable.
 >

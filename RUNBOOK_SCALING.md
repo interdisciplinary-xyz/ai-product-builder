@@ -9,7 +9,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_SCALING` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/SCALING.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/SCALING.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». The audit framework (overall assessment → what's good → critical/high/medium issues with Impact-Where-Fix → phased roadmap → cost projections → before/after diagrams) is generic; the example findings, infra, costs, and dates are placeholders to replace.
 >

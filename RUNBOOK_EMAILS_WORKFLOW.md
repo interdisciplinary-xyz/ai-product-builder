@@ -8,7 +8,7 @@ The canonical inventory of every email `«PROJECT»` sends a user: the trigger (
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_EMAILS_WORKFLOW` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/EMAILS_WORKFLOW.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/EMAILS_WORKFLOW.md` and localize the items below.
 >
 > **Reusability:** template-ready — the "canonical email inventory" pattern (one row per template, columns: trigger / when / why / recipient / test entry-point) is generic across providers. The two load-bearing abstractions — (a) **never throw — fail closed to error monitor**, (b) **dev/no-key returns `{ success: false }`** — are what keep the calling flow correct regardless of vendor.
 >

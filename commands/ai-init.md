@@ -5,19 +5,19 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 # /ai-init
 
-Bootstrap (or incrementally refresh) the repo-wide `«placeholder»` values for one or more docs in `AI/`. Follow `AI/MANAGER_INIT.md` for the full spec — this command is the convenient shortcut.
+Bootstrap (or incrementally refresh) the repo-wide `«placeholder»` values for one or more docs in the `ai-product-builder` library. Follow `MANAGER_INIT.md` for the full spec — this command is the convenient shortcut.
 
 ## Argument
 
 `$ARGUMENTS` — the target doc name. Accept either:
-- the AI/ name (`RUNBOOK_RELEASE_MANAGER`), or
+- the library name (`RUNBOOK_RELEASE_MANAGER`), or
 - the deployed name (`RELEASE_MANAGER`) — resolve to its `RUNBOOK_*.md` / `MANAGER_*.md` source.
 
-If no argument is given, list available docs (RUNBOOKs + MANAGERs in `AI/`) and ask which to init.
+If no argument is given, list available docs (RUNBOOKs + MANAGERs in the `ai-product-builder` library) and ask which to init.
 
 ## Flow
 
-1. **Resolve** `$ARGUMENTS` to a target file under `AI/`.
+1. **Resolve** `$ARGUMENTS` to a target file under the `ai-product-builder` library.
 2. **Open** `.claude/ai-init.local.json` — create with `{ "_version": 1, "tokens": {}, "_meta": { "last_init": "<today>", "docs_rendered": [] } }` if missing. **Committed**, not gitignored.
 3. **Parse** the target doc's Reuse-block "Local definitions to provide per repo" list. Extract every `«TOKEN»` and its description. Cross-check `PLACEHOLDERS.md` for canonical examples.
 4. **Classify** each token (see `MANAGER_INIT.md` § "TOKEN CLASSIFICATION"):
@@ -39,4 +39,4 @@ If no argument is given, list available docs (RUNBOOKs + MANAGERs in `AI/`) and 
 - ❌ Don't write secrets to the answer file — refuse and route to `.env.local`.
 - ❌ Don't render `<NAME>.local.md` unless the user says yes.
 
-See `AI/MANAGER_INIT.md` for the full spec.
+See `MANAGER_INIT.md` for the full spec.

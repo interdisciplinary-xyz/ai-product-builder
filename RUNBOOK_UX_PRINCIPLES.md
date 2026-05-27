@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_UX_PRINCIPLES` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/UX_PRINCIPLES.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/UX_PRINCIPLES.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». The generic UX principles (copy, accessibility, responsive, notification patterns) carry over as-is; the stack-specific slots (framework, fonts, icons, animation, colors, thresholds, folder convention) are «placeholders». Reuse the section framework (design system → visual identity → copy guidelines → component conventions → bot voice → celebration → notifications → accessibility → responsive); fill the specifics.
 >

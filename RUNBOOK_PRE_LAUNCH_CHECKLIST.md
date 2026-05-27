@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_PRE_LAUNCH_CHECKLIST` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/PRE_LAUNCH_CHECKLIST.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/PRE_LAUNCH_CHECKLIST.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the STRUCTURE (security headers → SEO → observability → performance → operational → acceptance gate), then **run each verification against the target repo** — fill in real commands, real env vars, real `file:line` references. The shape is the checklist; the checks are per-repo.
 >
@@ -207,7 +207,7 @@ Expected: exit 0 + summary line ending `0 dead links`.
 
 ### 5.2 — Incident runbook pinned
 
-The repo's incident runbook (`docs/INCIDENTS.md`, derived from the `INCIDENTS` runbook template in AI/) is referenced from `README.md`. The pinning is purely an ops action.
+The repo's incident runbook (`docs/INCIDENTS.md`, derived from the `INCIDENTS` runbook template in the `ai-product-builder` library) is referenced from `README.md`. The pinning is purely an ops action.
 
 Pin the URL in your on-call communication surface (Slack channel, Notion page, wherever your incident response lives). Without this, the first 2 a.m. webhook outage is a treasure hunt.
 

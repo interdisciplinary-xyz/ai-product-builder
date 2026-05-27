@@ -7,7 +7,7 @@ allowed-tools: Bash, Read
 
 > **🔧 Reuse & local setup**
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `.claude/commands/test.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `.claude/commands/test.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders».
 >

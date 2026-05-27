@@ -8,7 +8,7 @@ and GitHub Copilot.
 > your repos.
 >
 > **What this is not:** a Claude Code plugin or marketplace. The naming convention
-> (`MANAGER_X` / `RUNBOOK_X`) is `AI/`-only; deployed copies in a target repo use the
+> (`MANAGER_X` / `RUNBOOK_X`) is library-only; deployed copies in a target repo use the
 > un-prefixed name (`docs/X.md`).
 
 ## What's in it

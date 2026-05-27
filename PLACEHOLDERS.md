@@ -1,4 +1,4 @@
-# AI/ placeholder glossary & conventions
+# Placeholder glossary & conventions
 
 Canonical token names and fill conventions for **every template in this folder**. When
 you copy a doc into a repo, replace these `«tokens»`. Define the repeated ones **once**
@@ -69,7 +69,7 @@ Every layer doc carries a **"Local definitions to provide per repo"** list in it
 /ai-init RUNBOOK_RELEASE_MANAGER
 ```
 
-(or invoke `AI/MANAGER_INIT.md` against any doc — same flow, no slash command needed).
+(or invoke `MANAGER_INIT.md` against any doc — same flow, no slash command needed).
 
 The init tool:
 - **prompts only for `«SCREAMING_SNAKE»`** persistent tokens (skips `«lowercase»` inline-fill
@@ -113,5 +113,5 @@ The init tool:
 
 Token keys are **bare** (no `«»`). Guillemets only appear in templates.
 
-See **`AI/MANAGER_INIT.md`** for the full spec (token classification, special tokens,
+See **`MANAGER_INIT.md`** for the full spec (token classification, special tokens,
 file-backed bootstrap, anti-patterns).

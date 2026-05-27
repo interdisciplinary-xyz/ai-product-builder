@@ -6,7 +6,7 @@
 >
 > **Reusability:** template-ready — generic; no product-specific content.
 >
-> **Pairs with:** every RUNBOOK and MANAGER in `AI/` (each doc's "Local definitions" list is the schema this playbook prompts against). `PLACEHOLDERS.md` is the canonical token glossary; this playbook uses it for descriptions + example values. `MANAGER_DOC_FRESHNESS.md` flags template drift that may require re-running this playbook with new tokens.
+> **Pairs with:** every RUNBOOK and MANAGER in the `ai-product-builder` library (each doc's "Local definitions" list is the schema this playbook prompts against). `PLACEHOLDERS.md` is the canonical token glossary; this playbook uses it for descriptions + example values. `MANAGER_DOC_FRESHNESS.md` flags template drift that may require re-running this playbook with new tokens.
 >
 > **Owns / defers to:** Owns the interactive `«placeholder»` bootstrap, the central answer-file (`.claude/ai-init.local.json`), the diff-aware re-run, and the optional render to `<NAME>.local.md`. Defers each token's *meaning* to the target doc's Reuse block and `PLACEHOLDERS.md`; defers detection of stale docs → `MANAGER_DOC_FRESHNESS`; defers secret management to `.env.local` (init **never** writes secrets).
 
@@ -17,7 +17,7 @@ _________
 INITIALIZATION
 
 1. Identify the target doc.
-   - If invoked as `/ai-init <NAME>` with an argument, target is `AI/<NAME>.md`. Accept either the AI/ name (`RUNBOOK_RELEASE_MANAGER`) or the deployed name (`RELEASE_MANAGER`) — resolve the latter to its `RUNBOOK_*.md` / `MANAGER_*.md` source.
+   - If invoked as `/ai-init <NAME>` with an argument, target is `<NAME>.md`. Accept either the library name (`RUNBOOK_RELEASE_MANAGER`) or the deployed name (`RELEASE_MANAGER`) — resolve the latter to its `RUNBOOK_*.md` / `MANAGER_*.md` source.
    - If no argument, list available RUNBOOKs and MANAGERs and ask which to init.
    - Verify the target exists; abort with a helpful list if not.
 
@@ -131,7 +131,7 @@ _________
 RENDER FLOW (optional `<NAME>.local.md` output)
 
 When the user confirms render:
-1. Read the target doc (`AI/RUNBOOK_X.md` or `AI/MANAGER_X.md`).
+1. Read the target doc (`RUNBOOK_X.md` or `MANAGER_X.md`).
 2. For each token in `.claude/ai-init.local.json.tokens`, substitute `«TOKEN»` → value globally in the text.
 3. For tokens NOT in the answer file (lowercase inline-fill, unclassified, or per-invocation), **leave the `«token»` as-is** — the human fills them inline.
 4. Write the result to `docs/<NAME>.local.md` (where `<NAME>` is the deployed name — drop `RUNBOOK_`/`MANAGER_` prefix).
@@ -204,7 +204,7 @@ OUTPUT FORMAT
 ## INIT Status
 
 ### Target
-- Doc: `AI/<TARGET>.md`
+- Doc: `<TARGET>.md`
 - Answer file: `.claude/ai-init.local.json` («exists / created»)
 
 ### This run

@@ -6,7 +6,7 @@ How we use branches and CI to keep GitHub Actions spend low while still gating p
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_GITHUB_ACTIONS` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/github-actions-minutes-workflow.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/github-actions-minutes-workflow.md` and localize the items below.
 >
 > **Reusability:** template-ready — the branch/CI cost model is generic; product specifics (package manager, deploy platform, job names, secrets) are isolated to the tokens below.
 >

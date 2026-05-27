@@ -8,9 +8,9 @@ Keep this file short. If a section grows past ~15 lines, either prune it or move
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_CLAUDE_MD` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `.claude/CLAUDE.md` and fill the `«placeholders»`.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `.claude/CLAUDE.md` and fill the `«placeholders»`.
 >
-> **Reusability:** template-ready — every section below is generic; only the `«placeholders»` need per-repo values. Define the **canonical tokens** (e.g. `«PROJECT»`, `«DOMAIN»`, `«NODE_VERSION»`, `«PKG_MGR»`, `«QUALITY_CMD»`, `«DB_CMS»`, `«AUTH»`, `«PAYMENTS»`, `«DEPLOY»`, `«OBSERVABILITY»`, `«AI_PROVIDER»`, `«TRUNK»`) **once here** — every other doc in `AI/` reads them from this file rather than restating them.
+> **Reusability:** template-ready — every section below is generic; only the `«placeholders»` need per-repo values. Define the **canonical tokens** (e.g. `«PROJECT»`, `«DOMAIN»`, `«NODE_VERSION»`, `«PKG_MGR»`, `«QUALITY_CMD»`, `«DB_CMS»`, `«AUTH»`, `«PAYMENTS»`, `«DEPLOY»`, `«OBSERVABILITY»`, `«AI_PROVIDER»`, `«TRUNK»`) **once here** — every other doc in the `ai-product-builder` library reads them from this file rather than restating them.
 >
 > **Pairs with:** the rest of the repo's `docs/*` — this file is the index, not the source of truth, for any topic it mentions.
 

@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_POWER_MOVES` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/POWER_MOVES.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/POWER_MOVES.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the STRUCTURE (boardroom-read across CEO/CTO/CFO/Data lenses → legend → ~20 moves grouped A–G → mental-models index → one-line summary), then **generate all 20 moves against your target repo's actual constraints** — do not ship the example moves. The shape is the artefact; the moves are per-launch.
 >

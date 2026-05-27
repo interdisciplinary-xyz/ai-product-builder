@@ -6,7 +6,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_THIRD_PARTY` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/THIRD-PARTY.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/THIRD-PARTY.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». The cost-model framework (paid/usage-based → free/included → self-hosted → cost summary) and the per-service table shape (Purpose / Pricing / Used by / Env var / Notes) carry over as-is; fill in this product's vendor inventory.
 >

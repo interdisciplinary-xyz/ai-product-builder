@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_A11Y_AUDIT` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/A11Y_AUDIT.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/A11Y_AUDIT.md` and localize the items below.
 >
 > **Reusability:** template-ready — the audit structure (scope → axe → allowlist → keyboard → screen reader → contrast → motion → findings) is generic across WCAG 2.1 AA programs; the stack-specific bits (axe runner, allowlist file path, e2e command) are `«placeholders»`.
 >

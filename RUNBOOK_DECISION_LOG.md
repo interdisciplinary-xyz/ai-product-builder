@@ -8,7 +8,7 @@ Format is informal ADR-style (single file instead of per-decision docs). Add new
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_DECISION_LOG` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/DECISION_LOG.md` and localize the items below. **Pairs with** `MANAGER_DECISION_LOG.md` (the playbook that creates & audits this log). _(Formerly named ARCHITECTURE_DECISIONS — now unified under DECISION_LOG.)_
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/DECISION_LOG.md` and localize the items below. **Pairs with** `MANAGER_DECISION_LOG.md` (the playbook that creates & audits this log). _(Formerly named ARCHITECTURE_DECISIONS — now unified under DECISION_LOG.)_
 >
 > **Reusability:** template-ready — this is a true single-file ADR log; the format (Decision / Why / Alternatives / Revisit-when, append-and-supersede) is fully generic. The entries below are placeholder examples, so replace them with the target repo's own decisions.
 >

@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_EMAIL_QA_MATRIX` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/EMAIL_QA_MATRIX.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/EMAIL_QA_MATRIX.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the STRUCTURE (matrix columns → auth-setup once → per-template `curl` rows → per-inbox render checklist → required env), then **enumerate the template rows against your repo's actual transactional email catalog** — pull the list from `EMAILS_WORKFLOW.md`. The shape is the matrix; the rows are per-repo.
 >

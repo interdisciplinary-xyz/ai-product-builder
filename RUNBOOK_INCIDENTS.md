@@ -8,7 +8,7 @@ you're paged at 3am you want a paste-and-run checklist, not prose.
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_INCIDENTS` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/RUNBOOK.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/RUNBOOK.md` and localize the items below.
 >
 > **Reusability:** template-ready — the incident-triage structure (symptom → triage commands → causes table → manual recovery) is reusable; the stack, commands, and incident list are «placeholders». Localize the tokens below per repo.
 >

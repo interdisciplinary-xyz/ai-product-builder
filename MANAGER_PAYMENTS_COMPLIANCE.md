@@ -8,7 +8,7 @@
 >
 > **Reusability:** template-ready — generic; no product-specific content. Not legal advice — pair with qualified `«JURISDICTION»` counsel before relying on any finding.
 >
-> **Pairs with:** `AI/RUNBOOK_PAYMENTS_COMPLIANCE.md` (the SaaS-vs-PI boundary, provider models, forbidden patterns), `AI/RUNBOOK_PAYMENTS_LIFECYCLE.md` (operational payment flows + state machine), `AI/RUNBOOK_SECURITY_MODEL.md` (custody-tokens CI gate, payments route auth), `AI/RUNBOOK_LEGAL_RISK.md` (jurisdiction risk register), `AI/RUNBOOK_GDPR_PRE_LAUNCH_CHECKLIST.md` (checkout-time data handling) — boundary: this MANAGER owns *process* (verify/audit/re-audit) for the platform-vs-PI line; the RUNBOOK owns *content shape*.
+> **Pairs with:** `RUNBOOK_PAYMENTS_COMPLIANCE.md` (the SaaS-vs-PI boundary, provider models, forbidden patterns), `RUNBOOK_PAYMENTS_LIFECYCLE.md` (operational payment flows + state machine), `RUNBOOK_SECURITY_MODEL.md` (custody-tokens CI gate, payments route auth), `RUNBOOK_LEGAL_RISK.md` (jurisdiction risk register), `RUNBOOK_GDPR_PRE_LAUNCH_CHECKLIST.md` (checkout-time data handling) — boundary: this MANAGER owns *process* (verify/audit/re-audit) for the platform-vs-PI line; the RUNBOOK owns *content shape*.
 >
 > **Owns / defers to:** Owns verification of the SaaS-vs-PI boundary, custody patterns, forbidden-fields enforcement, jurisdiction fit, and periodic re-audit triggers. Defers: broader legal exposure → `MANAGER` derived from `RUNBOOK_LEGAL_RISK`; security model / IDOR / headers → `MANAGER_SECURITY`; data-handling-at-checkout → `RUNBOOK_GDPR_PRE_LAUNCH_CHECKLIST`; product-level "should we charge a fee?" → founder / product owner.
 >
@@ -39,7 +39,7 @@ already exists, and whether the supporting code paths exist:
 - the platform's own SaaS billing surface (`«PLATFORM_SAAS_BILLING»`)
 
 2. If `docs/PAYMENTS_COMPLIANCE.md` does not exist:
-- create it from `AI/RUNBOOK_PAYMENTS_COMPLIANCE.md`;
+- create it from `RUNBOOK_PAYMENTS_COMPLIANCE.md`;
 - fill the placeholders (`«PROJECT»`, `«JURISDICTION»`, `«PAYMENT_PROVIDER_PRIMARY»`, `«PAYMENT_PROVIDER_SECONDARY»`, `«PLATFORM_FEE_MECHANISM»`, `«CUSTODY_BOUNDARY»`, `«PLATFORM_SAAS_BILLING»`);
 - document the two contractual relationships (Platform↔Creator SaaS, End-user→Creator via provider);
 - document the provider models in use;

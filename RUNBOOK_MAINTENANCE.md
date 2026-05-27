@@ -6,7 +6,7 @@ Operational reference for monitoring costs, understanding free-tier limits, and 
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_MAINTENANCE` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/MAINTENANCE.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/MAINTENANCE.md` and localize the items below.
 >
 > **Reusability:** template-ready — the cost-table / free-tier-cliff / cost-per-action / monitoring-checklist structure is reusable; the services, prices, and usage projections are «placeholders». Re-cost against the repo's actual stack and localize the tokens below.
 >

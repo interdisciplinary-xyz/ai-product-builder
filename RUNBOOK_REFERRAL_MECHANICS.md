@@ -6,7 +6,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_REFERRAL_MECHANICS` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/REFERRAL_MECHANICS.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/REFERRAL_MECHANICS.md` and localize the items below.
 >
 > **Reusability:** template-ready — the model-decision / anti-abuse / tracking / eligibility / implementation / KPI / break-even structure is reusable; the benefit amounts, attribution windows, and jurisdiction constraints are «placeholders». Localize the tokens below per repo.
 >

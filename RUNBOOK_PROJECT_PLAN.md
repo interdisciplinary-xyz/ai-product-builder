@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_PROJECT_PLAN` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/PROJECT_PLAN-v«X.Y.Z».md` (one per milestone) and fill the `«placeholders»`.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/PROJECT_PLAN-v«X.Y.Z».md` (one per milestone) and fill the `«placeholders»`.
 >
 > **Reusability:** template-ready — the structure is generic; only the milestone-specific content is filled in per milestone.
 >

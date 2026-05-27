@@ -6,7 +6,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_BACKUP_RECOVERY` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/BACKUP_RECOVERY.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/BACKUP_RECOVERY.md` and localize the items below.
 >
 > **Reusability:** template-ready — the inventory / RPO-RTO / verification / drill-cadence / restore-runbook structure is reusable; the vendors, retention periods, and data classes are «placeholders». Localize the tokens below per repo.
 >

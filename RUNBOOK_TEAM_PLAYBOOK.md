@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_TEAM_PLAYBOOK` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/TEAM_PLAYBOOK.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/TEAM_PLAYBOOK.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». The process framework (workflow → code standards → code organization → testing → env setup → deployment) carries over as-is; swap in this repo's stack, commands, and conventions.
 >
@@ -111,7 +111,7 @@ Every PR triggers:
 
 ### What Not to Touch
 
-See your decision log for protected areas (if you keep one — see the `RUNBOOK_DECISION_LOG.md` template in the `AI/` folder).
+See your decision log for protected areas (if you keep one — see the `RUNBOOK_DECISION_LOG.md` template in the the `ai-product-builder` library folder).
 
 ---
 

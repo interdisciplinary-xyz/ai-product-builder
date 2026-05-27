@@ -4,11 +4,11 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_PAYMENTS_COMPLIANCE` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/PAYMENTS_COMPLIANCE.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/PAYMENTS_COMPLIANCE.md` and localize the items below.
 >
 > **Reusability:** template-ready — the platform-vs-PI boundary, the provider split, the forbidden-pattern list, and the custody-vs-marketplace distinction are reusable; provider names, route paths, schema names, and milestone references are «placeholders». Not legal advice — validate with `«JURISDICTION»` counsel before relying on it.
 >
-> **Pairs with:** `AI/RUNBOOK_SECURITY_MODEL.md` (forbidden-tokens CI gate, payment route auth model), `AI/RUNBOOK_LEGAL_RISK.md` (jurisdiction-level risk register), `AI/RUNBOOK_GDPR_PRE_LAUNCH_CHECKLIST.md` (data-handling at checkout), `AI/RUNBOOK_PAYMENTS_LIFECYCLE.md` (operational payment flows).
+> **Pairs with:** `RUNBOOK_SECURITY_MODEL.md` (forbidden-tokens CI gate, payment route auth model), `RUNBOOK_LEGAL_RISK.md` (jurisdiction-level risk register), `RUNBOOK_GDPR_PRE_LAUNCH_CHECKLIST.md` (data-handling at checkout), `RUNBOOK_PAYMENTS_LIFECYCLE.md` (operational payment flows).
 >
 > **Local definitions to provide per repo** (fill the placeholders in this doc, or define once in the repo's `.claude/CLAUDE.md`):
 > - `«PROJECT»` — the platform's product name; used in the SaaS-vs-PI sign-off line.

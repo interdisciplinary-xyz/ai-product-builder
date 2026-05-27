@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_OUTREACH_TEMPLATES` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/OUTREACH_TEMPLATES.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/OUTREACH_TEMPLATES.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the STRUCTURE (channel taxonomy → per-template "why this works" → anti-pattern pairs → cadence rules), then replace every «placeholder» with your product's facts. The personalisation slots (`[name]`, `[ONE reason]`, `[SPECIFIC thing]`) are non-negotiable — copy-paste with placeholders intact converts at < 5%.
 >

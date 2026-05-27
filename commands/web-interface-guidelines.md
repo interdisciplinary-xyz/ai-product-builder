@@ -7,7 +7,7 @@ allowed-tools: Read, Grep, Glob
 
 > **🔧 Reuse & local setup**
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `.claude/commands/web-interface-guidelines.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `.claude/commands/web-interface-guidelines.md` and localize the items below.
 >
 > **Reusability:** template-ready — generic web-interface review rules (a11y, forms, animation, perf, i18n); no product names, domains, or repo-specific paths embedded. The example findings use placeholder filenames only.
 >

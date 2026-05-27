@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_LAUNCH_TARGET_LIST` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/LAUNCH_TARGET_LIST.md` and localize the items below. Consider **gitignoring the localized copy** once real names are in — the list is sensitive.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/LAUNCH_TARGET_LIST.md` and localize the items below. Consider **gitignoring the localized copy** once real names are in — the list is sensitive.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the STRUCTURE (ICP fit-scoring rubric (1–5) → table columns → source-mining checklist → out-of-scope), then replace every «placeholder» with your product's facts. The rubric levels stay the same; the **definitions** of each level come from your `ICP.md`.
 >

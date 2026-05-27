@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_DECISION_THRESHOLDS` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/DECISION_THRESHOLDS.md`, **fill the bands BEFORE first user lands**, and commit. Bands set after data lands are confirmation bias.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/DECISION_THRESHOLDS.md`, **fill the bands BEFORE first user lands**, and commit. Bands set after data lands are confirmation bias.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the band STRUCTURE (kill / iterate / expand) and the **gate patterns** (`any 2 of` for kill, `all of` for expand) — those are load-bearing. Replace every «placeholder» with your product's facts.
 >

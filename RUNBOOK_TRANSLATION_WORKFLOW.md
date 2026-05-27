@@ -1,6 +1,6 @@
 # TRANSLATION_WORKFLOW.md — Locale matrix & translation pipeline
 
-> **Canonical / source-of-truth copy** (lives in `AI/`). Adopt in a repo by
+> **Canonical / source-of-truth copy** (lives in the `ai-product-builder` library). Adopt in a repo by
 > copying to `docs/TRANSLATION_WORKFLOW.md` and filling the `«placeholders»`.
 >
 > **Scope:** *what locales we ship*, *how keys move from code to translator and back*,
@@ -12,7 +12,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_TRANSLATION_WORKFLOW` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/TRANSLATION_WORKFLOW.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/TRANSLATION_WORKFLOW.md` and localize the items below.
 >
 > **Reusability:** template-ready — the locale matrix, translation-source format, key-naming convention, audit command, pseudo-locale rollout, new-locale checklist, formatting gotchas, and known-untranslated allowlist are all reusable; the locale list, namespace list, file paths, and audit command are `«placeholders»`.
 >

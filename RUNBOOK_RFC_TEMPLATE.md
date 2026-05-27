@@ -10,7 +10,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_RFC_TEMPLATE` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/RFC-«N»-«slug».md` (or `docs/rfcs/«N»-«slug».md` if you keep RFCs in a subfolder) and localize the items below. **One RFC = one proposal = one file.** Do not stack multiple proposals in one RFC; if you have several, file several.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/RFC-«N»-«slug».md` (or `docs/rfcs/«N»-«slug».md` if you keep RFCs in a subfolder) and localize the items below. **One RFC = one proposal = one file.** Do not stack multiple proposals in one RFC; if you have several, file several.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the CARD SHAPE (Problem → What it does → Effort → Category → Decision → Rationale → Related), then replace every «placeholder» with the proposal's facts.
 >

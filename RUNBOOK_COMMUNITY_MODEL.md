@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_COMMUNITY_MODEL` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/COMMUNITY_MODEL.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/COMMUNITY_MODEL.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». The framework (growth strategy → viral loop → distribution channel → segments → content → anti-patterns) is generic; the example loop steps, surfaces, and channels are placeholders to replace with your product's specifics.
 >

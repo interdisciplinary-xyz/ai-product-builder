@@ -4,7 +4,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_WEEKLY_RETRO` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/WEEKLY_RETRO.md` and localize the items below. **Each Friday**, copy *that* file to `docs/retros/«DATE».md`, fill it in, commit.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/WEEKLY_RETRO.md` and localize the items below. **Each Friday**, copy *that* file to `docs/retros/«DATE».md`, fill it in, commit.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the four-section STRUCTURE (Numbers → Learned → Changing → Risk), then replace every «placeholder» with your product's facts.
 >

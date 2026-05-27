@@ -8,7 +8,7 @@
 >
 > **🚀 First time?** Run `/ai-init RUNBOOK_AUDIT` to fill the local definitions below interactively (or invoke `MANAGER_INIT.md`).
 >
-> Canonical copy — lives in `AI/` (source of truth). To use in a repo, copy to `docs/AUDIT.md` and localize the items below.
+> Canonical copy — lives in the `ai-product-builder` library (source of truth). To use in a repo, copy to `docs/AUDIT.md` and localize the items below.
 >
 > **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». This is a **point-in-time findings report** skeleton: keep the section layout (Code Quality, Security, Architecture, Performance, Testing, Accessibility, SEO, CI/CD, Action Items) and the grade table, but **generate all findings against the target repo** — fill in real grades, bug counts, and `file:line` references; do not ship the placeholder examples.
 >
