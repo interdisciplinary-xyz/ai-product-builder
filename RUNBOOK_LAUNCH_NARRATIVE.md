@@ -22,6 +22,7 @@
 > - `«CTA_SECONDARY»` — optional zero-commitment alternative (e.g. a free demo / no-signup tool)
 > - `«FIRST_COHORT_SIZE»` — the first manually-reviewable cohort (e.g. 15, 25, 50)
 > - `«FOUNDER_NAME»` — the byline; founder-voice means a named human signs it
+> - `«UTM_CAMPAIGN»` — the campaign slug appended to outbound CTAs for attribution (e.g. `launch-v1`, `pmf-survey`); shared with `LAUNCH_SOCIAL.md`
 
 ---
 

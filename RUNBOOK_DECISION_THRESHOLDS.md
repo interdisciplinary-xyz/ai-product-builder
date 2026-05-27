@@ -19,6 +19,7 @@
 > - `«EXPAND_BAND»` — the expand-side value for each signal (e.g. `≥ 40%` of N ≥ 30)
 > - `«HYPOTHESES»` — the 3–5 pre-launch bets the product encodes
 > - `«MUST_HAVE_ANSWER»` — the answer you expect when a user is asked what value they get
+> - `«PAYMENTS_PROVIDER_URL»`, `«ANALYTICS_URL»`, `«EMAIL_PROVIDER_URL»` — dashboards the bands are read from. Typically **inherited** from `.claude/CLAUDE.md` (defined once there, referenced everywhere). If `/ai-init` doesn't find them in the central answer file, prompt to define them centrally rather than locally.
 
 > **Why this exists:** the most common PMF-read failure isn't bad data — it's the founder reading the data they wanted to see instead of the data they actually got. This doc pre-commits thresholds + hypotheses **BEFORE** first user lands. Future-us reads this list at the «TRIGGER_COHORT_N»-user mark and is forced to face whichever bet failed.
 >

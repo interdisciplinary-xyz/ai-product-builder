@@ -107,7 +107,7 @@ Mark the row's inbox checkbox `✓` only when all of the above pass in that inbo
 
 For the templates to actually deliver from the live deploy:
 
-- **`«EMAIL_PROVIDER»` API key** — the provider's project secret. Without it, the `getProvider()` / equivalent client returns `null` and `sendEmail()` silently no-ops (returns `{ success: false }`; doesn't throw).
+- **`«EMAIL_PROVIDER»` API key** — the provider's project secret. **Required behaviour:** a missing or invalid key MUST fail fast — surface as a boot-time startup error or a failing health-check, **not** a silent no-op. (Many provider SDKs default to silent failure modes — e.g. returning `null` from `getProvider()` and `{ success: false }` from `sendEmail()` without throwing. Wrap them so a missing key becomes a startup failure, not a silently-dropped send.)
 - **Domain verification.** `«EMAIL_PROVIDER»` → Domains → `«DOMAIN»` must show all green (DKIM, SPF, DMARC records added in DNS). Without verification, real emails from `«SENDER_DISPLAY»` land in spam.
 
 Defers full DNS / DKIM setup to `EMAIL_DELIVERABILITY.md` and `RESEND_DOMAIN_VERIFICATION.md` (or the equivalent provider runbook).

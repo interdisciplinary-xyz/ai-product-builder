@@ -19,6 +19,7 @@
 > - `«ANALYTICS_TOOLS»` — analytics/consent tools the cookie banner must match
 > - `«EMAIL_TOOL»` — transactional/marketing email provider + template split
 > - `«DB_CMS»` collections — data-model collections/fields referenced for retention/export/deletion (e.g. users, leads, feedback collections; an email-suppression flag); rename to this repo's schema
+> - `«EMAIL_SUPPRESSION_FLAG»` — the boolean field on user/lead/feedback records that re-engagement jobs MUST check before sending (e.g. `users.emailSuppressed`); name what your schema uses
 > - `«SECRET_NAMES»` — secrets that must stay server-only (e.g. a cron secret + webhook secrets); list this repo's
 > - `«ARTICLE_9_FIELDS»` — the special-category fields this product collects (e.g. health/diagnosis fields, self-declared sensitive attributes); name what applies, or drop if none
 
@@ -27,7 +28,7 @@
 - [ ] Privacy policy and Terms linked from signup, survey, and checkout (`«PRIVACY_ROUTE»`, `«TERMS_ROUTE»`)
 - [ ] Marketing email only after explicit opt-in; transactional vs marketing separated in «EMAIL_TOOL» templates
 - [ ] Cookie / analytics consent banner matches what «ANALYTICS_TOOLS» actually load
-- [ ] Engagement / re-engagement jobs (your data-collection surfaces) respect `«EMAIL_SUPPRESSION_FLAG»` / bounce flags («DB_CMS» «COLLECTION» (e.g. users, leads, feedback))
+- [ ] Engagement / re-engagement jobs (your data-collection surfaces) respect `«EMAIL_SUPPRESSION_FLAG»` / bounce flags across the relevant `«DB_CMS»` collections (e.g. users, leads, feedback)
 
 ## Article 9 (special category) — sensitive / special-category data
 

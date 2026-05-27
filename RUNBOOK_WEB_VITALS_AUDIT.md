@@ -163,6 +163,8 @@ Alert thresholds + routing live in `OBSERVABILITY.md` (the analytics pipeline + 
 
 ## 7. Cross-references
 
+> _Link **targets** below use the **deployed-copy** filenames (`OBSERVABILITY.md`, `RELEASE_MANAGER.md`, etc.) — that's where this doc lives once copied into a consumer repo. In the source-of-truth library these map to `RUNBOOK_OBSERVABILITY.md`, `RUNBOOK_RELEASE_MANAGER.md`, `RUNBOOK_QUALITY_ASSURANCE.md`, `RUNBOOK_GITHUB_ACTIONS.md`, `MANAGER_PERFORMANCE.md`, `RUNBOOK_DESIGN_SYSTEM.md` (`MANAGER_*` keeps its library name in the deployed copy too)._
+
 - [`MANAGER_PERFORMANCE.md`](./MANAGER_PERFORMANCE.md) — the agent playbook that produces / verifies / audits this file.
 - [`OBSERVABILITY.md`](./OBSERVABILITY.md) — RUM data pipeline + alert routing (the runtime side of the perf verdict).
 - [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md) §6 — build + bundle gate (the static side of the perf verdict).

@@ -37,7 +37,7 @@ The shortest list that lets a fresh agent pick the right library/idiom on the fi
 - **Payments:** `«PAYMENTS»` (drop this line if not applicable)
 - **AI:** `«AI_PROVIDER»` — «which models for which surfaces» (drop if not applicable)
 - **Observability:** `«OBSERVABILITY»`
-- **i18n:** «library + supported locales `«LOCALES»»` (drop if EN-only)
+- **i18n:** «i18n_library» — supported locales: `«LOCALES»` (drop if EN-only)
 
 ## Project structure
 
