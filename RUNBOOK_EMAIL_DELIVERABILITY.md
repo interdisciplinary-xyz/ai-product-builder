@@ -96,7 +96,7 @@ Once DKIM + SPF are green, add a DMARC record. Start permissive:
 
 - Type: `TXT`
 - Name: `_dmarc.«DOMAIN»`
-- Value: `v=DMARC1; p=none; rua=mailto:«dmarc-reports@«DOMAIN»»;`
+- Value: `v=DMARC1; p=none; rua=mailto:dmarc-reports@«DOMAIN»;`
 
 This makes receivers send you weekly aggregate reports — use them to confirm alignment before tightening. After 1–2 weeks of clean reports, raise to `p=quarantine` (failures → spam folder), then `p=reject` (hard fail).
 
