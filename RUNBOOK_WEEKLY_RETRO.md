@@ -6,7 +6,7 @@
 >
 > Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_WEEKLY_RETRO.md` in every deployed repo (source of truth). Fill the `«placeholders»` below in place via `/ai-init`. **Each Friday**, copy *that* file to `docs/retros/«DATE».md`, fill it in, commit.
 >
-> **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the four-section STRUCTURE (Numbers → Learned → Changing → Risk), then replace every «placeholder» with your product's facts.
+> **Reusability:** template-ready — abstracted into a reusable template; fill the «placeholders». Reuse the five-section STRUCTURE (Numbers → Learned → Changing → Decision-thresholds → Anti-patterns), then replace every «placeholder» with your product's facts.
 >
 > **Pairs with:** `RUNBOOK_DAILY_RITUAL.md` (the daily input this aggregates), `RUNBOOK_DECISION_THRESHOLDS.md` (the pre-committed bands this retro checks against), `RUNBOOK_FOUNDER_DASHBOARD.md` (where the Numbers section reads from), `MANAGER_FOUNDER_OPS.md` (the cadence this is a leg of).
 >
@@ -17,10 +17,11 @@
 > - `«ACTIVATION_DEFINITION»` — the single activation event for this product (defined once in `METRICS.md`)
 > - `«TRIGGER_COHORT_N»` — the cohort size at which `DECISION_THRESHOLDS.md` re-opens
 > - `«HYPOTHESES»` — the pre-launch hypotheses tracked in `DECISION_THRESHOLDS.md`
+> - `«AI_PROVIDER»` / `«PAYMENTS»` — variable-cost vendor names referenced in the Numbers section's cost line (typically **inherited** from `.claude/CLAUDE.md`)
 
 > Copy this file each Friday → `docs/retros/«DATE».md` → fill it in → commit. **30 minutes max.** The point is to leave a record future-you can read in 6 weeks, not to write a thesis.
 >
-> Pair with the daily ritual at `DAILY_RITUAL.md`. The retro is the weekly aggregation of what daily already surfaced.
+> Pair with the daily ritual at `docs/ai-product-builder/RUNBOOK_DAILY_RITUAL.md` (the vendored template in this repo's library mirror — works regardless of where the per-week retro file lives). The retro is the weekly aggregation of what daily already surfaced.
 
 ---
 

@@ -1,14 +1,12 @@
 # SESSION_MIGRATION.md — Session offload & restore policy
 
-> **Canonical / source-of-truth copy** (lives in the `ai-product-builder` library). Unified from the
-> multiple project variants across the codebase. To adopt in a repo,
-> copy to `docs/SESSION_MIGRATION.md` and fill the `«placeholders»`.
+> **Canonical / source-of-truth copy** — vendored at `docs/ai-product-builder/RUNBOOK_SESSION_MIGRATION.md` in every deployed repo. Unified from multiple project variants across the codebase. Fill the `«placeholders»` in place via `/ai-init`.
 >
 > **Scope:** how an AI/developer session persists ("hands off") and restores
 > ("hands on") its state across sessions, terminals, machines, and agents — so the
 > next session **resumes instead of re-learning the repo**. Companion to
-> [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) (flow/cost) and
-> [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md) (quality bar).
+> [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md) (flow/cost) and
+> [`RUNBOOK_QUALITY_ASSURANCE.md`](./RUNBOOK_QUALITY_ASSURANCE.md) (quality bar).
 
 > **🔧 Reuse & local setup**
 >
