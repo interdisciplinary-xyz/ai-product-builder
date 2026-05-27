@@ -1,0 +1,19 @@
+# macOS junk
+.DS_Store
+
+# editor / vim backups
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# any local init answer file that ends up here by mistake
+# (this file belongs in consuming repos' .claude/, never in AI/)
+.ai-init.local.json
+.claude/ai-init.local.json
+
+# tarball / staging artefacts
+*.tar.gz
+
+# node noise if anyone ever adds tooling
+node_modules/
