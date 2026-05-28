@@ -14,7 +14,7 @@ How we use branches and CI to keep GitHub Actions spend low while still gating p
 > - `«PKG_MGR»` — package manager (e.g. pnpm); used in `«QUALITY_CMD»`, `«BUILD_CMD»`, `«E2E_CMD»`.
 > - `«QUALITY_CMD»` — the local pre-merge gate mirroring the CI `quality` job (e.g. `pnpm ci:quality`: format + lint + types + unit).
 > - `«BUILD_CMD»` / `«E2E_CMD»` — build and e2e commands (e.g. `pnpm build`, `pnpm test:e2e --project=chromium`).
-> - `«BRANCH_NAMING»` — release/scope/fix/feat conventions (`release/«X.Y.Z»`, `scope/«X.Y.Z»`, `fix/<issue>-*`, `feat/<issue>-*`) and which heads skip CI. See [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) for the canonical naming policy.
+> - `«BRANCH_NAMING»` — release/scope/fix/feat conventions (`release/«X.Y.Z»`, `scope/«X.Y.Z»`, `fix/<issue>-*`, `feat/<issue>-*`) and which heads skip CI. See [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md) for the canonical naming policy.
 > - `«CI_JOB_NAMES»` — required status-check names (`commit naming`, `lint + format + types + unit`, `e2e (build + playwright)`) for branch protection.
 > - `«DEPLOY»` — production deploy target on «TRUNK» (e.g. Vercel) and whether previews build on every PR.
 > - `«E2E_STACK»` — test runner + DB harness (e.g. Playwright + (in-memory «DB_CMS» for tests) via «E2E_BOOTSTRAP»).
@@ -39,7 +39,7 @@ release/«X.Y.Z»         Release umbrella (milestone integration)
 scope/«X.Y.Z»           WIP aggregate (feature work lands here first)
 ```
 
-The branch-naming convention itself is **policy** — see [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §1. This doc covers the CI implementation that enacts it. In short: `fix/<issue>-short-name` or `feat/<issue>-short-name` cut from `release/«X.Y.Z»` are for isolated reviews; those heads are **not** `scope/**`, so **CI will run** on PRs into `release/**` unless you rename them or extend the skip rule.
+The branch-naming convention itself is **policy** — see [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md) §1. This doc covers the CI implementation that enacts it. In short: `fix/<issue>-short-name` or `feat/<issue>-short-name` cut from `release/«X.Y.Z»` are for isolated reviews; those heads are **not** `scope/**`, so **CI will run** on PRs into `release/**` unless you rename them or extend the skip rule.
 
 ## Design goals
 
@@ -113,7 +113,7 @@ Cost controls baked into the workflow:
 
 ## Domain-scoped E2E (required)
 
-**Required for domain-driven repos** — see [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §4.2 for the
+**Required for domain-driven repos** — see [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md) §4.2 for the
 policy. The `e2e` job MUST run **only the E2E of the domains whose files changed** (union when
 several), and fall back to the **full** suite when shared code changes. Implement it as a
 **dynamic matrix**:
@@ -170,7 +170,7 @@ jobs:
 - Keep `«SHARED_PATHS»` accurate (shared libs, design system, config, lockfile, CI, cross-domain contracts/fixtures) — these force the full suite.
 - `quality` (lint/format/types/unit) and `build` still run **full** — only E2E is scoped.
 - Make **`e2e-gate`** the single required E2E status check in branch protection. The per-domain `e2e` matrix is dynamic (and may be empty when no domain changed), so gating on it directly would block legitimate PRs; `e2e-gate` always runs and reports one stable result.
-- Needs `fetch-depth: 0` for the diff base; the same detection mirrors `RELEASE_MANAGER.md` §4.2 so local and CI agree.
+- Needs `fetch-depth: 0` for the diff base; the same detection mirrors `RUNBOOK_RELEASE_MANAGER.md` §4.2 so local and CI agree.
 
 ## Required CI gates
 
@@ -179,7 +179,7 @@ Beyond the domain-scoped E2E above, these run as **required** status checks. Reu
 whole-repo gates run on every PR.
 
 **Scoped to changed domains** (reuse `detect`; a `*-gate` aggregator is the required check):
-- **`unit`** — domain-scoped unit/integration on `feat/*`/`fix/*` PRs (affected runner: `«TEST_CMD»` changed-mode; full on `«SHARED_PATHS»` change). Required check: **`unit-gate`**. Types/lint stay full in `quality`. See [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §4.1.
+- **`unit`** — domain-scoped unit/integration on `feat/*`/`fix/*` PRs (affected runner: `«TEST_CMD»` changed-mode; full on `«SHARED_PATHS»` change). Required check: **`unit-gate`**. Types/lint stay full in `quality`. See [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md) §4.1.
 - **`visual`** + **`axe`** — domain-scoped visual-regression and a11y at the release merge; the a11y `KNOWN_VIOLATIONS` allowlist must **shrink, not grow**. See [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md).
 
 **Whole-repo gates** (cheap, every PR):
@@ -291,7 +291,7 @@ After migrating from the old split workflows (`[CI] Quality + Vitest Unit`, `[CI
 
 ## Related docs
 
-- Release policy (POLICY doc this implementation enacts): [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md)
+- Release policy (POLICY doc this implementation enacts): [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md)
 - Current release: «CURRENT_RELEASE_DOC»
 - CI env placeholders: [`.github/ci.env`](../.github/ci.env)
-- Local dev / Portless: [`docs/dev-portless.md`](./dev-portless.md)
+- Local dev / Portless: [`RUNBOOK_DEV_PORTLESS.md`](./RUNBOOK_DEV_PORTLESS.md)

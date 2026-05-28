@@ -15,6 +15,7 @@
 >
 > **Local definitions to provide per repo** (fill the placeholders, or define common ones once in `.claude/CLAUDE.md`):
 > - `«PROJECT»` / `«DOMAIN»` — product name + canonical URL
+> - `«REPO_URL»` — canonical repo URL used by the `git clone` step (typically defined once in `.claude/CLAUDE.md`; see `PLACEHOLDERS.md`)
 > - `«NODE_VERSION»` — from `.nvmrc` (e.g. 22.15.1)
 > - `«PKG_MGR»` — package manager (e.g. pnpm)
 > - `«QUALITY_CMD»` / `«BUILD_CMD»` / `«TEST_CMD»` / `«E2E_CMD»` — aggregate gates

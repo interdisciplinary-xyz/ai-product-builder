@@ -12,7 +12,7 @@
 >
 > **Local definitions to provide per repo** (replace the product content; define product facts in the repo's `.claude/CLAUDE.md` or fill them inline):
 > - `«PROJECT»` — the product being measured
-> - `«NORTH_STAR_METRIC»` — must match NORTH_STAR.md
+> - `«NORTH_STAR_METRIC»` — must match `RUNBOOK_NORTH_STAR.md`
 > - `«METRIC_DEFINITIONS»` — per stage, the metrics, their formulas, and the events backing them
 > - `«METRIC_TARGETS»` — the target/threshold for each KPI
 > - `«EVENT_NAME»` — analytics event identifiers referenced in definitions
@@ -24,11 +24,11 @@ Key metrics for tracking product health and growth, organized by subscription li
 
 ## North Star Metric
 
-**«NORTH_STAR_METRIC»** (must match NORTH_STAR.md).
+**«NORTH_STAR_METRIC»** (must match `RUNBOOK_NORTH_STAR.md`).
 
-See [NORTH_STAR.md](./NORTH_STAR.md) for rationale and launch targets.
+See [`RUNBOOK_NORTH_STAR.md`](./RUNBOOK_NORTH_STAR.md) for rationale and launch targets.
 
-If these targets disagree with NORTH_STAR.md, NORTH_STAR wins.
+If these targets disagree with `RUNBOOK_NORTH_STAR.md`, `RUNBOOK_NORTH_STAR.md` wins.
 
 ---
 

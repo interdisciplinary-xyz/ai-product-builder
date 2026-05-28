@@ -13,7 +13,8 @@
 > **Local definitions to provide per milestone** (fill the placeholders below):
 > - `«X.Y.Z»` — milestone version (matches GitHub milestone `v«X.Y.Z»` and `scope/v«X.Y.Z»`).
 > - `«MILESTONE_GOAL»` — one-sentence success criterion.
-> - `«NSM_DELTA»` — north-star metric impact (see `NORTH_STAR.md` / `METRICS.md`).
+> - `«REPO_URL»` — canonical repo URL (e.g. `https://github.com/«org»/«repo»`) used to build the RAID query links below. Typically defined once in `.claude/CLAUDE.md` and inherited; see `PLACEHOLDERS.md`.
+> - `«NSM_DELTA»` — north-star metric impact (see `RUNBOOK_NORTH_STAR.md` / `RUNBOOK_METRICS.md`).
 > - `«TARGET_DATE»` — milestone due date.
 > - `«DRI»` — milestone DRI handle.
 > - `«WIP_CAP»` — soft WIP cap (default 12).

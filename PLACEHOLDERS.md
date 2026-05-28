@@ -23,6 +23,7 @@ in the repo's `.claude/CLAUDE.md`, then each doc only needs its extra specifics.
 |---|---|---|
 | `«PROJECT»` | Product / app / brand name | Acme |
 | `«DOMAIN»` | Primary domain / URL | acme.app |
+| `«REPO_URL»` | Canonical repo URL (no trailing slash) — used by issue-query links across docs | https://github.com/acme/acme-web |
 | `«NODE_VERSION»` | Node version (from `.nvmrc`) | 22.15.1 |
 | `«PKG_MGR»` | Package manager | pnpm / npm / yarn |
 | `«QUALITY_CMD»` | Aggregate local gate | pnpm ci:quality |

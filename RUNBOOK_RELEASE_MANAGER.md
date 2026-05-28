@@ -7,11 +7,11 @@
 >
 > **Scope:** how work moves from implementation to production, and how we keep
 > GitHub Actions spend low while still gating «TRUNK». Companion to
-> [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md) (the quality bar) and
-> [`SESSION_MIGRATION.md`](./SESSION_MIGRATION.md) (session handoff).
+> [`RUNBOOK_QUALITY_ASSURANCE.md`](./RUNBOOK_QUALITY_ASSURANCE.md) (the quality bar) and
+> [`RUNBOOK_SESSION_MIGRATION.md`](./RUNBOOK_SESSION_MIGRATION.md) (session handoff).
 >
 > **This is the POLICY doc.** Its implementation companion is
-> [`github-actions-minutes-workflow.md`](./github-actions-minutes-workflow.md) —
+> [`RUNBOOK_GITHUB_ACTIONS.md`](./RUNBOOK_GITHUB_ACTIONS.md) —
 > the concrete workflow YAML that enacts the §3 cost-control policy below.
 
 > **🔧 Reuse & local setup**
@@ -167,7 +167,7 @@ files** during scope/feature work — then run the **full** suite at the release
 > changed-mode (see the import-graph commands below) — falling back to the **full** suite on
 > any `«SHARED_PATHS»` change. `unit-gate` is the **required check** for these PRs. Types and
 > lint stay **full** (project-wide) even when tests are scoped. CI implementation:
-> [`github-actions-minutes-workflow.md`](./github-actions-minutes-workflow.md).
+> [`RUNBOOK_GITHUB_ACTIONS.md`](./RUNBOOK_GITHUB_ACTIONS.md).
 
 **How to scope (pick what your stack supports):**
 - **By import graph (preferred — follows the dependency graph, so a change in one domain
@@ -198,7 +198,7 @@ files** during scope/feature work — then run the **full** suite at the release
 > **Required for domain-driven repos.** The `release/* → «TRUNK»` merge MUST run E2E for the
 > changed domains only, with a full-suite fallback on shared-code changes (step 3 below).
 > This requires E2E specs to be domain-mapped (path or tag). CI implementation:
-> [`github-actions-minutes-workflow.md`](./github-actions-minutes-workflow.md).
+> [`RUNBOOK_GITHUB_ACTIONS.md`](./RUNBOOK_GITHUB_ACTIONS.md).
 
 This repo is **domain-driven** — code lives under `«DOMAIN_PATHS»` (e.g. `src/domains/<domain>/`).
 At the `release/* → «TRUNK»` merge, run E2E **only for the domains whose files changed**:

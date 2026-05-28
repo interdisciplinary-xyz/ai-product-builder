@@ -192,9 +192,9 @@ Each Critical/High finding MUST have a tracked issue (`audit` + `a11y` + `priori
 ## 9. Cross-references
 
 - [`MANAGER_A11Y_AUDIT.md`](./MANAGER_A11Y_AUDIT.md) — the agent playbook that produces / verifies / audits this file.
-- [`UX_PRINCIPLES.md`](./UX_PRINCIPLES.md) — accessibility baseline + responsive rules.
-- [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md) — frontend quality gate (§4) — the visual-regression + a11y note in §4 makes a11y **domain-scoped at the release merge** (same mechanism as E2E).
-- [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §4.2 — domain-scoped a11y at the `release/* → «TRUNK»` merge (path-scoped via `«DOMAIN_PATHS»`, full suite on `«SHARED_PATHS»` changes).
-- [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md) — component-level a11y primitives (focus-visible ring, accessible name patterns, ARIA defaults, contrast tokens).
-- [`OBSERVABILITY.md`](./OBSERVABILITY.md) — runtime error capture (a11y-violating crashes surface via the standard error pipeline).
+- [`RUNBOOK_UX_PRINCIPLES.md`](./RUNBOOK_UX_PRINCIPLES.md) — accessibility baseline + responsive rules.
+- [`RUNBOOK_QUALITY_ASSURANCE.md`](./RUNBOOK_QUALITY_ASSURANCE.md) — frontend quality gate (§4) — the visual-regression + a11y note in §4 makes a11y **domain-scoped at the release merge** (same mechanism as E2E).
+- [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md) §4.2 — domain-scoped a11y at the `release/* → «TRUNK»` merge (path-scoped via `«DOMAIN_PATHS»`, full suite on `«SHARED_PATHS»` changes).
+- [`MANAGER_DESIGN_SYSTEM.md`](./MANAGER_DESIGN_SYSTEM.md) — component-level a11y primitives (focus-visible ring, accessible name patterns, ARIA defaults, contrast tokens).
+- [`RUNBOOK_OBSERVABILITY.md`](./RUNBOOK_OBSERVABILITY.md) — runtime error capture (a11y-violating crashes surface via the standard error pipeline).
 - `«KNOWN_VIOLATIONS_FILE»` — the committed allowlist.
