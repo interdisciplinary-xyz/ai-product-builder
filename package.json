@@ -1,0 +1,22 @@
+{
+  "name": "ai-product-builder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A curated library of MANAGER playbooks + RUNBOOK templates for AI-assisted product engineering, vendored into consumer repos under docs/ai-product-builder/.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/interdisciplinary-xyz/ai-product-builder.git"
+  },
+  "scripts": {
+    "build": "bin/build",
+    "check": "bin/build --check",
+    "deploy": "bin/build --out"
+  },
+  "keywords": [
+    "documentation",
+    "playbooks",
+    "runbooks",
+    "claude-code",
+    "ai-assisted-development"
+  ]
+}

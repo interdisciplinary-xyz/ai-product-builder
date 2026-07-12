@@ -14,6 +14,20 @@ and GitHub Copilot.
 > targets (`.claude/CLAUDE.md`, `.claude/commands/*`, `.github/pull_request_template.md`) —
 > each doc's Reuse block calls those out.
 
+## Contents
+
+- [Repo layout](#repo-layout) — `src/` tree, `bin/build`, and the flat deployed layout
+- [What's in it](#whats-in-it) — the three layers at a glance
+- [Quickest path to value](#quickest-path-to-value) — `/ai-init` in one command
+- [Minimum-viable adoption](#minimum-viable-adoption-the-5-docs-that-earn-their-keep-on-day-1) — the 5 docs that earn their keep on day 1
+- [Catalog by theme](#catalog-by-theme) — all 88 playbooks and templates, grouped
+- [Required policies](#required-policies-the-library-enforces-by-convention) — what the library enforces by convention
+- [The init system](#the-init-system) — how `«placeholders»` are declared and filled
+- [Quality bar](#quality-bar) — the verification battery
+- [Honest weak points](#honest-weak-points-we-know-about-these) — what's still prose, not enforcement
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Repo layout
 
 Sources live under `src/`, grouped by layer. The **deployed** layout is flat — `bin/build`
@@ -39,6 +53,14 @@ README.md                           ─┘
 bin/build                                    # → dist/
 bin/build --out ../my-app/docs/ai-product-builder
 bin/build --check                            # build, then verify every cross-link resolves
+```
+
+The same three via npm (`package.json` carries no dependencies — the scripts are just aliases):
+
+```bash
+npm run build
+npm run deploy -- ../my-app/docs/ai-product-builder
+npm run check
 ```
 
 `dist/` is generated — never commit it, never edit it. Edit under `src/` and rebuild.
