@@ -55,15 +55,15 @@ column should make each spec's domain unambiguous.
 domains whose files changed (union when several), and **fall back to the full
 E2E suite** when a `«SHARED_PATHS»` file or a cross-domain contract/shared
 fixture changes. Mechanism (diff → changed domains → scoped run + fallback):
-[`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md) §4.2. CI implementation:
-[`RUNBOOK_GITHUB_ACTIONS.md`](./RUNBOOK_GITHUB_ACTIONS.md). Do **not** re-paste that bash/YAML
+[`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §4.2. CI implementation:
+[`GITHUB_ACTIONS.md`](./GITHUB_ACTIONS.md). Do **not** re-paste that bash/YAML
 here — cross-reference it.
 
 **Visual-regression + a11y specs are domain-mapped too (REQUIRED).** Screenshot/visual-
 regression and a11y (axe) specs MUST follow the **same** domain-mapping (path `e2e/<domain>/**`
 or tag `@<domain>`) as E2E, so the release merge can scope them to the changed domains with a
 full-suite fallback on `«SHARED_PATHS»` changes — same diff→changed-domains→scoped-run+fallback
-mechanism: [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md) §4.2.
+mechanism: [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §4.2.
 
 ---
 

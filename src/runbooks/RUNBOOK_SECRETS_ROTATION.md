@@ -119,7 +119,7 @@ Each class has the same 7 steps; this section captures the **vendor-specific** q
 - The single highest-value rotation class: a compromised webhook signing secret lets an attacker forge events (e.g. fake `«PAYMENTS»` payment-success events) and silently grant entitlements.
 - Most providers (e.g. `«PAYMENTS»`) support a **rolling secret** — both old and new are valid for the dual-write window. Use it; never accept a brief window where neither is valid.
 - After rotation, confirm at least one **real** event arrives and is verified with the new secret (e.g. trigger a test payment, watch the webhook log show `signature: valid (new)`).
-- Cross-ref the webhook section of [`RUNBOOK.md`](./RUNBOOK.md) — a rotated signing secret that the consumer doesn't know about is the #1 webhook incident.
+- Cross-ref the webhook section of [`INCIDENTS.md`](./INCIDENTS.md) — a rotated signing secret that the consumer doesn't know about is the #1 webhook incident.
 
 ### Env-file rotation (`.env*`)
 
@@ -140,7 +140,7 @@ The compressed runbook. Goal: full revocation of every potentially-affected secr
 2. **Revoke first, dual-write later.** Skip the polite dual-write window. Revoke the old secret at the provider **before** the new one is fully rolled out — accept the brief outage. A leaked secret in the wild is worse than a 5-minute outage.
 3. **Mint new, deploy.** Push the new value to `«SECRET_STORE»` and redeploy every surface in parallel (not sequentially). Verify each surface picks up the new value within the first 30 minutes.
 4. **Sweep.** Search every channel the old secret could have leaked through: git history (`git log -p --all -S "«SECRET_PREFIX»"`), CI logs, error-monitor events, support tickets, chat threads, screenshots. The leak surface is almost always wider than the first report.
-5. **Notify.** If user data was reachable through the leaked secret, file an incident per [`RUNBOOK.md`](./RUNBOOK.md). If the leak window exceeds the GDPR-notifiable threshold, escalate per the privacy review process.
+5. **Notify.** If user data was reachable through the leaked secret, file an incident per [`INCIDENTS.md`](./INCIDENTS.md). If the leak window exceeds the GDPR-notifiable threshold, escalate per the privacy review process.
 6. **Post-mortem.** Within 48h of recovery, write the incident up in [`DECISION_LOG.md`](./DECISION_LOG.md): root cause, scope, time-to-revoke, what would have made it faster. Update this runbook's per-class playbook with any vendor-specific learning.
 
 **Hard rule.** Emergency rotation does **not** wait for a planned change window. The cost of a 5-minute outage is bounded; the cost of an unrotated leaked secret is not.
@@ -164,7 +164,7 @@ Cross-ref: [`SMOKE_TEST.md`](./SMOKE_TEST.md) — the per-page scenario inventor
 ## Cross-references
 
 - [`SECURITY_MODEL.md`](./SECURITY_MODEL.md) — the access-control / env-validation model that defines which surfaces read which secrets. A rotation that updates `«SECRET_STORE»` but not the schema in `SECURITY_MODEL.md` will fail validation at boot.
-- [`RUNBOOK.md`](./RUNBOOK.md) — the incident runbook. Webhook signature errors, auth 401 storms, and DB connection failures often surface here first.
+- [`INCIDENTS.md`](./INCIDENTS.md) — the incident runbook. Webhook signature errors, auth 401 storms, and DB connection failures often surface here first.
 - [`DECISION_LOG.md`](./DECISION_LOG.md) — the audit trail. Every rotation event lands here.
 - [`SMOKE_TEST.md`](./SMOKE_TEST.md) — the post-rotation verification scenarios.
 - `MANAGER_SECURITY` (in the AI library) — the audit playbook that verifies this doc against the live `«SECRET_STORE»` and flags secrets in code that aren't on the inventory.

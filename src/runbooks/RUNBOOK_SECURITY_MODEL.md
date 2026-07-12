@@ -1,6 +1,6 @@
 # Security Model
 
-> **Note:** this is the security **MODEL** (architecture, access matrix, controls); the pre-merge security checklist lives in [`RUNBOOK_QUALITY_ASSURANCE.md`](./RUNBOOK_QUALITY_ASSURANCE.md).
+> **Note:** this is the security **MODEL** (architecture, access matrix, controls); the pre-merge security checklist lives in [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md).
 
 > **🔧 Reuse & local setup**
 >
@@ -101,7 +101,7 @@ All data-layer operations enforce ownership via token verification. A shared acc
 | `«Collection»`  | «rule»   | «rule»   | «rule»   | «rule»   |
 <!-- (one row per collection) -->
 
-**REQUIRED — IDOR / ownership negative test per owner-scoped route.** Every route in this matrix (or the custom-endpoint list below) whose rule is owner / `«isAdminOrSelf»` MUST ship a test asserting a **non-owner** request returns **403/404** (not the resource). CI asserts the test exists per owner-scoped route — e.g. a co-located `*.idor.spec.ts` file or an `@idor`-tagged case — and fails the PR if an owner route has no matching negative test. See [`RUNBOOK_QUALITY_ASSURANCE.md`](./RUNBOOK_QUALITY_ASSURANCE.md) (AuthZ checklist) and [`RUNBOOK_GITHUB_ACTIONS.md`](./RUNBOOK_GITHUB_ACTIONS.md) (CI gate).
+**REQUIRED — IDOR / ownership negative test per owner-scoped route.** Every route in this matrix (or the custom-endpoint list below) whose rule is owner / `«isAdminOrSelf»` MUST ship a test asserting a **non-owner** request returns **403/404** (not the resource). CI asserts the test exists per owner-scoped route — e.g. a co-located `*.idor.spec.ts` file or an `@idor`-tagged case — and fails the PR if an owner route has no matching negative test. See [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md) (AuthZ checklist) and [`GITHUB_ACTIONS.md`](./GITHUB_ACTIONS.md) (CI gate).
 
 ### Custom Endpoint Protection
 
@@ -147,13 +147,13 @@ Custom endpoints verify the authenticated user id matches the resource owner (un
 
 ### Custody-Field Static Check (payments repos)
 
-**REQUIRED — unconditional CI gate.** The custody-implying field-name static check (e.g. `«FORBIDDEN_TOKENS_SPEC»`, such as `forbidden-tokens.static.spec.ts`) runs on **every PR** as a required check — not a manual checkbox. It fails the build if any field with a custody-implying name (e.g. `balance`, `walletId`, `payoutSchedule`, `settlementBatch`) is added, asserting the platform never holds funds. CI implementation: [`RUNBOOK_GITHUB_ACTIONS.md`](./RUNBOOK_GITHUB_ACTIONS.md) (`forbidden-tokens` gate).
+**REQUIRED — unconditional CI gate.** The custody-implying field-name static check (e.g. `«FORBIDDEN_TOKENS_SPEC»`, such as `forbidden-tokens.static.spec.ts`) runs on **every PR** as a required check — not a manual checkbox. It fails the build if any field with a custody-implying name (e.g. `balance`, `walletId`, `payoutSchedule`, `settlementBatch`) is added, asserting the platform never holds funds. CI implementation: [`GITHUB_ACTIONS.md`](./GITHUB_ACTIONS.md) (`forbidden-tokens` gate).
 
 ---
 
 ## CI Security Gates
 
-**REQUIRED.** Secret scanning (e.g. `gitleaks`) and dependency audit (e.g. `osv-scanner` / `«PKG_MGR» audit --audit-level=high`) run on every PR as required checks. Mechanism + branch-protection wiring: [`RUNBOOK_GITHUB_ACTIONS.md`](./RUNBOOK_GITHUB_ACTIONS.md).
+**REQUIRED.** Secret scanning (e.g. `gitleaks`) and dependency audit (e.g. `osv-scanner` / `«PKG_MGR» audit --audit-level=high`) run on every PR as required checks. Mechanism + branch-protection wiring: [`GITHUB_ACTIONS.md`](./GITHUB_ACTIONS.md).
 
 ---
 

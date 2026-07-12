@@ -2,7 +2,7 @@
 
 > **Audience:** founder / on-call doing pre-release QA on the email layer.
 
-The canonical inventory of every email `«PROJECT»` sends a user: the trigger (exact code path), when it fires, why, who receives it, and how to test it manually. Companion to [`RUNBOOK_EMAIL_DELIVERABILITY.md`](./RUNBOOK_EMAIL_DELIVERABILITY.md) (DNS + inbox-placement matrix) and [`RUNBOOK_E2E.md`](./RUNBOOK_E2E.md) (app-flow automated tests).
+The canonical inventory of every email `«PROJECT»` sends a user: the trigger (exact code path), when it fires, why, who receives it, and how to test it manually. Companion to [`EMAIL_DELIVERABILITY.md`](./EMAIL_DELIVERABILITY.md) (DNS + inbox-placement matrix) and [`E2E.md`](./E2E.md) (app-flow automated tests).
 
 > **🔧 Reuse & local setup**
 >
@@ -127,7 +127,7 @@ curl -X POST "$BASE«EMAIL_SEND_ROUTE»" \
 
 Valid `type` values are enumerated in `«EMAIL_SCHEMA»`. Lifecycle emails also have cron entry-points (§2 below) when you want to exercise selection logic, not just rendering.
 
-A companion deliverability script loops every template against a set of test inboxes (Gmail / Outlook / iCloud / Proton) for the inbox-placement matrix — see [`RUNBOOK_EMAIL_DELIVERABILITY.md`](./RUNBOOK_EMAIL_DELIVERABILITY.md).
+A companion deliverability script loops every template against a set of test inboxes (Gmail / Outlook / iCloud / Proton) for the inbox-placement matrix — see [`EMAIL_DELIVERABILITY.md`](./EMAIL_DELIVERABILITY.md).
 
 ### 2. Trigger the crons directly
 
@@ -149,7 +149,7 @@ Each returns a JSON run summary (`{ candidates/picked, sent, skipped }`). To exe
 
 ## Cross-references
 
-- [`RUNBOOK_EMAIL_DELIVERABILITY.md`](./RUNBOOK_EMAIL_DELIVERABILITY.md) — DNS (SPF/DKIM/DMARC), inbox-placement matrix, common-failure remediation.
-- [`RUNBOOK_E2E.md`](./RUNBOOK_E2E.md) — automated app-flow coverage.
+- [`EMAIL_DELIVERABILITY.md`](./EMAIL_DELIVERABILITY.md) — DNS (SPF/DKIM/DMARC), inbox-placement matrix, common-failure remediation.
+- [`E2E.md`](./E2E.md) — automated app-flow coverage.
 - `«EMAIL_TEMPLATES_PATH»` — the React/MJML template source.
 - `«EMAIL_WRAPPERS_PATH»` — the per-template `send*Email()` wrappers.

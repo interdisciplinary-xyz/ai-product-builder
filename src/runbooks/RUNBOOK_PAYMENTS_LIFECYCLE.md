@@ -6,7 +6,7 @@ Umbrella runbook for the **entire** payment-processor lifecycle. Three phases, i
 - **§2 Test-mode verify** — what gets exercised before any release that touches payments.
 - **§3 Live flip + first self-transaction** — the founder $-test that closes the launch milestone.
 
-> **Pricing decisions live elsewhere.** Tier shape, price, anchor, trial policy, currency, metering — see [`RUNBOOK_PRICING_STRATEGY.md`](./RUNBOOK_PRICING_STRATEGY.md) "Pricing decisions matrix". This runbook only mechanizes what's decided there.
+> **Pricing decisions live elsewhere.** Tier shape, price, anchor, trial policy, currency, metering — see [`PRICING_STRATEGY.md`](./PRICING_STRATEGY.md) "Pricing decisions matrix". This runbook only mechanizes what's decided there.
 
 > **🔧 Reuse & local setup**
 >
@@ -41,7 +41,7 @@ Everything in §1 happens in **sandbox / test mode**. Sandbox is reversible — 
 
 ### Step 1.1 — Create products + prices
 
-Per tier × cadence decided in [`RUNBOOK_PRICING_STRATEGY.md`](./RUNBOOK_PRICING_STRATEGY.md) "Pricing decisions matrix":
+Per tier × cadence decided in [`PRICING_STRATEGY.md`](./PRICING_STRATEGY.md) "Pricing decisions matrix":
 
 1. In the `«PAYMENTS»` dashboard → Product catalogue → **Add product**.
 2. Fill in product name, description, statement descriptor (≤22 chars), tax behavior (per PRICING_STRATEGY decision).
@@ -327,7 +327,7 @@ If health passes but checkout fails in Step 3.5, check deploy logs for the key-s
 - [ ] Confirm `«customer.subscription.created»» shows 200 OK.
 - [ ] In `«OBSERVABILITY»», search for issues created in the last hour with `domain:payments` — there should be **none** for this test.
 
-If there ARE error-monitor issues from the founder transaction, **STOP**. The flip isn't done. Triage the [`RUNBOOK_INCIDENTS.md`](./RUNBOOK_INCIDENTS.md) flow first, then redo Step 3.5 with a refund.
+If there ARE error-monitor issues from the founder transaction, **STOP**. The flip isn't done. Triage the [`INCIDENTS.md`](./INCIDENTS.md) flow first, then redo Step 3.5 with a refund.
 
 ### Step 3.7 — Refund the test transaction (~2 min)
 
@@ -341,7 +341,7 @@ If there ARE error-monitor issues from the founder transaction, **STOP**. The fl
 ### Step 3.8 — Close the milestone
 
 - [ ] Record the live-mode evidence under the active release/launch doc.
-- [ ] Flip the relevant entry-criterion (typically code-freeze / launch gate) to satisfied. See [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md).
+- [ ] Flip the relevant entry-criterion (typically code-freeze / launch gate) to satisfied. See [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md).
 
 ---
 
@@ -362,14 +362,14 @@ If there ARE error-monitor issues from the founder transaction, **STOP**. The fl
 - Migrating existing test-mode customers to live mode (intentionally — delete them, don't migrate).
 - Setting up Apple Pay / Google Pay domain verification for live mode (do separately if mobile checkout shows the buttons missing — provider → Settings → Payment methods → verify domain).
 - Tax handling — the provider's tax engine setup is a separate doc, deferred until first non-domestic customer or a meaningful MRR threshold.
-- Compliance posture (PSD2 / KYC / payment-institution boundary) — see [`RUNBOOK_PAYMENTS_COMPLIANCE.md`](./RUNBOOK_PAYMENTS_COMPLIANCE.md).
+- Compliance posture (PSD2 / KYC / payment-institution boundary) — see [`PAYMENTS_COMPLIANCE.md`](./PAYMENTS_COMPLIANCE.md).
 - Security posture (webhook signature verification details, secret rotation) — see [`SECURITY_MODEL.md`](./SECURITY_MODEL.md).
 
 ## Cross-references
 
-- [`RUNBOOK_PRICING_STRATEGY.md`](./RUNBOOK_PRICING_STRATEGY.md) — pricing decisions matrix (the *why* behind the prices created in §1.1).
+- [`PRICING_STRATEGY.md`](./PRICING_STRATEGY.md) — pricing decisions matrix (the *why* behind the prices created in §1.1).
 - [`SECURITY_MODEL.md`](./SECURITY_MODEL.md) — webhook signature verification, `«PAYMENTS_WEBHOOK_SECRET»» rotation, key-shape guards.
-- [`RUNBOOK_PAYMENTS_COMPLIANCE.md`](./RUNBOOK_PAYMENTS_COMPLIANCE.md) — PSD2 / KYC / payment-institution boundary.
-- [`RUNBOOK_OBSERVABILITY.md`](./RUNBOOK_OBSERVABILITY.md) — analytics events emitted by the webhook + the `domain: 'payments'» tag taxonomy.
-- [`RUNBOOK_INCIDENTS.md`](./RUNBOOK_INCIDENTS.md) — what to do when §3 throws something at you.
-- [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md) — milestone closing criteria.
+- [`PAYMENTS_COMPLIANCE.md`](./PAYMENTS_COMPLIANCE.md) — PSD2 / KYC / payment-institution boundary.
+- [`OBSERVABILITY.md`](./OBSERVABILITY.md) — analytics events emitted by the webhook + the `domain: 'payments'» tag taxonomy.
+- [`INCIDENTS.md`](./INCIDENTS.md) — what to do when §3 throws something at you.
+- [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) — milestone closing criteria.

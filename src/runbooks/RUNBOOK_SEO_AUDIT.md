@@ -186,6 +186,6 @@ Each Critical/High finding MUST have a tracked issue (`audit` + `seo` + `priorit
 - [`BRAND_VOICE_GUIDELINE.md`](./BRAND_VOICE_GUIDELINE.md) — title + meta-description voice rules (no overclaim, no urgency).
 - [`FEATURE_SPEC.md`](./FEATURE_SPEC.md) — per-feature SEO acceptance criteria.
 - [`ROADMAP.md`](./ROADMAP.md) — programmatic-SEO planning + pace.
-- [`DESIGN_REVIEW.md`](./DESIGN_REVIEW.md) — page-level conversion (SEO traffic that lands + bounces is wasted).
+- [`MANAGER_DESIGN_REVIEW.md`](./MANAGER_DESIGN_REVIEW.md) — page-level conversion (SEO traffic that lands + bounces is wasted).
 - `«METADATA_API»` source files — the source of truth for per-route metadata.
 - `«SEARCH_CONSOLE_PROPERTY»` — the live Search Console property the snapshot in §4 comes from.

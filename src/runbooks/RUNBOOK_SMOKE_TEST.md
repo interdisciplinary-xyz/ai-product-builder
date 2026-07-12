@@ -1,6 +1,6 @@
 # Smoke test checklist
 
-Manual QA scenarios for `«PROJECT»`. Run through before every release. Companion to [`RUNBOOK_E2E.md`](./RUNBOOK_E2E.md) (automated coverage) and to the `«SMOKE_TESTS»` placeholder in [`MAINTENANCE.md`](./MAINTENANCE.md) / [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md), which both reference this doc as the scenario inventory.
+Manual QA scenarios for `«PROJECT»`. Run through before every release. Companion to [`E2E.md`](./E2E.md) (automated coverage) and to the `«SMOKE_TESTS»` placeholder in [`MAINTENANCE.md`](./MAINTENANCE.md) / [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md), which both reference this doc as the scenario inventory.
 
 > **🔧 Reuse & local setup**
 >
@@ -101,7 +101,7 @@ Manual QA scenarios for `«PROJECT»`. Run through before every release. Compani
 | Post-checkout     | `/«locale»/app/account?upgraded=true»    | Success-state copy   | Complete a test-mode checkout             | User plan updates in DB; `«planExpiresAt»» is set; success state shown                                 |
 | Billing portal    | `/«locale»/app/account»                   | "Manage subscription" CTA | Click manage                       | Opens processor portal; cancellation flow completes; plan reverts at period end                        |
 
-(full payments verification lives in [`RUNBOOK_PAYMENTS_LIFECYCLE.md`](./RUNBOOK_PAYMENTS_LIFECYCLE.md) §2; this is only the surface-level smoke)
+(full payments verification lives in [`PAYMENTS_LIFECYCLE.md`](./PAYMENTS_LIFECYCLE.md) §2; this is only the surface-level smoke)
 
 ## §8. Pricing surfaces
 
@@ -167,8 +167,8 @@ Manual QA scenarios for `«PROJECT»`. Run through before every release. Compani
 
 ## Cross-references
 
-- [`RUNBOOK_E2E.md`](./RUNBOOK_E2E.md) — automated coverage that should subsume this list over time.
+- [`E2E.md`](./E2E.md) — automated coverage that should subsume this list over time.
 - [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md) — the gate this smoke is part of (`«SMOKE_TESTS»` placeholder).
 - [`MAINTENANCE.md`](./MAINTENANCE.md) — pre-release smoke schedule.
-- [`RUNBOOK_PAYMENTS_LIFECYCLE.md`](./RUNBOOK_PAYMENTS_LIFECYCLE.md) — deep payments verification (§7 here is only surface-level).
-- [`RUNBOOK_EMAIL_DELIVERABILITY.md`](./RUNBOOK_EMAIL_DELIVERABILITY.md) — deep email-delivery verification.
+- [`PAYMENTS_LIFECYCLE.md`](./PAYMENTS_LIFECYCLE.md) — deep payments verification (§7 here is only surface-level).
+- [`EMAIL_DELIVERABILITY.md`](./EMAIL_DELIVERABILITY.md) — deep email-delivery verification.

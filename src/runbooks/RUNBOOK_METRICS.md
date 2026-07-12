@@ -26,7 +26,7 @@ Key metrics for tracking product health and growth, organized by subscription li
 
 **«NORTH_STAR_METRIC»** (must match `RUNBOOK_NORTH_STAR.md`).
 
-See [`RUNBOOK_NORTH_STAR.md`](./RUNBOOK_NORTH_STAR.md) for rationale and launch targets.
+See [`NORTH_STAR.md`](./NORTH_STAR.md) for rationale and launch targets.
 
 If these targets disagree with `RUNBOOK_NORTH_STAR.md`, `RUNBOOK_NORTH_STAR.md` wins.
 

@@ -255,7 +255,7 @@ If a product decision genuinely needs one of these, the path is:
 4. Update the static guardrail allowlist.
 5. Update the dashboard / public copy.
 
-Skipping any step is a compliance regression. See [`LEGAL_RISK.md`](./LEGAL_RISK.md) for the broader `«JURISDICTION»` risk register, and [`gdpr-pre-launch-checklist.md`](./compliance/gdpr-pre-launch-checklist.md) for data-handling obligations that fire at checkout.
+Skipping any step is a compliance regression. See [`LEGAL_RISK.md`](./LEGAL_RISK.md) for the broader `«JURISDICTION»` risk register, and [`GDPR_PRE_LAUNCH_CHECKLIST.md`](./GDPR_PRE_LAUNCH_CHECKLIST.md) for data-handling obligations that fire at checkout.
 
 ---
 

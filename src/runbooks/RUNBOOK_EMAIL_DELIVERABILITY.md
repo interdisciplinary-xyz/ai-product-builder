@@ -2,7 +2,7 @@
 
 End-to-end workflow for landing transactional + lifecycle email in the **inbox** (not spam, not Promotions, not Junk) across the major consumer inbox vendors. Run this **once** when standing up a new sending domain, and **re-run §2 + §3** whenever the email layer is materially changed (new template, new sender identity, DKIM rotation, DMARC tightening).
 
-Companion to [`RUNBOOK_EMAILS_WORKFLOW.md`](./RUNBOOK_EMAILS_WORKFLOW.md) (catalog + send wrappers + test entry-points).
+Companion to [`EMAILS_WORKFLOW.md`](./EMAILS_WORKFLOW.md) (catalog + send wrappers + test entry-points).
 
 > **🔧 Reuse & local setup**
 >
@@ -197,5 +197,5 @@ After all cells are checked:
 
 ## Cross-references
 
-- [`RUNBOOK_EMAILS_WORKFLOW.md`](./RUNBOOK_EMAILS_WORKFLOW.md) — catalog, send wrappers, fail-closed pattern.
+- [`EMAILS_WORKFLOW.md`](./EMAILS_WORKFLOW.md) — catalog, send wrappers, fail-closed pattern.
 - [`MAINTENANCE.md`](./MAINTENANCE.md) — pre-release smoke (deliverability is a smoke-blocker).

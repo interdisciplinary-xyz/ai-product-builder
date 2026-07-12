@@ -6,8 +6,8 @@
 >
 > **Scope:** *what "good" means* and how we verify it. Run **repeatedly**,
 > especially before `scope/* → release/*`. Companion to
-> [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md) (which owns branch/CI cost policy)
-> and [`RUNBOOK_SESSION_MIGRATION.md`](./RUNBOOK_SESSION_MIGRATION.md) (session handoff).
+> [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) (which owns branch/CI cost policy)
+> and [`SESSION_MIGRATION.md`](./SESSION_MIGRATION.md) (session handoff).
 
 > **🔧 Reuse & local setup**
 >

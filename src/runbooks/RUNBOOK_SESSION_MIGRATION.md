@@ -5,8 +5,8 @@
 > **Scope:** how an AI/developer session persists ("hands off") and restores
 > ("hands on") its state across sessions, terminals, machines, and agents — so the
 > next session **resumes instead of re-learning the repo**. Companion to
-> [`RUNBOOK_RELEASE_MANAGER.md`](./RUNBOOK_RELEASE_MANAGER.md) (flow/cost) and
-> [`RUNBOOK_QUALITY_ASSURANCE.md`](./RUNBOOK_QUALITY_ASSURANCE.md) (quality bar).
+> [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) (flow/cost) and
+> [`QUALITY_ASSURANCE.md`](./QUALITY_ASSURANCE.md) (quality bar).
 
 > **🔧 Reuse & local setup**
 >

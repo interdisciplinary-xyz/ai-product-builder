@@ -40,12 +40,31 @@ if [[ "$out" == "$root" ]]; then
   exit 1
 fi
 
+# --- deployed-name mapping -------------------------------------------------
+# A RUNBOOK is a *template you fill*, so the prefix is a shipping-crate label:
+# it names the crate, not the thing inside. It is stripped on deploy —
+# RUNBOOK_METRICS.md ships as METRICS.md — which is what consumer repos
+# actually do by hand, and what the docs' own cross-links already assume.
+#
+# A MANAGER is a *playbook you run*. It keeps its prefix: it stays recognisably
+# a library artifact rather than a doc the repo owns, and dropping it would
+# collide with the RUNBOOK of the same name (MANAGER_DECISION_LOG /
+# RUNBOOK_DECISION_LOG both want DECISION_LOG.md).
+deployed_name() {
+  case "$1" in
+    RUNBOOK_*) echo "${1#RUNBOOK_}" ;;
+    *)         echo "$1" ;;
+  esac
+}
+
 # --- collision guard -------------------------------------------------------
-# Flattening three directories into one is only safe while basenames are unique.
-dupes="$(find "$root/src/managers" "$root/src/runbooks" "$root/src/meta" -name '*.md' -exec basename {} \; \
-         | sort | uniq -d)"
+# Flattening several dirs into one is only safe while *deployed* names are
+# unique — so this must run on the post-strip names, not the source ones.
+dupes="$(for f in "$root/src/managers/"*.md "$root/src/runbooks/"*.md "$root/src/meta/"*.md; do
+           deployed_name "$(basename "$f")"
+         done | sort | uniq -d)"
 if [[ -n "$dupes" ]]; then
-  echo "filename collision — these basenames appear in more than one src/ dir:" >&2
+  echo "deployed-name collision — these resolve to the same output file:" >&2
   echo "$dupes" >&2
   exit 1
 fi
@@ -55,15 +74,73 @@ rm -rf "$out"
 mkdir -p "$out/commands"
 
 for dir in managers runbooks meta; do
-  cp "$root/src/$dir/"*.md "$out/"
+  for f in "$root/src/$dir/"*.md; do
+    cp "$f" "$out/$(deployed_name "$(basename "$f")")"
+  done
 done
 cp "$root/README.md" "$out/"
 cp "$root/src/commands/"*.md "$out/commands/"
+
+# Layers that install into .claude/ rather than docs/ — copied through verbatim.
+for dir in agents scripts config; do
+  [[ -d "$root/src/$dir" ]] || continue
+  mkdir -p "$out/$dir"
+  cp -R "$root/src/$dir/." "$out/$dir/"
+done
+
+# --- skills: one source, two outputs -----------------------------------------
+# A skill source is both a doc a human can read and an artifact the agent can
+# fire. So it ships twice:
+#
+#   OUT/SKILL_X.md              flat, alongside the other docs — sibling links resolve
+#   OUT/skills/<name>/SKILL.md  drop into .claude/skills/ — frontmatter hoisted
+#
+# The YAML lives in a `## Frontmatter to install with` block in the source.
+# Hoisting it here, rather than asking a human to retype it into a second file,
+# is what stops the skill and its source from drifting apart.
+if [[ -d "$root/src/skills" ]]; then
+  cp "$root/src/skills/"*.md "$out/"          # the readable half
+  mkdir -p "$out/skills"
+  python3 - "$root/src/skills" "$out/skills" <<'PY'
+import pathlib, re, sys
+src, out = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+emitted = 0
+for f in sorted(src.glob("SKILL_*.md")):
+    text = f.read_text()
+    if f.name == "SKILL_TEMPLATE.md":       # the anatomy, not a skill
+        continue
+    m = re.search(r'^## Frontmatter to install with\s*\n+```ya?ml\n(.*?)\n```\s*\n',
+                  text, re.S | re.M)
+    if not m:
+        print(f"  !! {f.name}: no '## Frontmatter to install with' block", file=sys.stderr)
+        sys.exit(1)
+    yaml = re.sub(r'\A-{3,}\s*\n', '', m.group(1).strip())
+    yaml = re.sub(r'\n-{3,}\s*\Z', '', yaml).strip()
+    name = re.search(r'^name:\s*(\S+)', yaml, re.M)
+    if not name:
+        print(f"  !! {f.name}: frontmatter has no name:", file=sys.stderr)
+        sys.exit(1)
+    body = (text[:m.start()] + text[m.end():]).strip()
+    # An installed skill sits in .claude/skills/, not next to the docs, so a
+    # relative sibling link would dangle. Demote them to plain names rather
+    # than invent a path into a tree whose layout we don't control.
+    body = re.sub(r'\[`?([A-Za-z0-9_.-]+\.md)`?\]\(\.{0,2}/?[A-Za-z0-9_./-]*\)', r'`\1`', body)
+    d = out / name.group(1)
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "SKILL.md").write_text(f"---\n{yaml}\n---\n\n{body}\n")
+    emitted += 1
+print(f"  {emitted} skills emitted as installable SKILL.md")
+PY
+fi
 
 flat=$(find "$out" -maxdepth 1 -name '*.md' | wc -l | tr -d ' ')
 cmds=$(find "$out/commands" -name '*.md' | wc -l | tr -d ' ')
 echo "built → $out"
 echo "  $flat docs (flat) + $cmds commands"
+for dir in skills agents scripts config; do
+  [[ -d "$out/$dir" ]] || continue
+  printf '  %s %s\n' "$(find "$out/$dir" -type f | wc -l | tr -d ' ')" "$dir"
+done
 
 [[ $check -eq 0 ]] && exit 0
 

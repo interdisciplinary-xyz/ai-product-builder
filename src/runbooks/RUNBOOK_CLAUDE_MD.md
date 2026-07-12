@@ -12,7 +12,20 @@ Keep this file short. If a section grows past ~15 lines, either prune it or move
 >
 > **Reusability:** template-ready — every section below is generic; only the `«placeholders»` need per-repo values. Define the **canonical tokens** (e.g. `«PROJECT»`, `«DOMAIN»`, `«NODE_VERSION»`, `«PKG_MGR»`, `«QUALITY_CMD»`, `«DB_CMS»`, `«AUTH»`, `«PAYMENTS»`, `«DEPLOY»`, `«OBSERVABILITY»`, `«AI_PROVIDER»`, `«TRUNK»`) **once here** — every other doc in the `ai-product-builder` library reads them from this file rather than restating them.
 >
-> **Pairs with:** the rest of the repo's `docs/*` — this file is the index, not the source of truth, for any topic it mentions.
+> **Additional local definitions** for the layering + exception tables below:
+> - `«SHARED_LIB_PATH»` — where cross-cutting infrastructure lives (e.g. `src/lib`) — the directory that becomes a junk drawer if the layering rule isn't written down
+> - `«DEEP_IMPORT_PATH»` — one row per deliberate deep import / rule-break, with its reason
+>
+> **Pairs with:** the rest of the repo's `docs/*` — this file is the index, not the source of truth, for any topic it mentions. Also pairs with [`PERMISSIONS_AND_AUTONOMY.md`](./PERMISSIONS_AND_AUTONOMY.md) + `.claude/settings.json`: this file tells the agent what is **true**; that pair tells it what it may **do**.
+
+## The four rules that make this file work
+
+Everything below is an application of these. If you only keep four lines, keep these.
+
+1. **Don't restate — link.** A fact written in two files is a fact that will be wrong in one of them. This file names the canonical doc for each topic and stops. It is an **index**, not a handbook. *(Pricing numbers live in `PRICING_STRATEGY.md`. Do not copy one here "for convenience" — convenience is how the number goes stale.)*
+2. **Where a doc disagrees with the code, the code wins.** Say this out loud, in the file, where an agent will read it. Otherwise a confident, obsolete sentence in a doc beats the actual source — and the agent will "fix" working code to match a stale line.
+3. **Write the negatives.** The most valuable line in this file is often about something that does **not** exist. See [Inline negative facts](#inline-negative-facts--the-highest-value-lines-in-this-file).
+4. **A deliberate exception is declared, not commented.** Every rule you deliberately break is listed in a table *with the reason it exists*. See [Declared exceptions](#declared-exceptions--every-deliberate-rule-break-with-its-reason).
 
 ## Project overview
 
@@ -21,6 +34,10 @@ One paragraph: what `«PROJECT»` is, the deployed shape (single app / monorepo 
 - **Product:** `«PROJECT»` — «one-line description»
 - **Primary domain:** `«DOMAIN»`
 - **Deploy shape:** «single-app / monorepo / N services», hosted on `«DEPLOY»`
+
+> **Docs index — read this before answering from memory.** `docs/README.md` is the canonical map of every doc, tagged ✅ Canonical / ⚠️ Superseded / 🕰️ Historical. **Where a doc disagrees with the code, the code wins.** Canonical sources of truth: pricing → `PRICING_STRATEGY.md`; ICP → `ICP.md`; data model → `DATA_MODEL_GUIDE.md`; security → `SECURITY_MODEL.md`; decisions → `DECISION_LOG.md`; release flow → `RELEASE_MANAGER.md`. «one line per canonical doc». **Don't restate any of them here — link.**
+
+(That paragraph is the highest-leverage block in the file: it is the one an agent reads *before* it starts guessing. Keep it at the top, keep it to one paragraph, and keep the staleness tiebreak in it.)
 
 ## Tech stack
 
@@ -55,6 +72,70 @@ A diagrammed tree of the top-level layout. Keep it shallow — one level deep is
 ```
 
 Path alias: `«@/*»` maps to `./src/*`.
+
+### What goes where (the layering rule)
+
+The single question an agent gets wrong most often is *"where does this new file go?"* — and the cost is invisible: a shared-utils directory silently becomes a junk drawer, and load-bearing business rules end up buried in a folder called `helpers`.
+
+Answer it with a table, and give every bucket a **falsifiable test** — a question with a yes/no answer that a tired human or an agent can apply without judgement. A bucket without a test is a vibe, and vibes do not survive a refactor.
+
+| Bucket | Home | Falsifiable test |
+|---|---|---|
+| **Integration / subsystem** — wraps a third party or owns a cross-cutting concern | `«SHARED_LIB_PATH»/<name>/` | Would a second consumer reuse it **as-is**? Does it own an `«OBSERVABILITY»` tag of its own? |
+| **Pure helper** — no I/O, no product policy; publishable to a package registry unchanged | `«SHARED_LIB_PATH»/utils/<name>/` | **Could you explain it without mentioning `«PROJECT»`?** If you can't, it isn't a util. |
+| **Product / business logic** — encodes a rule about *your* users, plans, teams, funnels | `«DOMAIN_PATHS»/<domain>/` — **never** `utils/` | Does it reference a plan tier, an account, an org, a funnel stage? Then it's product logic. |
+
+*(One row per bucket. The test column is not optional — it is the only column that gets used.)*
+
+Two corollaries, both easy to get wrong, both worth stating in the file:
+
+- **A shared-lib module that imports a domain is almost always misfiled.** It's product logic wearing an infrastructure costume. The import direction *is* the test.
+- **Business logic is not "minor stuff." Small ≠ generic.** A 40-line function deciding who gets a paid seat belongs in the domain that owns seats, not in `utils/`. Burying a load-bearing rule in a helper bucket is precisely how it gets lost — and then re-implemented, differently, six months later.
+
+### Declared exceptions — every deliberate rule-break, with its reason
+
+Every real codebase breaks its own rules on purpose. The failure isn't the exception; it's that the exception is **indistinguishable from an accident** — because it lives in a code comment that no linter reads and no reviewer greps.
+
+**If a deep import (or any rule-break) is deliberate, declare it rather than commenting it.** A declared exception is a decision. An undeclared one is a bug that hasn't been noticed yet, and an agent tidying up will "fix" it and break your build in a way typecheck will not catch.
+
+| Exception | Why it exists |
+|---|---|
+| `«DEEP_IMPORT_PATH»` | «the concrete reason — e.g. "pulls a heavy SDK that must not enter the client bundle"; "the CMS config graph imports this barrel, so barrelling it deadlocks type generation"» |
+
+*(One row per deliberate rule-break. If the reason doesn't fit in a sentence, the exception is probably a design problem wearing a table row.)*
+
+Two rules of thumb that fall out of this:
+
+- **A barrel is only as safe as its heaviest re-export.** One helper that pulls a server-only SDK into a widely-imported barrel breaks a build in a way `tsc` cannot see.
+- **Declaring an exception is the point of the rule, not a loophole in it.** The list being *visible* is what makes it reviewable — and what makes an unlisted deep import an unambiguous error rather than a judgement call.
+
+### Inline negative facts — the highest-value lines in this file
+
+Positive facts ("auth lives in `«DOMAIN_PATHS»/auth`") are cheap: an agent finds them by reading the code. **Negative facts are unfindable by reading the code**, because the thing isn't there. Absence leaves no trace — so an agent confidently recreates the file you deleted last month, re-adds the hook you removed as dead code, and reintroduces the pattern you spent a week removing.
+
+Write the negatives **inline, next to the positive fact they qualify**, in the form *"there is NO x — «reason»"*:
+
+```markdown
+constants/
+  env.ts    — the ONLY place that reads process.env
+  ui.ts     — UI constants
+  (NOTE: there is NO app.ts — app URLs live in config/urls.ts, see below)
+
+Hooks at `«SHARED_LIB_PATH»/queries/hooks/` (exact set — see hooks/index.ts):
+  - useCreateTransaction(), useUpdateUser(), …
+  (There is no usePlans() hook — queries/plans.ts was removed as dead code.)
+```
+
+Each of these is a load-bearing sentence. `(there is NO app.ts)` is what stops an agent from creating `app.ts` — a plausible, conventional, *wrong* file that would fork your config layer. Without the line, nothing prevents it: the code cannot say "and also, don't add this."
+
+Write one whenever:
+
+- you **deleted** something for a reason («dead code», «superseded by X», «it broke Y»);
+- you **deliberately did not build** something an agent would expect to exist («no Redis — in-memory is fine at this size»);
+- a conventional file **is absent on purpose** («no `app.ts`», «no `index.ts` here — the barrel would create a cycle»);
+- a name exists but **does not do what its name implies** («`e2e/` is the spec home, not a product domain»).
+
+Two failure modes to avoid: a negative fact **without a reason** ("there is no `app.ts`") gets deleted by the next reader as noise, and a negatives *section* at the bottom of the file never gets read. **Reason, and inline — both, or it doesn't work.**
 
 ## Commands
 

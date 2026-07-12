@@ -4,23 +4,37 @@ A curated library of **MANAGER playbooks** + **RUNBOOK templates** for AI-assist
 engineering. Designed for solo founders and small teams shipping with Claude Code, Cursor,
 and GitHub Copilot.
 
-> **What this is:** a hand-curated, source-of-truth library you **vendor into each repo**
-> under `docs/ai-product-builder/` and run *against*.
+> **What this is:** a hand-curated, source-of-truth library you **build into each repo** and
+> run *against*.
 >
-> **What this is not:** a Claude Code plugin or marketplace. **Deployment convention:** the
-> full library is mirrored at `docs/ai-product-builder/` in every consumer repo (filenames
-> preserve the `RUNBOOK_*` / `MANAGER_*` prefix — e.g. `docs/ai-product-builder/RUNBOOK_RELEASE_MANAGER.md`).
-> Placeholders are filled **in place** via `/ai-init`. A few files have additional install
-> targets (`.claude/CLAUDE.md`, `.claude/commands/*`, `.github/pull_request_template.md`) —
-> each doc's Reuse block calls those out.
+> **What this is not:** a Claude Code plugin or marketplace. Placeholders are filled **in
+> place** via `/ai-init`.
+
+### Deployment convention (changed in v0.2.0 — read this)
+
+A **`RUNBOOK_` prefix is a shipping-crate label: it names the crate, not the thing inside.**
+`bin/build` strips it on deploy, so `RUNBOOK_METRICS.md` lands in the consumer repo as
+`METRICS.md`. A **`MANAGER_` prefix is kept** — a playbook stays recognisably a library
+artifact rather than a doc the repo owns, and dropping it would collide with the runbook of
+the same name.
+
+This is not a preference; it is what already happened. v0.1.0 claimed the prefix was
+preserved on deploy. In the two repos that adopted these docs by hand, **`RUNBOOK_` survived
+in 2 files out of ~30 — people stripped it**, exactly as the docs told them to. Worse, the
+library's own cross-links were already written against the *stripped* names, which is why 43
+of them were broken. Matching reality fixed all 43.
+
+Layers that are not documentation (`skills/`, `agents/`, `scripts/`, `config/`) install into
+`.claude/`, not `docs/` — each file's Reuse block names its target.
 
 ## Contents
 
-- [Repo layout](#repo-layout) — `src/` tree, `bin/build`, and the flat deployed layout
-- [What's in it](#whats-in-it) — the three layers at a glance
+- [Repo layout](#repo-layout) — `src/` tree, `bin/build`, and the deployed layout
+- [What's in it](#whats-in-it) — the seven layers at a glance
 - [Quickest path to value](#quickest-path-to-value) — `/ai-init` in one command
 - [Minimum-viable adoption](#minimum-viable-adoption-the-5-docs-that-earn-their-keep-on-day-1) — the 5 docs that earn their keep on day 1
 - [Catalog by theme](#catalog-by-theme) — all 88 playbooks and templates, grouped
+- [Skill or doc?](#skill-or-doc) — the rule that decides which format a thing wants
 - [Required policies](#required-policies-the-library-enforces-by-convention) — what the library enforces by convention
 - [The init system](#the-init-system) — how `«placeholders»` are declared and filled
 - [Quality bar](#quality-bar) — the verification battery
@@ -30,23 +44,30 @@ and GitHub Copilot.
 
 ## Repo layout
 
-Sources live under `src/`, grouped by layer. The **deployed** layout is flat — `bin/build`
-flattens the tree so that a doc's bare-filename cross-references (`RUNBOOK_E2E.md`) resolve
-in the consumer repo:
+Sources live under `src/`, grouped by layer. Docs deploy **flat** so that a doc's
+bare-filename cross-references (`E2E.md`) resolve; everything else keeps its shape:
 
 ```
 src/
-├── managers/    25  MANAGER_*.md   ─┐
-├── runbooks/    63  RUNBOOK_*.md   ─┼─▶  docs/ai-product-builder/*.md          (flat)
-├── meta/         1  PLACEHOLDERS.md┤
-│                                   │
-└── commands/    10  slash-commands ──▶  docs/ai-product-builder/commands/*.md
-README.md                           ─┘
+├── managers/    25  MANAGER_*.md  ──▶  docs/MANAGER_*.md        (prefix kept)
+├── runbooks/    63  RUNBOOK_*.md  ──▶  docs/*.md                (prefix STRIPPED)
+├── meta/         1  PLACEHOLDERS.md ▶  docs/PLACEHOLDERS.md
+├── commands/    11  slash-commands ▶  .claude/commands/*.md
+├── skills/       5  SKILL_*.md    ──▶  .claude/skills/<name>/SKILL.md   +  docs/SKILL_*.md
+├── agents/       5  AGENT_*.md    ──▶  .claude/agents/<name>.md
+├── scripts/      2  calculators   ──▶  run in place
+└── config/       2  settings      ──▶  .claude/settings.json
+README.md                          ──▶  docs/README.md
 ```
+
+A **skill ships twice** from one source: flat as a readable doc, *and* as a drop-in
+`.claude/skills/<name>/SKILL.md` with its YAML frontmatter hoisted out of the source's
+`## Frontmatter to install with` block. You never hand-copy it into a second home, so the two
+cannot drift apart.
 
 ```bash
 bin/build                                    # → dist/
-bin/build --out ../my-app/docs/ai-product-builder
+bin/build --out ../my-app/docs
 bin/build --check                            # build, then verify every cross-link resolves
 ```
 
@@ -54,7 +75,7 @@ The same three via npm (`package.json` carries no dependencies — the scripts a
 
 ```bash
 npm run build
-npm run deploy -- ../my-app/docs/ai-product-builder
+npm run deploy -- ../my-app/docs
 npm run check
 ```
 
@@ -64,9 +85,13 @@ npm run check
 
 | Layer | Count | Role | Example |
 |---|:--:|---|---|
-| **`MANAGER_*`** | **25** | Agent playbook — *run it* with Claude / Cursor against a repo; the playbook creates / verifies / audits a target doc | `MANAGER_RELEASE_MANAGER`, `MANAGER_SECURITY` |
-| **`RUNBOOK_*`** | **63** | Content template — vendored at `docs/ai-product-builder/RUNBOOK_X.md` in every consumer repo; fill the `«placeholders»` in place via `/ai-init` | `RUNBOOK_RELEASE_MANAGER.md` → `docs/ai-product-builder/RUNBOOK_RELEASE_MANAGER.md` |
-| **`commands/*`** | **10** | Claude Code slash-commands — 6 workflow + 4 recurring audits | `/ai-init`, `/review`, `/deploy-check`, `/audit-structure`, `/audit-performance` |
+| **`MANAGER_*`** | **25** | Agent playbook — *run it* against a repo; it creates / verifies / audits a target doc | `MANAGER_SECURITY` |
+| **`RUNBOOK_*`** | **63** | Content template — fill the `«placeholders»` in place via `/ai-init` | `RUNBOOK_METRICS.md` → `docs/METRICS.md` |
+| **`commands/*`** | **11** | Slash-commands — 7 workflow + 4 recurring audits | `/ai-init`, `/board`, `/deploy-check` |
+| **`SKILL_*`** | **5** | **Ambient rule** — fires *without being asked*, on the strength of its frontmatter `description`, at the moment you're about to make the mistake | `SKILL_TESTS_THAT_CANNOT_FAIL` |
+| **`AGENT_*`** | **5** | Exec-persona subagents — read-only advisory lenses (CEO / CFO / CPO / CTO), convened by `/board` | `AGENT_CTO.md` → `.claude/agents/cto.md` |
+| **`scripts/*`** | **2** | Executable calculators — *a playbook that ends in a number ships the calculator that produces it* | `sensitivity-table.py`, `score-sean-ellis.py` |
+| **`config/*`** | **2** | `settings.json` deny-list + the autonomy contract that explains it | `SETTINGS_TEMPLATE.json` |
 | meta | 2 | `README.md` (this file) + `PLACEHOLDERS.md` (canonical token glossary) | — |
 
 Every layer doc carries a **`🔧 Reuse & local setup`** block declaring:
@@ -137,6 +162,7 @@ Adopt more as they earn their place.
 | Command | Purpose |
 |---|---|
 | `/ai-init` | Interactive bootstrap of a doc's `«placeholders»`; saves to `.claude/ai-init.local.json` |
+| `/board` | Convene the exec board (`ceo`/`cfo`/`cpo`/`cto`) on a scope question — gathers live state, injects it into all four lenses, then **synthesizes the disagreement** into one call with the dissent recorded |
 | `/review` | Targeted code review |
 | `/test` | Run repo tests + summarise |
 | `/deploy-check` | Pre-deploy readiness check |
@@ -152,11 +178,46 @@ Adopt more as they earn their place.
 | `/audit-design-system` | Token drift, component reuse, a11y, responsive + visual consistency | `MANAGER_DESIGN_SYSTEM` |
 | `/audit-performance` | Client bundle size, Core Web Vitals, unused deps, query/index hygiene | `MANAGER_PERFORMANCE`, `RUNBOOK_WEB_VITALS_AUDIT` |
 
+### 🎩 Exec board (advisory personas)
+
+`AGENT_TEMPLATE` (the anatomy) · `AGENT_CEO` · `AGENT_CFO` · `AGENT_CPO` · `AGENT_CTO` — four
+read-only lenses, convened by `/board`.
+
+The layer's one rule: **the agent file holds the lens; the live state is injected at
+invocation.** A persona never hardcodes an issue number, a version or a revenue figure — it
+receives them from `/board`, which gathers the backlog, the recent commits and the doc bundle
+fresh each time. The output's value is where the four lenses **conflict**, not where they agree.
+
+## Skill or doc?
+
+Adding something new? This is the rule that decides its format, and it is the sharpest thing
+we learned from auditing two real repos:
+
+> **A skill is a trigger + a refusal + (optionally) a script. A doc is everything else.**
+> If you delete the `description` and the artifact loses nothing, it was always a doc.
+
+The distinction is about **who initiates**:
+
+- **A doc** is opened by a human who has *already decided* to do the thing. You don't need a
+  trigger, because the human supplies it. Every `MANAGER_*` playbook is correctly a doc.
+- **A skill** must **ambush the diff** — it exists precisely because the human *does not know
+  they need it*. Nobody thinks "I should consult the never-throws doc" while writing a
+  `try/catch`. That's why the frontmatter *is* the skill: no `description`, no auto-fire, and
+  what you've really written is a doc filed in the wrong folder.
+
+Both surveyed repos got this wrong in the same direction: **19 of one repo's 28 "skills" have
+no frontmatter at all** and can never fire. They are docs wearing a skill costume. Don't add
+to that pile.
+
+One hard anti-pattern: **never write a skill whose body is a list of current facts** (a bug
+list, a status snapshot, a "known issues" register). It will rot, silently, and keep firing
+with stale content. If you must, it carries a staleness banner and a regeneration command.
+
 ## Required policies the library enforces by convention
 
 These are stated as **REQUIRED** across the appropriate MANAGER + RUNBOOK pairs:
 
-- **Domain-scoped E2E** at the `release/* → main` merge (only the changed domains' E2E run; full-suite fallback on `«SHARED_PATHS»` changes; CI implementation in `github-actions-minutes-workflow.md`).
+- **Domain-scoped E2E** at the `release/* → main` merge (only the changed domains' E2E run; full-suite fallback on `«SHARED_PATHS»` changes; CI implementation in `GITHUB_ACTIONS.md`).
 - **Domain-boundary enforcement** (no cross-domain deep imports; `domain → shared` only; no cycles; lint via `eslint-plugin-boundaries` or `dependency-cruiser`).
 - **`«SHARED_PATHS»` single source of truth** (`.github/shared-paths.txt` committed; CI + docs read it; never restated).
 - **`CODEOWNERS` per domain** (every `src/domains/*` + shared layer owned; branch protection requires code-owner review).
@@ -204,13 +265,19 @@ The library is verified against this battery (cross-refs via `bin/build --check`
 
 | Check | Status |
 |---|:--:|
+| Cross-links resolve in the built tree (`bin/build --check`) | ✅ 0 broken (was 43) |
 | Reuse-block coverage on every layer doc | ✅ 100% |
 | MANAGER has Layer + Pairs-with + Owns/defers + OUTPUT FORMAT | ✅ 25/25 |
 | RUNBOOK marked `Reusability: template-ready` | ✅ 63/63 |
+| Every `SKILL_*` carries an installable frontmatter block | ✅ 4/4 |
 | Zero product-name leaks (`empatalk`, `respect.click`, etc.) | ✅ |
-| Zero deprecated tokens outside the glossary | ✅ |
-| `«TOKEN»` discipline (canonical names registered in `PLACEHOLDERS.md`) | ✅ |
-| `/ai-init` hint in every layer doc | ✅ 87/87 |
+| `«TOKEN»` discipline — every token registered in `PLACEHOLDERS.md` | ⚠️ **41 unregistered in `src/commands/`** |
+| `/ai-init` hint in every layer doc | ✅ |
+| Both calculators run clean with no args | ✅ 2/2 |
+
+The `«TOKEN»` row was marked ✅ before anyone checked it. It isn't: the slash-commands use 41
+tokens (`«API_ROUTES_DIR»`, `«BRAND_TOKENS_PATH»`, …) that appear in no glossary, so `/ai-init`
+cannot prompt for them. Fixing that is the next obvious job.
 
 ## Honest weak points (we know about these)
 
@@ -218,11 +285,11 @@ This library is **policy declared in prose, not enforcement deployed in repos.**
 
 | # | Weak point | Concrete fix |
 |---|---|---|
-| 1 | **No live deployment** — 0 repos have actually adopted these docs end-to-end | Pick one repo; deploy the 5-doc minimum + `CODEOWNERS` + `shared-paths.txt` + the `boundaries` lint job |
-| 2 | **Partial library-quality CI** — `bin/build --check` now catches broken cross-refs (**43 currently broken**, all pointing at an older un-prefixed naming convention). Missing tokens, orphan files and drift still go undetected | Fix the 43; extend the check to body-tokens-in-Reuse-blocks, orphan files, deprecated tokens |
-| 3 | **No sync mechanism for deployed copies** — when this library updates, repo copies drift silently | Add `_canonical_version` to each doc + a `bin/sync` script per repo |
-| 4 | **No usage telemetry** — we don't know which docs are read, run, or dead weight | After 60 days of real use, audit which docs got read / referenced / run; retire unused |
-| 5 | **Context cost** — MANAGERs are 200–400 lines each; running several burns LLM context | Mark MANAGER sections as "essential" / "deep"; agents can read essentials by default |
+| 1 | **Never deployed — and rejected where it was tried.** `docs/ai-product-builder/` exists in **zero** repos. Two repos adopted some docs by hand; both **disowned** them. Every `MANAGER_*` copy in one carries a banner reading *"NOT wired to this repo… Treat as a template, not current process"*, and in the other the library-derived docs are the deadest cohort in the tree. ~12 library docs describe a process **neither repo has ever performed** | Stop assuming distribution is the blocker. Deploy the 5-doc minimum to **one** repo, wire **one** policy into `.github/`, and let it fail a PR. Retire the dozen docs nobody runs |
+| 2 | **Partial library-quality CI** — `bin/build --check` now catches broken cross-refs (0 remain). Unregistered tokens (41), orphan files and drift still go undetected, and no workflow runs the check | Extend the check to tokens / orphans / deprecated aliases; run it in CI |
+| 3 | **No sync mechanism for deployed copies** — when this library updates, repo copies drift silently. This is not hypothetical: it is exactly how the hand-copied docs rotted | Add `_canonical_version` to each doc + a `bin/sync` |
+| 4 | **No usage telemetry** — we don't know which docs are read, run, or dead weight. The audit commands' trend-comparison step has fired **zero** times in the wild, because no audit has ever been run twice | After 60 days of real use, audit which docs got read / referenced / run; retire unused |
+| 5 | **Context cost** — MANAGERs are 200–400 lines each; running several burns LLM context | Mark MANAGER sections as "essential" / "deep" |
 
 See `MANAGER_DOC_FRESHNESS.md` for the quarterly sweep that catches drift.
 

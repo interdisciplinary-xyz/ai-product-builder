@@ -1,0 +1,140 @@
+{
+  "_comment": "Example input for score-sean-ellis.py. 15 responses, 6 of them 'very disappointed' — a raw 40% that PASSES the Sean Ellis line. Three of those six are polite signal (DM'd, replied within the hour, barely used the product, complimented instead of describing). Discounted, the read is 20% and the verdict flips to WEAK. This file exists to show that flip. Replace it with your own export.",
+  "responses": [
+    {
+      "respondent_id": "u-101",
+      "disappointment": "very",
+      "who_benefits": "solo consultants who bill hourly and chase late invoices themselves",
+      "main_benefit": "cuts the monthly invoice reconciliation from three hours down to twenty minutes",
+      "delivery_surface": "email",
+      "responded_within_hours": 72,
+      "usage_count": 14
+    },
+    {
+      "respondent_id": "u-102",
+      "disappointment": "very",
+      "who_benefits": "freelance bookkeepers managing more than ten client accounts at once",
+      "main_benefit": "the recurring reminder that goes out before the due date without me writing it",
+      "delivery_surface": "in_app",
+      "responded_within_hours": 40,
+      "usage_count": 9
+    },
+    {
+      "respondent_id": "u-103",
+      "disappointment": "very",
+      "who_benefits": "agency owners who invoice retainers monthly and hate the follow-up",
+      "main_benefit": "one place to see which retainer invoices are unpaid past thirty days",
+      "delivery_surface": "email",
+      "responded_within_hours": 96,
+      "usage_count": 22
+    },
+    {
+      "respondent_id": "u-104",
+      "disappointment": "very",
+      "who_benefits": "anyone who runs a small business",
+      "main_benefit": "it is really useful and saves time",
+      "delivery_surface": "dm",
+      "responded_within_hours": 1,
+      "usage_count": 2
+    },
+    {
+      "respondent_id": "u-105",
+      "disappointment": "very",
+      "who_benefits": "everyone in my network honestly",
+      "main_benefit": "great tool, love it",
+      "delivery_surface": "dm",
+      "responded_within_hours": 1,
+      "usage_count": 1
+    },
+    {
+      "respondent_id": "u-106",
+      "disappointment": "very",
+      "who_benefits": "product managers at early-stage startups",
+      "main_benefit": "helps a lot with the whole process",
+      "delivery_surface": "email",
+      "responded_within_hours": 20,
+      "usage_count": 3
+    },
+    {
+      "respondent_id": "u-107",
+      "disappointment": "somewhat",
+      "who_benefits": "small agencies",
+      "main_benefit": "keeps the client list tidy but I could do it in a spreadsheet",
+      "delivery_surface": "email",
+      "responded_within_hours": 30,
+      "usage_count": 6
+    },
+    {
+      "respondent_id": "u-108",
+      "disappointment": "somewhat",
+      "who_benefits": "anyone doing freelance work",
+      "main_benefit": "reminders are nice",
+      "delivery_surface": "in_app",
+      "responded_within_hours": 12,
+      "usage_count": 4
+    },
+    {
+      "respondent_id": "u-109",
+      "disappointment": "somewhat",
+      "who_benefits": "consultants who invoice a few clients a month",
+      "main_benefit": "the payment status view, though I still check the bank anyway",
+      "delivery_surface": "email",
+      "responded_within_hours": 55,
+      "usage_count": 8
+    },
+    {
+      "respondent_id": "u-110",
+      "disappointment": "somewhat",
+      "who_benefits": "people like me",
+      "main_benefit": "good overview",
+      "delivery_surface": "dm",
+      "responded_within_hours": 2,
+      "usage_count": 5
+    },
+    {
+      "respondent_id": "u-111",
+      "disappointment": "somewhat",
+      "who_benefits": "bookkeepers I guess",
+      "main_benefit": "saves a bit of admin time each week",
+      "delivery_surface": "email",
+      "responded_within_hours": 18,
+      "usage_count": 7
+    },
+    {
+      "respondent_id": "u-112",
+      "disappointment": "somewhat",
+      "who_benefits": "teams that send a lot of invoices",
+      "main_benefit": "the export, when I remember it exists",
+      "delivery_surface": "in_app",
+      "responded_within_hours": 61,
+      "usage_count": 11
+    },
+    {
+      "respondent_id": "u-113",
+      "disappointment": "not",
+      "who_benefits": "not sure",
+      "main_benefit": "I already have this in my accounting tool",
+      "delivery_surface": "email",
+      "responded_within_hours": 34,
+      "usage_count": 2
+    },
+    {
+      "respondent_id": "u-114",
+      "disappointment": "not",
+      "who_benefits": "bigger companies maybe",
+      "main_benefit": "none really, I only send two invoices a month",
+      "delivery_surface": "email",
+      "responded_within_hours": 48,
+      "usage_count": 1
+    },
+    {
+      "respondent_id": "u-115",
+      "disappointment": "na",
+      "who_benefits": "",
+      "main_benefit": "",
+      "delivery_surface": "email",
+      "responded_within_hours": 80,
+      "usage_count": 1
+    }
+  ]
+}

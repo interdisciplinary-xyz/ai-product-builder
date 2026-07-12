@@ -35,7 +35,7 @@
 
 The locked decisions behind the pricing matrix above — what was chosen, and **why per the ICP**. Re-derive this table on every pricing change so the rationale survives. Every row is a decision you must defend to a customer (or to your future self at the next pricing review).
 
-> **Why this lives here, not in the payment-processor runbook:** these are *product* decisions (tier shape, anchor, trial, currency, metering policy). The processor runbook (e.g. [`RUNBOOK_PAYMENTS_LIFECYCLE.md`](./RUNBOOK_PAYMENTS_LIFECYCLE.md)) only mechanizes what's decided here — the products + prices to create, the webhooks to wire. Keep the *why* out of the *how*.
+> **Why this lives here, not in the payment-processor runbook:** these are *product* decisions (tier shape, anchor, trial, currency, metering policy). The processor runbook (e.g. [`PAYMENTS_LIFECYCLE.md`](./PAYMENTS_LIFECYCLE.md)) only mechanizes what's decided here — the products + prices to create, the webhooks to wire. Keep the *why* out of the *how*.
 
 | Decision              | Choice                                            | Why (per ICP)                                                                                       |
 | --------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------- |

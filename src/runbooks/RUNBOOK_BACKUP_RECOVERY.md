@@ -23,7 +23,7 @@
 
 Operational reference for backups, restore drills, and the "the database is gone, restore it" runbook. A backup that has never been restored is **not** a backup — it's a hopeful filename.
 
-Pair with [`RUNBOOK.md`](./RUNBOOK.md) (the incident runbook — backups are invoked from there), [`MAINTENANCE.md`](./MAINTENANCE.md) (cost / cadence checklist), and [`SECURITY_MODEL.md`](./SECURITY_MODEL.md) (encryption-at-rest and access control on `«BACKUP_DESTINATION»`).
+Pair with [`INCIDENTS.md`](./INCIDENTS.md) (the incident runbook — backups are invoked from there), [`MAINTENANCE.md`](./MAINTENANCE.md) (cost / cadence checklist), and [`SECURITY_MODEL.md`](./SECURITY_MODEL.md) (encryption-at-rest and access control on `«BACKUP_DESTINATION»`).
 
 ---
 
@@ -119,7 +119,7 @@ The 3 am paste-and-run version. Terse on purpose.
 3. **Restore into `«SCRATCH_ENV»` first.** Never restore directly into production unless the production data is fully gone (e.g. the cluster is destroyed). A scratch restore takes minutes; an incorrect production restore takes weeks of trust to rebuild.
 4. **Verify the restored data.** Per data class, run the smoke: a representative read, a representative write, a representative join across collections. Confirm record counts roughly match the expected production state.
 5. **Cut over.** Either promote `«SCRATCH_ENV»` to production (if the vendor supports it), or export the specific records and re-import into production. The cut-over choice is per-vendor — document yours below.
-6. **Resume writes.** Any writes that happened during the outage may now need to be replayed (e.g. queued webhook events, queued payment processor events). Cross-ref [`RUNBOOK.md`](./RUNBOOK.md) for replay procedures per provider.
+6. **Resume writes.** Any writes that happened during the outage may now need to be replayed (e.g. queued webhook events, queued payment processor events). Cross-ref [`INCIDENTS.md`](./INCIDENTS.md) for replay procedures per provider.
 7. **Document.** Write the incident in [`DECISION_LOG.md`](./DECISION_LOG.md): what was lost, what was restored, total RTO, gap vs. `«RTO»` target, and one concrete improvement to this runbook.
 
 ### Per data class — `«DB_CMS»`
@@ -156,7 +156,7 @@ If a future feature changes one of these from "acceptable to lose" to "must be p
 
 ## Cross-references
 
-- [`RUNBOOK.md`](./RUNBOOK.md) — the incident runbook. When a `«DB_CMS»` timeout or data-corruption incident fires, this backup runbook is the recovery path.
+- [`INCIDENTS.md`](./INCIDENTS.md) — the incident runbook. When a `«DB_CMS»` timeout or data-corruption incident fires, this backup runbook is the recovery path.
 - [`MAINTENANCE.md`](./MAINTENANCE.md) — the cost / cadence monitoring checklist. Backup verification and the next drill date belong in the monitoring cadence.
 - [`SECURITY_MODEL.md`](./SECURITY_MODEL.md) — encryption-at-rest and access-control rules for `«BACKUP_DESTINATION»`. A backup that's readable by anyone with a leaked credential is a fresh attack surface.
 - [`SECRETS_ROTATION.md`](./SECRETS_ROTATION.md) — rotating the encryption key or the storage access credential for `«BACKUP_DESTINATION»` requires special care; a rotated key that locks the team out of old backups is a self-inflicted incident.
