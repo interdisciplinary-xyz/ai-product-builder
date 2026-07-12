@@ -40,14 +40,9 @@ src/
 ├── runbooks/    63  RUNBOOK_*.md   ─┼─▶  docs/ai-product-builder/*.md          (flat)
 ├── meta/         1  PLACEHOLDERS.md┤
 │                                   │
-└── commands/     6  slash-commands ──▶  docs/ai-product-builder/commands/*.md
+└── commands/    10  slash-commands ──▶  docs/ai-product-builder/commands/*.md
 README.md                           ─┘
 ```
-
-> ⚠️ `src/commands/` also holds 4 **untracked** files (`audit-api-routes`, `audit-design-system`,
-> `audit-performance`, `audit-structure`) that were never committed and are referenced by no
-> other doc. `bin/build` copies them, but they are not yet part of the library — either
-> `git add` them and list them in the slash-command table below, or delete them.
 
 ```bash
 bin/build                                    # → dist/
@@ -71,7 +66,7 @@ npm run check
 |---|:--:|---|---|
 | **`MANAGER_*`** | **25** | Agent playbook — *run it* with Claude / Cursor against a repo; the playbook creates / verifies / audits a target doc | `MANAGER_RELEASE_MANAGER`, `MANAGER_SECURITY` |
 | **`RUNBOOK_*`** | **63** | Content template — vendored at `docs/ai-product-builder/RUNBOOK_X.md` in every consumer repo; fill the `«placeholders»` in place via `/ai-init` | `RUNBOOK_RELEASE_MANAGER.md` → `docs/ai-product-builder/RUNBOOK_RELEASE_MANAGER.md` |
-| **`commands/*`** | **6** | Claude Code slash-commands | `/ai-init`, `/review`, `/test`, `/deploy-check`, `/content-editor`, `/web-interface-guidelines` |
+| **`commands/*`** | **10** | Claude Code slash-commands — 6 workflow + 4 recurring audits | `/ai-init`, `/review`, `/deploy-check`, `/audit-structure`, `/audit-performance` |
 | meta | 2 | `README.md` (this file) + `PLACEHOLDERS.md` (canonical token glossary) | — |
 
 Every layer doc carries a **`🔧 Reuse & local setup`** block declaring:
@@ -136,6 +131,9 @@ Adopt more as they earn their place.
 `MANAGER_FOUNDER_OPS` · `RUNBOOK_DAILY_RITUAL` · `RUNBOOK_WEEKLY_RETRO` · `RUNBOOK_DECISION_THRESHOLDS` · `RUNBOOK_FOUNDER_DASHBOARD`
 
 ### ⌨️ Slash-commands
+
+**Workflow** — run on demand:
+
 | Command | Purpose |
 |---|---|
 | `/ai-init` | Interactive bootstrap of a doc's `«placeholders»`; saves to `.claude/ai-init.local.json` |
@@ -144,6 +142,15 @@ Adopt more as they earn their place.
 | `/deploy-check` | Pre-deploy readiness check |
 | `/content-editor` | CMS / content editing workflow |
 | `/web-interface-guidelines` | Apply the universal interface-guidelines check |
+
+**Recurring audits** — each writes a dated report; meant to run every 1–2 weeks:
+
+| Command | Purpose | Pairs with |
+|---|---|---|
+| `/audit-structure` | Architecture DAG, observability-tag taxonomy, generated-type drift | `MANAGER_ARCHITECTURE` |
+| `/audit-api-routes` | Route↔OpenAPI-spec parity, doc completeness, stale entries, authn/authz, route hygiene | `MANAGER_SECURITY`, `MANAGER_ARCHITECTURE` |
+| `/audit-design-system` | Token drift, component reuse, a11y, responsive + visual consistency | `MANAGER_DESIGN_SYSTEM` |
+| `/audit-performance` | Client bundle size, Core Web Vitals, unused deps, query/index hygiene | `MANAGER_PERFORMANCE`, `RUNBOOK_WEB_VITALS_AUDIT` |
 
 ## Required policies the library enforces by convention
 
