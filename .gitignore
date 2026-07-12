@@ -17,3 +17,6 @@
 
 # node noise if anyone ever adds tooling
 node_modules/
+
+# build output (bin/build) — regenerate, never commit
+dist/

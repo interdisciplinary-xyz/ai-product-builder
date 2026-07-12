@@ -14,6 +14,35 @@ and GitHub Copilot.
 > targets (`.claude/CLAUDE.md`, `.claude/commands/*`, `.github/pull_request_template.md`) —
 > each doc's Reuse block calls those out.
 
+## Repo layout
+
+Sources live under `src/`, grouped by layer. The **deployed** layout is flat — `bin/build`
+flattens the tree so that a doc's bare-filename cross-references (`RUNBOOK_E2E.md`) resolve
+in the consumer repo:
+
+```
+src/
+├── managers/    25  MANAGER_*.md   ─┐
+├── runbooks/    63  RUNBOOK_*.md   ─┼─▶  docs/ai-product-builder/*.md          (flat)
+├── meta/         1  PLACEHOLDERS.md┤
+│                                   │
+└── commands/     6  slash-commands ──▶  docs/ai-product-builder/commands/*.md
+README.md                           ─┘
+```
+
+> ⚠️ `src/commands/` also holds 4 **untracked** files (`audit-api-routes`, `audit-design-system`,
+> `audit-performance`, `audit-structure`) that were never committed and are referenced by no
+> other doc. `bin/build` copies them, but they are not yet part of the library — either
+> `git add` them and list them in the slash-command table below, or delete them.
+
+```bash
+bin/build                                    # → dist/
+bin/build --out ../my-app/docs/ai-product-builder
+bin/build --check                            # build, then verify every cross-link resolves
+```
+
+`dist/` is generated — never commit it, never edit it. Edit under `src/` and rebuild.
+
 ## What's in it
 
 | Layer | Count | Role | Example |
@@ -142,7 +171,7 @@ Secrets **never** belong here — they live in `.env.local`. See `MANAGER_INIT.m
 
 ## Quality bar
 
-The library is verified against this battery (run `bin/lint` — see TODO below):
+The library is verified against this battery (cross-refs via `bin/build --check`; the rest still by hand):
 
 | Check | Status |
 |---|:--:|
@@ -161,7 +190,7 @@ This library is **policy declared in prose, not enforcement deployed in repos.**
 | # | Weak point | Concrete fix |
 |---|---|---|
 | 1 | **No live deployment** — 0 repos have actually adopted these docs end-to-end | Pick one repo; deploy the 5-doc minimum + `CODEOWNERS` + `shared-paths.txt` + the `boundaries` lint job |
-| 2 | **No library-quality CI** — broken cross-refs, missing tokens, drift all go undetected | A 50-line `bin/lint`: cross-refs resolve, body tokens are in Reuse blocks, no orphan files, no deprecated tokens |
+| 2 | **Partial library-quality CI** — `bin/build --check` now catches broken cross-refs (**43 currently broken**, all pointing at an older un-prefixed naming convention). Missing tokens, orphan files and drift still go undetected | Fix the 43; extend the check to body-tokens-in-Reuse-blocks, orphan files, deprecated tokens |
 | 3 | **No sync mechanism for deployed copies** — when this library updates, repo copies drift silently | Add `_canonical_version` to each doc + a `bin/sync` script per repo |
 | 4 | **No usage telemetry** — we don't know which docs are read, run, or dead weight | After 60 days of real use, audit which docs got read / referenced / run; retire unused |
 | 5 | **Context cost** — MANAGERs are 200–400 lines each; running several burns LLM context | Mark MANAGER sections as "essential" / "deep"; agents can read essentials by default |
@@ -172,7 +201,7 @@ See `MANAGER_DOC_FRESHNESS.md` for the quarterly sweep that catches drift.
 
 This library is curated by hand. Improvements welcome via PR, but:
 - preserve the Reuse-block convention on every layer doc;
-- run the (forthcoming) `bin/lint` before proposing changes;
+- edit under `src/` (never `dist/`) and run `bin/build --check` before proposing changes;
 - if you add a new MANAGER, also add its paired RUNBOOK (and vice versa) unless the boundary doc explicitly says no pair;
 - new canonical tokens go in `PLACEHOLDERS.md`.
 

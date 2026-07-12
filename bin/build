@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+#
+# Flatten the src/ tree into the layout consumer repos vendor.
+#
+#   src/managers/MANAGER_X.md  ─┐
+#   src/runbooks/RUNBOOK_X.md  ─┼─▶  <out>/MANAGER_X.md, <out>/RUNBOOK_X.md   (flat)
+#   src/meta/PLACEHOLDERS.md   ─┤
+#   README.md                  ─┘
+#   src/commands/foo.md        ───▶  <out>/commands/foo.md
+#
+# The flat output is the contract: every doc cross-references its siblings by
+# bare filename (`RUNBOOK_E2E.md`), which only resolves once flattened.
+#
+# Usage:
+#   bin/build                       # build into dist/
+#   bin/build --out ../app/docs/ai-product-builder
+#   bin/build --check               # build, then verify cross-links resolve
+#
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+out="$root/dist"
+check=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --out)   out="$2"; shift 2 ;;
+    --check) check=1; shift ;;
+    -h|--help) sed -n '2,18p' "${BASH_SOURCE[0]}" | sed 's/^# \?//'; exit 0 ;;
+    *) echo "unknown argument: $1" >&2; exit 2 ;;
+  esac
+done
+
+# Resolve --out to an absolute path before we start deleting anything.
+mkdir -p "$out"
+out="$(cd "$out" && pwd)"
+
+if [[ "$out" == "$root" ]]; then
+  echo "refusing to build into the repo root" >&2
+  exit 1
+fi
+
+# --- collision guard -------------------------------------------------------
+# Flattening three directories into one is only safe while basenames are unique.
+dupes="$(find "$root/src/managers" "$root/src/runbooks" "$root/src/meta" -name '*.md' -exec basename {} \; \
+         | sort | uniq -d)"
+if [[ -n "$dupes" ]]; then
+  echo "filename collision — these basenames appear in more than one src/ dir:" >&2
+  echo "$dupes" >&2
+  exit 1
+fi
+
+# --- build -----------------------------------------------------------------
+rm -rf "$out"
+mkdir -p "$out/commands"
+
+for dir in managers runbooks meta; do
+  cp "$root/src/$dir/"*.md "$out/"
+done
+cp "$root/README.md" "$out/"
+cp "$root/src/commands/"*.md "$out/commands/"
+
+flat=$(find "$out" -maxdepth 1 -name '*.md' | wc -l | tr -d ' ')
+cmds=$(find "$out/commands" -name '*.md' | wc -l | tr -d ' ')
+echo "built → $out"
+echo "  $flat docs (flat) + $cmds commands"
+
+[[ $check -eq 0 ]] && exit 0
+
+# --- link check ------------------------------------------------------------
+# Every markdown link to a sibling .md must resolve in the flattened layout.
+echo
+echo "checking cross-links…"
+
+report="$(mktemp)"
+trap 'rm -f "$report"' EXIT
+
+while IFS= read -r file; do
+  rel="${file#"$out"/}"
+  dir="$(dirname "$rel")"
+  # Pull ](target.md) / ](./target.md) out of each doc. A doc with no links is
+  # not an error, hence `|| true` — grep exits 1 when it matches nothing.
+  targets="$(grep -oE '\]\((\./)?[A-Za-z0-9_./-]+\.md(#[A-Za-z0-9_-]+)?\)' "$file" || true)"
+  [[ -z "$targets" ]] && continue
+
+  while IFS= read -r target; do
+    [[ -z "$target" ]] && continue
+    # Links resolve relative to the doc's own directory in the built tree.
+    base="$out"
+    [[ "$dir" != "." ]] && base="$out/$dir"
+    [[ -e "$base/$target" ]] && continue
+    printf '  %-38s → %s\n' "$rel" "$target" >> "$report"
+  done <<< "$(printf '%s\n' "$targets" | sed -E 's/^\]\(//; s/\)$//; s/#.*$//; s|^\./||')"
+done < <(find "$out" -name '*.md')
+
+echo
+if [[ -s "$report" ]]; then
+  sort -u "$report"
+  echo
+  echo "$(sort -u "$report" | wc -l | tr -d ' ') broken cross-link(s)"
+  exit 1
+fi
+echo "all cross-links resolve"
