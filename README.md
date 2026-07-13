@@ -2,6 +2,23 @@
 
 Playbooks, templates and agent skills for solo founders shipping products with Claude Code.
 
+## Contents
+
+- ⚡ [Quick start](#quick-start) — clone, deploy, done
+- 🤔 [Why](#why) — the problem, and what this is **not** for
+- 🚦 [Status](#status) — is it alive, and has anyone actually used it
+- 📥 [Adopt it](#adopt-it) — the copy, and what it overwrites
+- 🛠️ [Use it](#use-it) — filling the `«placeholders»`, running a playbook
+- 📦 [What's inside](#whats-inside) — all eight layers
+  - ⌨️ [Commands](#commands) · ⚡ [Skills](#skills) · 🎩 [Agents](#agents) · 🧮 [Scripts](#scripts) · 🔒🏷️ [Config and meta](#config-and-meta)
+  - 🎛️ [Managers](CATALOG.md#managers) · 📘 [Runbooks](CATALOG.md#runbooks) — the two big ones, in the catalog
+- 🚪 [Start here](#start-here) — three doors, by what you came for
+- 💡 [What this library believes](#what-this-library-believes) — the four opinions
+- ⚠️ [Known weak points](#known-weak-points) — what you'd be signing up for
+- 🔀 [Alternatives](#alternatives) · 🤝 [Contributing](#contributing) · 📄 [License](#license)
+
+## Quick start
+
 You copy it into your repo and run it *against* your repo. There is no package to install and
 nothing to import — the artifacts are markdown, and the runtime is your coding agent.
 
@@ -57,17 +74,6 @@ current process."* Roughly a dozen documents here describe a process nobody has 
 That's the honest state. The content is good; the adoption is unproven. Weigh accordingly.
 
 PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Contents
-
-- 🤔 [Why](#why) · 🚦 [Status](#status) — is this for me, and is it alive
-- 📥 [Adopt it](#adopt-it) — the copy, and what it overwrites
-- 🛠️ [Use it](#use-it) — filling the `«placeholders»`, running a playbook
-- 📦 [What's inside](#whats-inside) — all eight layers
-- 🚪 [Start here](#start-here) — three doors, by what you came for
-- 💡 [What this library believes](#what-this-library-believes) — the four opinions
-- ⚠️ [Known weak points](#known-weak-points) — what you'd be signing up for
-- 🔀 [Alternatives](#alternatives) · 🤝 [Contributing](#contributing) · 📄 [License](#license)
 
 ## Adopt it
 
