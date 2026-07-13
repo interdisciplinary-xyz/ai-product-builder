@@ -29,12 +29,29 @@ must contain, when an ADR is required, what "done" means for a payment path. You
 badly, under time pressure, in a Slack thread nobody can find six weeks later.
 
 This library is those decisions, written down once, as documents an AI agent can *execute* —
-not just read. A `MANAGER_*` playbook is a prompt you run against a repo; it produces or audits
-a `RUNBOOK_*` document. The runbook is the artifact your team actually lives with.
+not just read.
+
+```mermaid
+flowchart LR
+    M["MANAGER_SECURITY.md<br/>a playbook you run"]
+    R["SECURITY_MODEL.md<br/>the doc your team lives with"]
+    C["your code"]
+    S["a skill<br/>fires unasked"]
+    B["exec board<br/>read-only advice"]
+
+    M -->|"produces, then audits"| R
+    R -.->|"drifts from"| C
+    M -->|"reports the drift"| C
+    S ==>|"ambushes the diff"| C
+    B -.->|"convened by /board"| M
+```
+
+You **run** a playbook. You **fill** a runbook. A **skill** you never invoke at all — it fires on
+its own, at the moment you're about to make the mistake it knows about.
 
 **What it is not:** a Claude Code plugin, a marketplace, or a framework. It is a pile of
 opinionated markdown and a build script. If you want something that installs and does things to
-your codebase automatically, this is the wrong repo.
+your codebase automatically, this is the wrong repo — see [Alternatives](#alternatives).
 
 > [!IMPORTANT]
 > **This is policy declared in prose, not enforcement deployed in CI.** The "REQUIRED" markers
@@ -57,14 +74,14 @@ PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contents
 
-- [Adopt it](#adopt-it)
-- [Use it](#use-it)
-- [What's inside](#whats-inside)
-- [Start here](#start-here)
-- [What this library believes](#what-this-library-believes)
-- [Known weak points](#known-weak-points)
-- [Contributing](#contributing)
-- [License](#license)
+- [Why](#why) · [Status](#status) — is this for me, and is it alive
+- [Adopt it](#adopt-it) — the copy, and what it overwrites
+- [Use it](#use-it) — filling the `«placeholders»`, running a playbook
+- [What's inside](#whats-inside) — the six layers, with counts
+- [Start here](#start-here) — three doors, by what you came for
+- [What this library believes](#what-this-library-believes) — the four opinions
+- [Known weak points](#known-weak-points) — what you'd be signing up for
+- [Alternatives](#alternatives) · [Contributing](#contributing) · [License](#license)
 
 ## Adopt it
 
@@ -87,9 +104,11 @@ recognisable as library artifacts. ([Why](CONTRIBUTING.md#why-the-prefixes-behav
 **Three layers install outside `docs/`.** Commands, skills and agents belong in `.claude/`:
 
 ```bash
-cp -r ../my-app/docs/commands/*  ../my-app/.claude/commands/
-cp -r ../my-app/docs/skills/*    ../my-app/.claude/skills/
-cp -r ../my-app/docs/agents/*    ../my-app/.claude/agents/
+cd ../my-app
+mkdir -p .claude/commands .claude/skills .claude/agents
+cp -r docs/commands/* .claude/commands/
+cp -r docs/skills/*   .claude/skills/
+cp -r docs/agents/*   .claude/agents/
 ```
 
 ## Use it
@@ -185,6 +204,23 @@ We'd rather you hear these from us.
 | **A dozen unexercised documents** | Some playbooks describe a process nobody has ever run. They're theory. |
 | **Context cost** | Playbooks run 200–400 lines. Running several in one session burns a lot of an agent's context. |
 
+## Alternatives
+
+Use something else if:
+
+- **You want agents and skills that install themselves.** This library is markdown you copy;
+  a plugin marketplace is a better fit. Start with [`anthropics/skills`](https://github.com/anthropics/skills)
+  or [`wshobson/agents`](https://github.com/wshobson/agents).
+- **You want breadth over opinion.** This library takes hard positions — staged-branch releases,
+  domain-scoped E2E, a permission deny-list. An `awesome-*` list will give you more options and
+  fewer arguments.
+- **You have a team with an established process.** These documents are written for a solo founder
+  or a small team deciding things for the first time. If you already have a release policy, you
+  don't need ours — take the [skills](CATALOG.md#skills) and leave the rest.
+
+What you get here that those don't: the playbooks and the documents are **paired**, so a document
+has something that audits it, and the whole thing is meant to be *run*, not read.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) — repo layout, the skill-or-doc rule, token conventions,
@@ -192,5 +228,6 @@ and the release process. Run `npm run check` before opening a PR.
 
 ## License
 
-Not yet licensed. All rights reserved — the repository is private and no `LICENSE` file has been
-chosen. If you want to use this outside the org, ask first.
+**Not licensed.** No `LICENSE` file has been chosen, so by default all rights are reserved by the
+copyright holder (Michał Dopieralski / interdisciplinary-xyz). The repository is private; if you
+want to use this outside the org, ask first.
