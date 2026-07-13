@@ -32,22 +32,22 @@ This library is those decisions, written down once, as documents an AI agent can
 not just read.
 
 ```mermaid
-flowchart LR
-    M["MANAGER_SECURITY.md<br/>a playbook you run"]
-    R["SECURITY_MODEL.md<br/>the doc your team lives with"]
-    C["your code"]
-    S["a skill<br/>fires unasked"]
-    B["exec board<br/>read-only advice"]
+flowchart TD
+    M["<b>MANAGER_SECURITY.md</b><br/>a playbook you run"]
+    R["<b>SECURITY_MODEL.md</b><br/>the doc your team lives with"]
+    C["<b>your code</b>"]
+    S["<b>a skill</b><br/>you never invoke it"]
 
     M -->|"produces, then audits"| R
     R -.->|"drifts from"| C
     M -->|"reports the drift"| C
     S ==>|"ambushes the diff"| C
-    B -.->|"convened by /board"| M
 ```
 
 You **run** a playbook. You **fill** a runbook. A **skill** you never invoke at all — it fires on
-its own, at the moment you're about to make the mistake it knows about.
+its own, at the moment you're about to make the mistake it knows about. The
+[exec board](CATALOG.md#exec-board) is a fifth thing: four read-only advisors, convened by
+`/board`, which reports where they **disagree**.
 
 **What it is not:** a Claude Code plugin, a marketplace, or a framework. It is a pile of
 opinionated markdown and a build script. If you want something that installs and does things to
