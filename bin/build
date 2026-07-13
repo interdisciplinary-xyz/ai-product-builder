@@ -78,8 +78,10 @@ for dir in managers runbooks meta; do
     cp "$f" "$out/$(deployed_name "$(basename "$f")")"
   done
 done
-cp "$root/README.md" "$out/"
 cp "$root/src/commands/"*.md "$out/commands/"
+
+# README / CATALOG / CONTRIBUTING are about *this repo* — they link into src/, which does not
+# exist downstream. A consumer's docs/ gets the library, not our front page.
 
 # Layers that install into .claude/ rather than docs/ — copied through verbatim.
 for dir in agents scripts config; do
@@ -169,6 +171,41 @@ while IFS= read -r file; do
     printf '  %-38s → %s\n' "$rel" "$target" >> "$report"
   done <<< "$(printf '%s\n' "$targets" | sed -E 's/^\]\(//; s/\)$//; s/#.*$//; s|^\./||')"
 done < <(find "$out" -name '*.md')
+
+# The repo's own front page (README / CATALOG / CONTRIBUTING) never ships, so it isn't in
+# $out — but its links into src/ still have to resolve, and its anchors have to exist.
+# Nothing else checks them, so check them here against the repo itself.
+python3 - "$root" >> "$report" <<'PY'
+import pathlib, re, sys, unicodedata
+root = pathlib.Path(sys.argv[1])
+
+def slug(t):
+    t = t.strip().lower()
+    keep = ''.join(c for c in t
+                   if c in '- ' or unicodedata.category(c)[0] in 'LNM'
+                   or unicodedata.category(c) == 'Pc')
+    return keep.replace(' ', '-')
+
+for name in ("README.md", "CATALOG.md", "CONTRIBUTING.md"):
+    f = root / name
+    if not f.exists():
+        continue
+    text = f.read_text()
+    body = re.sub(r'```.*?```', '', text, flags=re.S)   # ignore fenced code
+    for target in re.findall(r'\]\(([^)#\s]*)(#[^)\s]*)?\)', body):
+        path, frag = target[0], (target[1] or '').lstrip('#')
+        if path.startswith(('http://', 'https://', 'mailto:')):
+            continue
+        dest = (root / path) if path else f
+        if path and not dest.exists():
+            print(f"  {name:<38} → {path}")
+            continue
+        if frag:                                        # verify the anchor really exists
+            dtext = re.sub(r'```.*?```', '', dest.read_text(), flags=re.S)
+            heads = {slug(m.group(1)) for m in re.finditer(r'^#{1,6}\s+(.*)$', dtext, re.M)}
+            if frag not in heads:
+                print(f"  {name:<38} → {path or dest.name}#{frag}  (no such anchor)")
+PY
 
 echo
 if [[ -s "$report" ]]; then
