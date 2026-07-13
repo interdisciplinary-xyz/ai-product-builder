@@ -31,23 +31,9 @@ badly, under time pressure, in a Slack thread nobody can find six weeks later.
 This library is those decisions, written down once, as documents an AI agent can *execute* —
 not just read.
 
-```mermaid
-flowchart TD
-    M["<b>MANAGER_SECURITY.md</b><br/>a playbook you run"]
-    R["<b>SECURITY_MODEL.md</b><br/>the doc your team lives with"]
-    C["<b>your code</b>"]
-    S["<b>a skill</b><br/>you never invoke it"]
-
-    M -->|"produces, then audits"| R
-    R -.->|"drifts from"| C
-    M -->|"reports the drift"| C
-    S ==>|"ambushes the diff"| C
-```
-
-You **run** a playbook. You **fill** a runbook. A **skill** you never invoke at all — it fires on
-its own, at the moment you're about to make the mistake it knows about. The
-[exec board](CATALOG.md#exec-board) is a fifth thing: four read-only advisors, convened by
-`/board`, which reports where they **disagree**.
+You **run** a playbook (`MANAGER_SECURITY.md`); it produces and then audits the document your
+team lives with (`SECURITY_MODEL.md`). You **fill** a runbook. A **skill** you never invoke at
+all — it fires on its own, at the moment you're about to make the mistake it knows about.
 
 **What it is not:** a Claude Code plugin, a marketplace, or a framework. It is a pile of
 opinionated markdown and a build script. If you want something that installs and does things to
@@ -141,16 +127,81 @@ what the code does.
 
 ## What's inside
 
-| Layer | Count | What it is |
-|---|:--:|---|
-| **Playbooks** (`MANAGER_*`) | 25 | Prompts you *run* against a repo. They create, verify, or audit a document. |
-| **Templates** (`RUNBOOK_*`) | 64 | Documents you *fill*. This is what your team lives with. |
-| **Slash-commands** | 11 | 7 workflow + 4 recurring audits that write dated reports and open an issue **only on regression**. |
-| **Skills** | 4 | Ambient rules that fire **without being asked**, at the moment you're about to make the mistake. |
-| **Exec board** (`AGENT_*`) | 4 | Read-only advisory lenses — CEO, CFO, CPO, CTO — convened by `/board`, which synthesizes their **disagreement**. |
-| **Calculators** | 2 | Python, no dependencies. A playbook that ends in a number ships the calculator that produces it. |
+| Layer | Files | What it is | |
+|---|:--:|---|---|
+| **Managers** | 25 | Playbooks you *run* against a repo. They create, verify, or audit a document. | [table →](CATALOG.md#managers) |
+| **Runbooks** | 64 | Documents you *fill*. This is what your team lives with. | [table →](CATALOG.md#runbooks) |
+| **Commands** | 11 | Slash-commands: 7 workflow + 4 recurring audits. | [below](#commands) |
+| **Skills** | 5 | Ambient rules that fire **without being asked**. | [below](#skills) |
+| **Agents** | 5 | Read-only exec lenses, convened by `/board`. | [below](#agents) |
+| **Scripts** | 2 | Calculators. Python, no dependencies. | [below](#scripts) |
+| **Config** | 1 | The permission deny-list. | [below](#config-and-meta) |
+| **Meta** | 1 | The `«token»` glossary. | [below](#config-and-meta) |
 
-**[→ Full catalog](CATALOG.md)** — every artifact, grouped, with what each one is for.
+The two big layers live in **[CATALOG.md](CATALOG.md)** — 89 rows would drown this page. The
+other six are small enough to show here.
+
+### Commands
+
+The four `audit-*` commands write a **dated report**, diff it against the last one, and open an
+issue **only when a number gets worse**. Install to `.claude/commands/`.
+
+| Command | What running it does |
+|---|---|
+| [`/ai-init`](src/commands/ai-init.md) | Prompts for a doc's `«placeholder»` values and saves them to `.claude/ai-init.local.json`. |
+| [`/board`](src/commands/board.md) | Fans a scope question out to all four exec lenses, then synthesizes their **disagreement** into one call. |
+| [`/review`](src/commands/review.md) | Diffs the branch against trunk; reviews it against your lint, i18n, design-token and auth conventions. |
+| [`/test`](src/commands/test.md) | Runs format, lint, type-check and unit tests in order; reports a pass/fail table. |
+| [`/deploy-check`](src/commands/deploy-check.md) | Adds build, clean-tree, commit-convention and up-to-date-with-trunk checks. Prints READY / NOT READY. |
+| [`/content-editor`](src/commands/content-editor.md) | Reads, creates, updates or deletes CMS content per locale via the admin API. |
+| [`/web-interface-guidelines`](src/commands/web-interface-guidelines.md) | Reviews files against a11y, focus, forms, animation and performance rules. |
+| [`/audit-structure`](src/commands/audit-structure.md) | Runs the repo's own architecture-DAG, observability-tag and type-drift enforcers. |
+| [`/audit-api-routes`](src/commands/audit-api-routes.md) | Checks route ↔ spec parity, rate-limit / validation / auth gates, and IDOR risk. |
+| [`/audit-design-system`](src/commands/audit-design-system.md) | Greps raw hex, arbitrary utility values and one-off components; trends the counts. |
+| [`/audit-performance`](src/commands/audit-performance.md) | Measures First Load JS, PageSpeed, raw `<img>`, unused deps, unindexed hot fields. |
+
+### Skills
+
+The only layer that **fires without being asked** — a skill exists precisely because you don't
+know you need it. Install to `.claude/skills/<name>/SKILL.md`.
+
+| Skill | The counterintuitive thing it knows |
+|---|---|
+| [`tests-that-cannot-fail`](src/skills/SKILL_TESTS_THAT_CANNOT_FAIL.md) | A guard never observed failing against the pre-fix code asserts **nothing**. Regex alternations, mocked throws and conditional skips pass in both worlds. |
+| [`claim-before-side-effect`](src/skills/SKILL_CLAIM_BEFORE_SIDE_EFFECT.md) | A marker stamped **after** an irreversible call is a re-send window, not idempotency. |
+| [`never-throws-contract`](src/skills/SKILL_NEVER_THROWS_CONTRACT.md) | The client resolves `{success: false}` instead of throwing — so your `try/catch` is dead code. |
+| [`framework-defaults-are-permissive`](src/skills/SKILL_FRAMEWORK_DEFAULTS_ARE_PERMISSIVE.md) | Unspecified access falls through to *any authenticated user*; locking only `update` leaves `create` open. |
+| [`SKILL_TEMPLATE`](src/skills/SKILL_TEMPLATE.md) | The anatomy for writing your own. The frontmatter **is** the skill. |
+
+### Agents
+
+Read-only advisory lenses. The lens lives in the file; live state is injected at invocation, so
+they don't rot. Install to `.claude/agents/`.
+
+| Agent | Its bias |
+|---|---|
+| [`ceo`](src/agents/AGENT_CEO.md) | Distribution and trust beat features. One bet per release. |
+| [`cfo`](src/agents/AGENT_CFO.md) | Ranks by revenue-at-risk × probability − build cost. Blocks traffic on a leaking money path. |
+| [`cpo`](src/agents/AGENT_CPO.md) | The funnel is the product. Never ship the editor before the viewer. |
+| [`cto`](src/agents/AGENT_CTO.md) | Correctness over cleverness. A green pipeline that skips the money path is a lie. |
+| [`AGENT_TEMPLATE`](src/agents/AGENT_TEMPLATE.md) | The anatomy: lens in the file, state injected, one invariant, a named verdict. |
+
+### Scripts
+
+*A playbook that ends in a number should ship the calculator that produces it.* Standard library
+only, no dependencies.
+
+| Script | What it answers |
+|---|---|
+| [`sensitivity-table.py`](src/scripts/sensitivity-table.py) | **Which variable, off by 50%, kills the model?** Ranks the damage and exposes the monthly-vs-annual fee physics. Prints trip-wires, not a forecast. |
+| [`score-sean-ellis.py`](src/scripts/score-sean-ellis.py) | **What's the PMF read after discounting polite signal?** The bundled example scores **raw 40% PASS / discounted 20% FAIL**. |
+
+### Config and meta
+
+| File | Deployed as | What it is |
+|---|---|---|
+| [`SETTINGS_TEMPLATE.json`](src/config/SETTINGS_TEMPLATE.json) | `.claude/settings.json` | Denies merge, rebase, force-push, the deploy CLI and every `.env` write. The human merges, deploys and touches secrets. |
+| [`PLACEHOLDERS.md`](src/meta/PLACEHOLDERS.md) | `docs/PLACEHOLDERS.md` | The canonical `«token»` glossary. `«SCREAMING_SNAKE»` is one value per repo; `«lowercase»` is filled inline. |
 
 ## Start here
 
