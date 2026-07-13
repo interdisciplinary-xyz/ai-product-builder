@@ -13,13 +13,13 @@ npm run deploy -- ../my-app/docs        # 95 docs + commands, skills, agents, ca
 
 ```
 my-app/docs/
-├── RELEASE_MANAGER.md        ← staged-branch CI policy, «placeholders» ready to fill
-├── SECURITY_MODEL.md         ← auth tiers, IDOR guard, webhook signing
-├── MANAGER_SECURITY.md       ← the playbook that audits the file above
-├── … 92 more
-├── commands/                 → .claude/commands/     (11 slash-commands)
-├── skills/                   → .claude/skills/       (4 ambient rules)
-└── agents/                   → .claude/agents/       (4 exec lenses + template)
+├── 📘 RELEASE_MANAGER.md     ← staged-branch CI policy, «placeholders» ready to fill
+├── 📘 SECURITY_MODEL.md      ← auth tiers, IDOR guard, webhook signing
+├── 🎛️ MANAGER_SECURITY.md    ← the playbook that audits the file above
+├──    … 92 more
+├── ⌨️ commands/              → .claude/commands/   (11 slash-commands)
+├── ⚡ skills/                → .claude/skills/     (4 ambient rules)
+└── 🎩 agents/                → .claude/agents/     (4 exec lenses + template)
 ```
 
 ## Why
@@ -60,14 +60,14 @@ PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contents
 
-- [Why](#why) · [Status](#status) — is this for me, and is it alive
-- [Adopt it](#adopt-it) — the copy, and what it overwrites
-- [Use it](#use-it) — filling the `«placeholders»`, running a playbook
-- [What's inside](#whats-inside) — the six layers, with counts
-- [Start here](#start-here) — three doors, by what you came for
-- [What this library believes](#what-this-library-believes) — the four opinions
-- [Known weak points](#known-weak-points) — what you'd be signing up for
-- [Alternatives](#alternatives) · [Contributing](#contributing) · [License](#license)
+- 🤔 [Why](#why) · 🚦 [Status](#status) — is this for me, and is it alive
+- 📥 [Adopt it](#adopt-it) — the copy, and what it overwrites
+- 🛠️ [Use it](#use-it) — filling the `«placeholders»`, running a playbook
+- 📦 [What's inside](#whats-inside) — all eight layers
+- 🚪 [Start here](#start-here) — three doors, by what you came for
+- 💡 [What this library believes](#what-this-library-believes) — the four opinions
+- ⚠️ [Known weak points](#known-weak-points) — what you'd be signing up for
+- 🔀 [Alternatives](#alternatives) · 🤝 [Contributing](#contributing) · 📄 [License](#license)
 
 ## Adopt it
 
@@ -129,21 +129,21 @@ what the code does.
 
 | Layer | Files | What it is | |
 |---|:--:|---|---|
-| **Managers** | 25 | Playbooks you *run* against a repo. They create, verify, or audit a document. | [table →](CATALOG.md#managers) |
-| **Runbooks** | 64 | Documents you *fill*. This is what your team lives with. | [table →](CATALOG.md#runbooks) |
-| **Commands** | 11 | Slash-commands: 7 workflow + 4 recurring audits. | [below](#commands) |
-| **Skills** | 5 | Ambient rules that fire **without being asked**. | [below](#skills) |
-| **Agents** | 5 | Read-only exec lenses, convened by `/board`. | [below](#agents) |
-| **Scripts** | 2 | Calculators. Python, no dependencies. | [below](#scripts) |
-| **Config** | 1 | The permission deny-list. | [below](#config-and-meta) |
-| **Meta** | 1 | The `«token»` glossary. | [below](#config-and-meta) |
+| 🎛️ **Managers** | 25 | Playbooks you *run* against a repo. They create, verify, or audit a document. | [table →](CATALOG.md#managers) |
+| 📘 **Runbooks** | 64 | Documents you *fill*. This is what your team lives with. | [table →](CATALOG.md#runbooks) |
+| ⌨️ **Commands** | 11 | Slash-commands: 7 workflow + 4 recurring audits. | [below](#commands) |
+| ⚡ **Skills** | 5 | Ambient rules that fire **without being asked**. | [below](#skills) |
+| 🎩 **Agents** | 5 | Read-only exec lenses, convened by `/board`. | [below](#agents) |
+| 🧮 **Scripts** | 2 | Calculators. Python, no dependencies. | [below](#scripts) |
+| 🔒 **Config** | 1 | The permission deny-list. | [below](#config-and-meta) |
+| 🏷️ **Meta** | 1 | The `«token»` glossary. | [below](#config-and-meta) |
 
 The two big layers live in **[CATALOG.md](CATALOG.md)** — 89 rows would drown this page. The
 other six are small enough to show here.
 
 ### Commands
 
-The four `audit-*` commands write a **dated report**, diff it against the last one, and open an
+⌨️ The four `audit-*` commands write a **dated report**, diff it against the last one, and open an
 issue **only when a number gets worse**. Install to `.claude/commands/`.
 
 | Command | What running it does |
@@ -162,7 +162,7 @@ issue **only when a number gets worse**. Install to `.claude/commands/`.
 
 ### Skills
 
-The only layer that **fires without being asked** — a skill exists precisely because you don't
+⚡ The only layer that **fires without being asked** — a skill exists precisely because you don't
 know you need it. Install to `.claude/skills/<name>/SKILL.md`.
 
 | Skill | The counterintuitive thing it knows |
@@ -175,7 +175,7 @@ know you need it. Install to `.claude/skills/<name>/SKILL.md`.
 
 ### Agents
 
-Read-only advisory lenses. The lens lives in the file; live state is injected at invocation, so
+🎩 Read-only advisory lenses. The lens lives in the file; live state is injected at invocation, so
 they don't rot. Install to `.claude/agents/`.
 
 | Agent | Its bias |
@@ -188,7 +188,7 @@ they don't rot. Install to `.claude/agents/`.
 
 ### Scripts
 
-*A playbook that ends in a number should ship the calculator that produces it.* Standard library
+🧮 *A playbook that ends in a number should ship the calculator that produces it.* Standard library
 only, no dependencies.
 
 | Script | What it answers |
@@ -197,6 +197,8 @@ only, no dependencies.
 | [`score-sean-ellis.py`](src/scripts/score-sean-ellis.py) | **What's the PMF read after discounting polite signal?** The bundled example scores **raw 40% PASS / discounted 20% FAIL**. |
 
 ### Config and meta
+
+🔒 The permission boundary. 🏷️ The token glossary.
 
 | File | Deployed as | What it is |
 |---|---|---|
@@ -207,11 +209,11 @@ only, no dependencies.
 
 Three doors, depending on why you're here.
 
-**"I'm evaluating whether to adopt."** Read [`RELEASE_MANAGER`](src/runbooks/RUNBOOK_RELEASE_MANAGER.md).
+🔍 **"I'm evaluating whether to adopt."** Read [`RELEASE_MANAGER`](src/runbooks/RUNBOOK_RELEASE_MANAGER.md).
 It's the most opinionated document in the library and the one most likely to make you disagree.
 If you can live with it, the rest will fit.
 
-**"I want the five documents that earn their keep on day one."**
+🚀 **"I want the five documents that earn their keep on day one."**
 
 1. [`RELEASE_MANAGER`](src/runbooks/RUNBOOK_RELEASE_MANAGER.md) — staged-branch CI cost control (`scope/* → release/* → main`)
 2. [`QUALITY_ASSURANCE`](src/runbooks/RUNBOOK_QUALITY_ASSURANCE.md) — the pre-merge gate
@@ -219,7 +221,7 @@ If you can live with it, the rest will fit.
 4. [`SECURITY_MODEL`](src/runbooks/RUNBOOK_SECURITY_MODEL.md) — auth tiers, IDOR guard, webhook signing
 5. [`PRODUCT_CONTEXT`](src/managers/MANAGER_PRODUCT_CONTEXT.md) — what you're building and what you refuse to build
 
-**"Just show me the single best thing in here."**
+💎 **"Just show me the single best thing in here."**
 [`SKILL_TESTS_THAT_CANNOT_FAIL`](src/skills/SKILL_TESTS_THAT_CANNOT_FAIL.md) — three assertion
 shapes that pass *identically* against broken and fixed code. One of them shipped a fully
 deployed, e2e-tested route that zero pages referenced, for months, with CI green.

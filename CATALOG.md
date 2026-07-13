@@ -6,20 +6,20 @@ is the name it takes in your repo after `npm run deploy` (the `RUNBOOK_` prefix 
 
 | Layer | Files | Goes to |
 |---|:--:|---|
-| [Agents](#agents) | 5 | `.claude/agents/` |
-| [Commands](#commands) | 11 | `.claude/commands/` |
-| [Config](#config) | 1 | `.claude/settings.json` |
-| [Managers](#managers) | 25 | `docs/` |
-| [Meta](#meta) | 1 | `docs/` |
-| [Runbooks](#runbooks) | 64 | `docs/` |
-| [Scripts](#scripts) | 2 | run in place |
-| [Skills](#skills) | 5 | `.claude/skills/` |
+| 🎩 [Agents](#agents) | 5 | `.claude/agents/` |
+| ⌨️ [Commands](#commands) | 11 | `.claude/commands/` |
+| 🔒 [Config](#config) | 1 | `.claude/settings.json` |
+| 🎛️ [Managers](#managers) | 25 | `docs/` |
+| 🏷️ [Meta](#meta) | 1 | `docs/` |
+| 📘 [Runbooks](#runbooks) | 64 | `docs/` |
+| 🧮 [Scripts](#scripts) | 2 | run in place |
+| ⚡ [Skills](#skills) | 5 | `.claude/skills/` |
 
 ---
 
 ## Agents
 
-Read-only advisory lenses. Convened by [`/board`](src/commands/board.md), which injects live
+🎩 Read-only advisory lenses. Convened by [`/board`](src/commands/board.md), which injects live
 state and reports where they **disagree**. The lens lives in the file; the state never does.
 
 | Source | Deployed as | What it is |
@@ -32,7 +32,7 @@ state and reports where they **disagree**. The lens lives in the file; the state
 
 ## Commands
 
-Slash-commands. The four `audit-*` ones write a **dated report**, diff it against the previous
+⌨️ Slash-commands. The four `audit-*` ones write a **dated report**, diff it against the previous
 run, and open an issue **only when a number gets worse**.
 
 | Source | Deployed as | What running it does |
@@ -51,6 +51,8 @@ run, and open an issue **only when a number gets worse**.
 
 ## Config
 
+🔒 The permission boundary, in one file.
+
 | Source | Deployed as | What it is |
 |---|---|---|
 | [`SETTINGS_TEMPLATE.json`](src/config/SETTINGS_TEMPLATE.json) | `.claude/settings.json` | Allow-lists git / gh / package / read-only Bash. **Denies merge, rebase, force-push, the deploy CLI, and every `.env` write.** The human merges, deploys and touches secrets. |
@@ -60,7 +62,7 @@ which explains every deny line — JSON can't carry comments.
 
 ## Managers
 
-A playbook you **run** against a repo. It creates, verifies, or audits a document — usually the
+🎛️ A playbook you **run** against a repo. It creates, verifies, or audits a document — usually the
 runbook of the same name.
 
 | Source | What running it does |
@@ -93,13 +95,15 @@ runbook of the same name.
 
 ## Meta
 
+🏷️ The token glossary every other document reads from.
+
 | Source | Deployed as | What it is |
 |---|---|---|
 | [`PLACEHOLDERS.md`](src/meta/PLACEHOLDERS.md) | `PLACEHOLDERS.md` | The canonical `«token»` glossary. `«SCREAMING_SNAKE»` is one value per repo; `«lowercase»` is filled inline per occurrence. |
 
 ## Runbooks
 
-A document you **fill**. This is the artifact your team actually lives with. Sorted by deployed
+📘 A document you **fill**. This is the artifact your team actually lives with. Sorted by deployed
 name.
 
 | Source | Deployed as | What it becomes |
@@ -171,7 +175,7 @@ name.
 
 ## Scripts
 
-Python, standard library only, no dependencies. *A playbook that ends in a number should ship
+🧮 Python, standard library only, no dependencies. *A playbook that ends in a number should ship
 the calculator that produces it.*
 
 | Source | Run it | What it answers |
@@ -185,7 +189,7 @@ serve) and [`examples/pmf-responses.example.json`](src/scripts/examples/pmf-resp
 
 ## Skills
 
-The only layer that **fires without being asked**. A skill exists because you *don't know you
+⚡ The only layer that **fires without being asked**. A skill exists because you *don't know you
 need it* — it ambushes the diff at the moment you're about to make the mistake it knows about.
 ([Skill or doc?](CONTRIBUTING.md#skill-or-doc))
 
