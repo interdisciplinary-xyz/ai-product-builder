@@ -4,7 +4,14 @@ Playbooks, templates and agent skills for solo founders shipping products with C
 
 ## Contents
 
-⚡ [Quick start](#quick-start) · 🤔 [Why](#why) · 🚦 [Status](#status) · 📦 [What's inside](#whats-inside) · 🚪 [Start here](#start-here) · ⚠️ [Weak points](#weak-points) · 🤝 [Contributing](CONTRIBUTING.md) · 📄 [License](#license)
+- ⚡ [Quick start](#quick-start) — clone, deploy, done
+- 🤔 [Why](#why) — the problem, and what this is **not** for
+- 🚦 [Status](#status) — is it alive, has anyone used it
+- 📦 [What's inside](#whats-inside) — all eight layers
+- 🚪 [Start here](#start-here) — three doors, by what you came for
+- ⚠️ [Weak points](#weak-points) — what you'd be signing up for
+- 🤝 [Contributing](CONTRIBUTING.md) — conventions, release process
+- 📄 [License](#license)
 
 ## Quick start
 
