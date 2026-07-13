@@ -3,6 +3,25 @@
 This library is curated by hand. Improvements are welcome, but the conventions below are
 load-bearing — they're what keeps ~100 cross-linked documents from rotting.
 
+## What this library believes
+
+Four opinions. They're why the documents look the way they do, and a change that contradicts one
+of them needs an argument.
+
+**A green test suite is not evidence.** Before a regression guard is worth writing, run it
+against the pre-fix code and watch it fail. If it passes, it asserts nothing.
+
+**An audit that reports the same twelve false positives forever gets run twice, then never
+again.** So every audit command carries a known-legitimate-exceptions list, diffs against its
+last run, and opens an issue **only when a number gets worse**.
+
+**The human merges, deploys, and touches secrets.** The agent may do everything local and
+everything draft-shaped. Enforced by a permission deny-list, not by good intentions.
+
+**A doc is opened by someone who already decided to act; a skill has to ambush them.** Nobody
+thinks *"I should consult the never-throws document"* while writing a `try/catch`. That's the
+whole reason the skill layer exists — see [Skill or doc?](#skill-or-doc) below.
+
 ## Repo layout
 
 Sources live under `src/`, grouped by layer. `bin/build` turns them into the tree a consumer
