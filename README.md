@@ -4,14 +4,29 @@ Playbooks, templates and agent skills for solo founders shipping products with C
 
 ## Contents
 
+- 📦 [What's inside](#whats-inside) — all eight layers
 - ⚡ [Quick start](#quick-start) — clone, deploy, done
 - 🤔 [Why](#why) — the problem, and what this is **not** for
 - 🚦 [Status](#status) — is it alive, has anyone used it
-- 📦 [What's inside](#whats-inside) — all eight layers
 - 🚪 [Start here](#start-here) — three doors, by what you came for
 - ⚠️ [Weak points](#weak-points) — what you'd be signing up for
 - 🤝 [Contributing](CONTRIBUTING.md) — conventions, release process
 - 📄 [License](#license)
+
+## What's inside
+
+| | Layer | Files | What it is |
+|---|---|:--:|---|
+| 🎛️ | [Managers](CATALOG.md#managers) | 25 | Playbooks you **run** against a repo. They create, verify, or audit a doc. |
+| 📘 | [Runbooks](CATALOG.md#runbooks) | 64 | Docs you **fill**. This is what your team lives with. |
+| ⌨️ | [Commands](CATALOG.md#commands) | 11 | Slash-commands. The 4 audits open an issue **only on regression**. |
+| ⚡ | [Skills](CATALOG.md#skills) | 5 | Ambient rules that fire **without being asked**. |
+| 🎩 | [Agents](CATALOG.md#agents) | 5 | Read-only exec lenses; `/board` reports their **disagreement**. |
+| 🧮 | [Scripts](CATALOG.md#scripts) | 2 | Calculators. A playbook ending in a number ships the one that produces it. |
+| 🔒 | [Config](CATALOG.md#config) | 1 | The deny-list. The human merges, deploys, touches secrets. |
+| 🏷️ | [Meta](CATALOG.md#meta) | 1 | The `«token»` glossary. |
+
+**[→ CATALOG.md](CATALOG.md)** — all 114 files, each with a one-line description.
 
 ## Quick start
 
@@ -63,21 +78,6 @@ then disowned them — every playbook copy in one carries a banner reading *"NOT
 repo."* It is policy in prose, not enforcement in CI.
 
 The content is good; the adoption is unproven. Weigh accordingly.
-
-## What's inside
-
-| | Layer | Files | What it is |
-|---|---|:--:|---|
-| 🎛️ | [Managers](CATALOG.md#managers) | 25 | Playbooks you **run** against a repo. They create, verify, or audit a doc. |
-| 📘 | [Runbooks](CATALOG.md#runbooks) | 64 | Docs you **fill**. This is what your team lives with. |
-| ⌨️ | [Commands](CATALOG.md#commands) | 11 | Slash-commands. The 4 audits open an issue **only on regression**. |
-| ⚡ | [Skills](CATALOG.md#skills) | 5 | Ambient rules that fire **without being asked**. |
-| 🎩 | [Agents](CATALOG.md#agents) | 5 | Read-only exec lenses; `/board` reports their **disagreement**. |
-| 🧮 | [Scripts](CATALOG.md#scripts) | 2 | Calculators. A playbook ending in a number ships the one that produces it. |
-| 🔒 | [Config](CATALOG.md#config) | 1 | The deny-list. The human merges, deploys, touches secrets. |
-| 🏷️ | [Meta](CATALOG.md#meta) | 1 | The `«token»` glossary. |
-
-**[→ CATALOG.md](CATALOG.md)** — all 114 files, each with a one-line description.
 
 ## Start here
 
