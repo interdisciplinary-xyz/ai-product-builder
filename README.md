@@ -25,11 +25,13 @@ Playbooks, templates and agent skills for solo founders shipping products with C
 
 ## Stack
 
-| Build | Runtime | Tooling |
-| --- | --- | --- |
-| npm scripts (`build`, `check`, `deploy`) | Node.js for the build shim; Python 3 stdlib for the two calculators | Bash (`bin/build`) |
-
-The library ships **no runtime dependencies**. `bin/build` is a shell script; every calculator under `src/scripts/` uses the Python standard library only. `package.json` declares neither `dependencies` nor `devDependencies`.
+| App | Tests | Tools |
+| --- | ----- | ----- |
+| [Markdown](https://commonmark.org/) |  |  |
+| [Node.js](https://nodejs.org/) |  |  |
+| [Bash](https://www.gnu.org/software/bash/) |  |  |
+| [Python](https://www.python.org/) |  |  |
+| [Claude Code](https://claude.com/claude-code) |  |  |
 
 ---
 
