@@ -73,16 +73,13 @@ Full rules, including the skill-or-doc test: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### API
 
-The library's public surface is one command. It copies the built tree into a target repo's `docs/` and (via manual sub-copy) `.claude/` directories:
+The library's public surface is one command:
 
 ```bash
 npm run deploy -- ../my-app/docs
 ```
 
-Re-running `deploy` **overwrites** — there is no sync. If you edited a doc in the consumer repo, your changes will be lost on the next run. Two supporting entry points round out the interface:
-
-- `npm run build` — emit the deploy-shaped tree into `dist/` for local inspection.
-- `npm run check` — build in memory and verify every internal cross-link resolves. Run before opening a PR.
+Copies the built tree into a target repo's `docs/` and (via manual sub-copy) `.claude/` directories. Re-running `deploy` overwrites — there is no sync.
 
 ---
 
@@ -92,24 +89,15 @@ Declared in [`package.json`](package.json).
 
 | Name | Description |
 | --- | --- |
-| `npm run build` | Walk `src/`, emit the deploy-shaped tree into `dist/` for inspection. |
+| `npm run build` | Emit the deploy-shaped tree into `dist/` for inspection. |
 | `npm run check` | Build in memory and verify every internal cross-link resolves. |
-| `npm run deploy -- <target>` | Emit the tree directly into the target directory (typically `../my-app/docs`). |
-
-Two Python calculators under `src/scripts/` also ship — standard library only, run in place:
-
-| Script | Run it | What it answers |
-| --- | --- | --- |
-| `sensitivity-table.py` | `python3 src/scripts/sensitivity-table.py` | Which variable, off by 50%, kills the model? |
-| `score-sean-ellis.py` | `python3 src/scripts/score-sean-ellis.py responses.json` | The PMF read after discounting polite signal. |
+| `npm run deploy -- <target>` | Emit the tree directly into the target directory. |
 
 ---
 
 ### Environment
 
-**No environment variables required.** The library is pure markdown plus a shell build script — there is no runtime, no server, no service account, no secrets. `.env.example` does not exist and would carry nothing if it did.
-
-The `.claude/settings.json` template the library deploys into consumer repos denies every `.env` write on that side by policy — see [`PERMISSIONS_AND_AUTONOMY`](src/runbooks/RUNBOOK_PERMISSIONS_AND_AUTONOMY.md).
+No environment variables required.
 
 ---
 
@@ -171,8 +159,10 @@ The content is good; the adoption is unproven. Weigh accordingly.
 
 ## Documentation
 
-- [CATALOG.md](CATALOG.md) — all 114 files, each with a one-line description, grouped by layer.
-- [CONTRIBUTING.md](CONTRIBUTING.md) — conventions, the prefix rules, the skill-or-doc test, the quality bar, the release process.
+| Document | For |
+| --- | --- |
+| [CATALOG.md](CATALOG.md) | All 114 files, each with a one-line description, grouped by layer. |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Conventions, prefix rules, the skill-or-doc test, the quality bar, the release process. |
 
 ---
 
