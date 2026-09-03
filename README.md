@@ -1,5 +1,7 @@
 # ai-product-builder
 
+![ai-product-builder](/logo.svg)
+
 Playbooks, templates and agent skills for solo founders shipping products with Claude Code.
 
 ---
