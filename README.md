@@ -43,16 +43,18 @@ The library is a corpus of ~100 curated markdown files organised into eight laye
 
 ### Domains:
 
-The eight layers of the library. Each bullet links to its section in the catalog.
+The eight layers of the library. Each row links to its section in the catalog.
 
-- `src/managers` — Playbooks you **run** against a repo; each creates, verifies or audits a doc, usually the paired runbook (25 items) — see [CATALOG.md#managers](CATALOG.md#managers)
-- `src/runbooks` — Docs you **fill**; the artifact your team actually lives with (64 items) — see [CATALOG.md#runbooks](CATALOG.md#runbooks)
-- `src/commands` — Slash-commands; the four `audit-*` write a dated report and open an issue **only when a number gets worse** (11 items) — see [CATALOG.md#commands](CATALOG.md#commands)
-- `src/skills` — The only layer that fires **without being asked**; ambushes the diff at the moment you're about to make the mistake (5 items) — see [CATALOG.md#skills](CATALOG.md#skills)
-- `src/agents` — Read-only exec lenses (CEO/CFO/CPO/CTO); `/board` fans out to all four and reports their **disagreement** (5 items) — see [CATALOG.md#agents](CATALOG.md#agents)
-- `src/scripts` — Calculators; a playbook ending in a number ships the one that produces it (2 items) — see [CATALOG.md#scripts](CATALOG.md#scripts)
-- `src/config` — The permission deny-list; denies merge, rebase, force-push, the deploy CLI, and every `.env` write (1 item) — see [CATALOG.md#config](CATALOG.md#config)
-- `src/meta` — The canonical `«token»` glossary every other document reads from (1 item) — see [CATALOG.md#meta](CATALOG.md#meta)
+| Domain | Purpose |
+| --- | --- |
+| `src/managers` | Playbooks you **run** against a repo; each creates, verifies or audits a doc, usually the paired runbook (25 items) — see [CATALOG.md#managers](CATALOG.md#managers) |
+| `src/runbooks` | Docs you **fill**; the artifact your team actually lives with (64 items) — see [CATALOG.md#runbooks](CATALOG.md#runbooks) |
+| `src/commands` | Slash-commands; the four `audit-*` write a dated report and open an issue **only when a number gets worse** (11 items) — see [CATALOG.md#commands](CATALOG.md#commands) |
+| `src/skills` | The only layer that fires **without being asked**; ambushes the diff at the moment you're about to make the mistake (5 items) — see [CATALOG.md#skills](CATALOG.md#skills) |
+| `src/agents` | Read-only exec lenses (CEO/CFO/CPO/CTO); `/board` fans out to all four and reports their **disagreement** (5 items) — see [CATALOG.md#agents](CATALOG.md#agents) |
+| `src/scripts` | Calculators; a playbook ending in a number ships the one that produces it (2 items) — see [CATALOG.md#scripts](CATALOG.md#scripts) |
+| `src/config` | The permission deny-list; denies merge, rebase, force-push, the deploy CLI, and every `.env` write (1 item) — see [CATALOG.md#config](CATALOG.md#config) |
+| `src/meta` | The canonical `«token»` glossary every other document reads from (1 item) — see [CATALOG.md#meta](CATALOG.md#meta) |
 
 [→ CATALOG.md](CATALOG.md) — all 114 files, one line each.
 
