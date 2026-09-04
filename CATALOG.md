@@ -11,9 +11,9 @@ is the name it takes in your repo after `npm run deploy` (the `RUNBOOK_` prefix 
 | 🔒 [Config](#config) | 1 | `.claude/settings.json` |
 | 🎛️ [Managers](#managers) | 25 | `docs/` |
 | 🏷️ [Meta](#meta) | 1 | `docs/` |
-| 📘 [Runbooks](#runbooks) | 64 | `docs/` |
+| 📘 [Runbooks](#runbooks) | 65 | `docs/` |
 | 🧮 [Scripts](#scripts) | 2 | run in place |
-| ⚡ [Skills](#skills) | 5 | `.claude/skills/` |
+| ⚡ [Skills](#skills) | 8 | `.claude/skills/` |
 
 ---
 
@@ -155,6 +155,7 @@ name.
 | [`RUNBOOK_PROJECT_PLAN.md`](src/runbooks/RUNBOOK_PROJECT_PLAN.md) | `PROJECT_PLAN.md` | Per-milestone plan — goal, DRI, WIP cap, RAID, status snapshots. |
 | [`RUNBOOK_PULL_REQUEST_TEMPLATE.md`](src/runbooks/RUNBOOK_PULL_REQUEST_TEMPLATE.md) | `PULL_REQUEST_TEMPLATE.md` | The `.github` PR template — quality gates, error taxonomy, env registry, review policy. |
 | [`RUNBOOK_QUALITY_ASSURANCE.md`](src/runbooks/RUNBOOK_QUALITY_ASSURANCE.md) | `QUALITY_ASSURANCE.md` | The pre-merge gate — commands, audits, budgets, severity rules. |
+| [`RUNBOOK_README_TEMPLATE.md`](src/runbooks/RUNBOOK_README_TEMPLATE.md) | `README_TEMPLATE.md` | The canonical README shape — Stack table, TOC, Architecture with Domains/API/Scripts, categorised Environment, Documentation table, centered theme-adaptive logo, `---` separators. |
 | [`RUNBOOK_REFERRAL_MECHANICS.md`](src/runbooks/RUNBOOK_REFERRAL_MECHANICS.md) | `REFERRAL_MECHANICS.md` | Referral spec — model choice, benefits, attribution, anti-abuse, k-factor, break-even. |
 | [`RUNBOOK_RELEASE_MANAGER.md`](src/runbooks/RUNBOOK_RELEASE_MANAGER.md) | `RELEASE_MANAGER.md` | Branch flow from implementation to production, plus the CI cost-control policy. |
 | [`RUNBOOK_RFC_TEMPLATE.md`](src/runbooks/RUNBOOK_RFC_TEMPLATE.md) | `RFC_TEMPLATE.md` | One-proposal RFC card — problem, proposal, effort, decision, rationale. |
@@ -199,4 +200,7 @@ need it* — it ambushes the diff at the moment you're about to make the mistake
 | [`SKILL_CLAIM_BEFORE_SIDE_EFFECT.md`](src/skills/SKILL_CLAIM_BEFORE_SIDE_EFFECT.md) | `claim-before-side-effect/` | A marker stamped **after** an irreversible call is a re-send window, not idempotency. Claim the row first. |
 | [`SKILL_NEVER_THROWS_CONTRACT.md`](src/skills/SKILL_NEVER_THROWS_CONTRACT.md) | `never-throws-contract/` | The client resolves `{success: false}` instead of throwing — so your `try/catch` is dead code and a bare `await` silently drops every failure. |
 | [`SKILL_FRAMEWORK_DEFAULTS_ARE_PERMISSIVE.md`](src/skills/SKILL_FRAMEWORK_DEFAULTS_ARE_PERMISSIVE.md) | `framework-defaults-are-permissive/` | Unspecified access falls through to *any authenticated user*, and locking only `update` leaves `create` wide open. |
+| [`SKILL_PRIVATE_REPO_README_IMAGES.md`](src/skills/SKILL_PRIVATE_REPO_README_IMAGES.md) | `private-repo-readme-images/` | Leading-slash image paths (`/logo.svg`) render on public repos and 404 on private ones. `<p align="center">` is the only reliable centering. Theme-adaptive SVGs live and die by inline `<style>` + `prefers-color-scheme`. |
+| [`SKILL_CI_TRANSIENT_FAILURE_TOLERANCE.md`](src/skills/SKILL_CI_TRANSIENT_FAILURE_TOLERANCE.md) | `ci-transient-failure-tolerance/` | A red CI check has three causes — regression, network flake, version drift — and they look identical. Retry the audit, pin `@lhci/cli`, align prettier — or the team learns to re-run every red check. |
+| [`SKILL_PORTFOLIO_ASSIGNMENT_HYGIENE.md`](src/skills/SKILL_PORTFOLIO_ASSIGNMENT_HYGIENE.md) | `portfolio-assignment-hygiene/` | Unassigned open PRs and issues do not show up in `is:open assignee:@me` — a solo-owned 17-repo portfolio silently leaks work into a queue nobody sees. One sweep moved 4 PRs + 81 issues. |
 | [`SKILL_TEMPLATE.md`](src/skills/SKILL_TEMPLATE.md) | — | The anatomy for writing your own. The frontmatter **is** the skill; a body that lists current facts rots and then argues with the diff. |

@@ -66,6 +66,78 @@ prefix may exist; prefer `scope/*` for new aggregate work.
 1. **Never** merge `scope/*` directly into «TRUNK». Scope always targets its `release/*`.
 2. Implementation (`feat/*`/`fix/*`) branches start from the **latest `release/*`**.
 3. The `release/* → «TRUNK»` merge is a **single approved PR**, **merged manually by the maintainer** — automation must not merge to «TRUNK».
+4. **PR titles MUST be `«PROJECT» - <branch-name>`.** e.g. `«PROJECT» - scope/v1.35.0`,
+   `«PROJECT» - release/v1.35.0`, `«PROJECT» - docs/readme.md`. The `«PROJECT»` prefix is the
+   repo's **human short name** (e.g. `respect.click`, `empatalk`), NOT the org/repo path. The
+   `-` separator is a literal space-dash-space. This puts the branch name at the visible
+   position of the browser tab title (`«PROJECT» - scope/v1.35.0 · Pull Request #… · …`) so an
+   author with a row of PR tabs open picks one out at a glance. Enforce via the PR template's
+   top HTML comment.
+
+---
+
+### 1.1 Docs branches — `docs/readme.md`
+
+**README-only work lives on a stable `docs/readme.md` branch, one per repo, portfolio-wide.**
+This is not a `scope/*` cycle — it is an ambient docs sweep that runs concurrently with active
+scope work. The convention is dotted, lowercase, verbatim: `docs/readme.md`.
+
+**Why a dedicated branch, not a `fix/readme-…` slug per change:**
+
+- README work is high-frequency and low-risk (no code, no CI cost — `paths-ignore` skips it).
+- One branch per repo means one PR per repo, portfolio-wide — the fleet stays trivially navigable.
+- The branch name is the docs "signal" — a `gh pr list` across the org filtered by
+  `head:docs/readme.md` returns exactly the docs-sweep queue.
+- The PR merges, stays open, or re-opens without ambiguity — there is no "which docs branch was that."
+
+**Rules**
+
+1. **Never work on `docs/readme.md` from the user's active scope worktree if it is dirty.**
+   The user's uncommitted work on `scope/vX.Y.Z` MUST NOT be disturbed. Use a **git worktree**
+   from `origin/main`:
+
+   ```bash
+   git fetch origin
+   git worktree add scratchpad/«REPO»-docs -B docs/readme.md origin/main
+   cd scratchpad/«REPO»-docs
+   # …edit README.md, commit…
+   git push --force-with-lease origin docs/readme.md
+   cd -
+   git worktree remove scratchpad/«REPO»-docs
+   ```
+
+   The worktree is disposable; the branch is the artifact. Cleanup only after the PR is opened.
+
+2. **`--force-with-lease`, not `--force`.** The docs branch is shared across sessions — a bare
+   `--force` clobbers a push you did not see. `--force-with-lease` refuses if the remote moved,
+   which is the correct failure mode for a shared branch. If it refuses, `git fetch` and
+   rebase before re-pushing.
+
+3. **Reconciling divergent docs branches.** If a docs branch has drifted from another (e.g.
+   `docs/readme.md` is a stale template push and `docs/readme-template-fixes` carries the real
+   work), realign both to the real work rather than merge-resolving:
+
+   ```bash
+   # Move docs/readme.md forward to whatever branch has the real work.
+   git push --force-with-lease origin origin/docs/readme-template-fixes:docs/readme.md
+   ```
+
+   Then delete the aux branch. **Observed in the portfolio sweep:** craftwave.pl had exactly
+   this shape — `docs/readme.md` stale, `docs/readme-template-fixes` 14 commits ahead.
+
+4. **PR title follows rule 4 above:** `«PROJECT» - docs/readme.md`.
+
+5. **Assign the PR to the owner** — see [`SKILL_PORTFOLIO_ASSIGNMENT_HYGIENE.md`](./SKILL_PORTFOLIO_ASSIGNMENT_HYGIENE.md).
+   `gh pr create --assignee «OWNER_HANDLE»` — a docs PR with no assignee is one that sits open
+   for months across 17 repos.
+
+6. **Docs-only PRs may skip CI entirely** via `paths-ignore` in `ci.yml`. That is by design.
+   If branch protection requires a check that never reports, either merge as admin, or bundle
+   a trivial non-docs change.
+
+7. **README shape** — every `docs/readme.md` PR follows [`RUNBOOK_README_TEMPLATE.md`](./README_TEMPLATE.md).
+   Logo mechanics (private-repo image trap, theme-adaptive SVG, `<p align="center">`) are in
+   [`SKILL_PRIVATE_REPO_README_IMAGES.md`](./SKILL_PRIVATE_REPO_README_IMAGES.md).
 
 ---
 

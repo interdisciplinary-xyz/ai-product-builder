@@ -172,3 +172,181 @@ Manual verification before code freeze. One row per core flow. Keep the generic 
 | 1   | **`«scenario»`**          | «steps»                | «expected result»      |
 <!-- (one row per smoke-test scenario — e.g. homepage loads, registration, social login, default plan, public page, payment checkout, payment webhook, billing portal, health endpoint (GET «HEALTH_ENDPOINT»), cookie consent, unauthenticated API returns 401) -->
 
+---
+
+## Portfolio-wide hygiene sweeps
+
+For a solo owner of multiple repos (a portfolio of `«PORTFOLIO_REPOS»`), several failure
+modes only surface when swept across the whole fleet — no single repo shows a problem, but
+the aggregate rots. Run these sweeps on a **monthly** cadence (or after any period of intense
+solo work — a scope cycle, a launch, a docs sweep).
+
+### 1. Unassigned open PRs and issues
+
+**The failure mode:** GitHub's default (unassigned + open) is not the neutral state — the
+owner's `is:open assignee:@me` view is empty, notification filters don't fire, and merged
+PRs' Co-Authored-By credit is missing. Over a 17-repo portfolio this compounds silently; one
+sweep moved **4 PRs + 81 issues** to their real owner.
+
+Full doctrine + script + proof obligation:
+[`SKILL_PORTFOLIO_ASSIGNMENT_HYGIENE.md`](./SKILL_PORTFOLIO_ASSIGNMENT_HYGIENE.md).
+
+Sweep loop (one-liner form; the skill has the full script):
+
+```bash
+for repo in «PORTFOLIO_REPOS»; do
+  gh pr list --repo "$repo" --state open --json number,assignees \
+    --jq '.[] | select(.assignees | length == 0) | .number' \
+    | xargs -I{} gh pr edit {} --repo "$repo" --add-assignee «OWNER_HANDLE»
+  gh issue list --repo "$repo" --state open --json number,assignees \
+    --jq '.[] | select(.assignees | length == 0) | .number' \
+    | xargs -I{} gh issue edit {} --repo "$repo" --add-assignee «OWNER_HANDLE»
+done
+```
+
+Verify with the leak query:
+
+```bash
+gh search prs    --owner «ORG» --state=open --no-assignee | wc -l    # 0
+gh search issues --owner «ORG» --state=open --no-assignee | wc -l    # 0
+```
+
+### 2. Stale local remote URLs
+
+**The failure mode:** repos moved between orgs (`mdopieralski/hannajuszczak.pl` →
+`interdisciplinary-xyz/hannajuszczak.pl`; `budget-receipts-app` → `savei`;
+`mdopieralski/wearedope` → `interdisciplinary-xyz/interdisciplinary.xyz`;
+`mdopieralski/neatual.com` → `interdisciplinary-xyz/neatual.com`) still push via GitHub's
+redirect, so nothing breaks — but every `git push` prints a redirect notice, and scripts
+that grep for the "canonical" remote URL misfire.
+
+Fix per repo:
+
+```bash
+cd «REPO»
+git remote -v
+git remote set-url origin git@github.com:«ORG»/«REPO».git
+```
+
+Sweep across the portfolio (run from the parent directory holding all repos):
+
+```bash
+for repo in «PORTFOLIO_REPOS»; do
+  cd "$repo" 2>/dev/null || continue
+  current=$(git remote get-url origin 2>/dev/null || echo "")
+  expected="git@github.com:«ORG»/$repo.git"
+  if [ "$current" != "$expected" ]; then
+    echo "$repo: $current → $expected"
+    # Uncomment to auto-fix:
+    # git remote set-url origin "$expected"
+  fi
+  cd - >/dev/null
+done
+```
+
+### 3. Dependabot alerts on the default branch that block PRs
+
+**The failure mode:** repos that gate PRs via a `check-audit-baseline.mjs`-style script
+(observed on neatual.com) fail every new PR when a Dependabot alert appears on `main`, even
+when the PR does not touch dependencies. The fix is either a `pnpm.overrides` patch on the
+transitive dep (cheap) or a baseline regeneration (louder).
+
+The `pnpm.overrides` pattern (observed on multiple repos — e.g. clearing GHSA-c83g-rgw3-j3cx
+via `@sentry/nextjs > @sentry/bundler-plugin-core > @babel/core > @babel/helper-compilation-targets > browserslist`):
+
+```json
+{
+  "pnpm": {
+    "overrides": {
+      "browserslist": ">=4.28.7"
+    }
+  }
+}
+```
+
+Sweep for open Dependabot alerts across the portfolio:
+
+```bash
+for repo in «PORTFOLIO_REPOS»; do
+  count=$(gh api "repos/«ORG»/$repo/dependabot/alerts?state=open" --jq 'length' 2>/dev/null || echo 0)
+  [ "$count" -gt 0 ] && echo "$repo: $count open alert(s)"
+done
+```
+
+Then for each hit: `gh api repos/«ORG»/«REPO»/dependabot/alerts?state=open --jq '.[].security_advisory.ghsa_id'`
+and resolve via `pnpm.overrides` or a real dependency bump.
+
+### 4. Case-duplicated files on case-insensitive filesystems
+
+**The failure mode:** macOS and Windows can hold both `README.md` and `readme.md` as the same
+inode; committing both produces a case-only diff that breaks on case-sensitive filesystems
+(Linux CI). **Observed:** warszawskaakademiamalucha.pl had both.
+
+Detect:
+
+```bash
+for repo in «PORTFOLIO_REPOS»; do
+  cd "$repo" 2>/dev/null || continue
+  dupes=$(git ls-tree -r HEAD --name-only | sort -f | uniq -di)
+  [ -n "$dupes" ] && echo "$repo: case-duplicate: $dupes"
+  cd - >/dev/null
+done
+```
+
+Fix — canonicalise to a single case (README.md is the convention):
+
+```bash
+git mv readme.md README.md.tmp
+git mv README.md.tmp README.md
+git commit -m "chore: canonicalise README.md case"
+```
+
+### 5. Missing CI configuration
+
+**The failure mode:** repos with no `.github/workflows/` show `no-checks` on every PR — no
+gate, no signal, no confidence that anything ran. **Observed:** musinet, ai-product-builder
+(before this scope). Not a bug per se, but worth flagging in the portfolio hygiene report
+so the missing coverage is a *decision*, not an oversight.
+
+Sweep:
+
+```bash
+for repo in «PORTFOLIO_REPOS»; do
+  cd "$repo" 2>/dev/null || continue
+  count=$(find .github/workflows -name '*.yml' -o -name '*.yaml' 2>/dev/null | wc -l | tr -d ' ')
+  [ "$count" = "0" ] && echo "$repo: no CI workflows"
+  cd - >/dev/null
+done
+```
+
+### 6. Diverged docs branches
+
+**The failure mode:** an aux docs branch (e.g. `docs/readme-template-fixes`) advances while
+the canonical `docs/readme.md` sits stale — the merged PR ships the stale one, and the real
+work is lost. **Observed:** craftwave.pl had `docs/readme.md` 14 commits behind
+`docs/readme-template-fixes` at sweep time.
+
+Fix — realign the canonical branch to whichever branch has the real work:
+
+```bash
+git fetch origin
+git push --force-with-lease origin origin/docs/readme-template-fixes:docs/readme.md
+git push origin --delete docs/readme-template-fixes
+```
+
+See [`RUNBOOK_RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §1.1 for the docs-branch convention.
+
+### Cadence
+
+| Sweep                            | Cadence     | Time     |
+|----------------------------------|-------------|----------|
+| Unassigned PRs and issues        | Monthly     | ~5 min   |
+| Stale remote URLs                | Quarterly   | ~5 min   |
+| Dependabot alerts on `main`      | Weekly      | ~10 min  |
+| Case-duplicated files            | Quarterly   | ~2 min   |
+| Missing CI configuration         | Quarterly   | ~2 min   |
+| Diverged docs branches           | Monthly     | ~5 min   |
+
+Commit the sweep output (or a summary) to a `docs/hygiene-sweeps/YYYY-MM.md` log as evidence
+the sweeps happened — the log is the artifact, the empty leak-query is the proof.
+
