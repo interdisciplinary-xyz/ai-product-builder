@@ -193,8 +193,8 @@ a:hover {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
-  backdrop-filter: blur(10px) saturate(1.4);
+  background: color-mix(in srgb, var(--paper) 97%, transparent);
+  backdrop-filter: blur(12px) saturate(1.3);
   border-bottom: 1px solid var(--rule);
 }
 
@@ -1227,4 +1227,75 @@ a.anchor:focus-visible {
   color: var(--ink-faint);
   font-size: 0.85rem;
   border-bottom: 1px solid var(--rule);
+}
+
+/* A code span that names another document in the library. */
+.prose .code-link {
+  text-decoration: none;
+}
+.prose .code-link code {
+  border-color: var(--rule-strong);
+  border-bottom-color: var(--layer, var(--accent));
+  color: var(--ink);
+  transition: color 130ms ease, border-color 130ms ease, background-color 130ms ease;
+}
+.prose .code-link:hover code {
+  color: var(--layer, var(--accent));
+  border-color: var(--layer, var(--accent));
+  background: var(--paper-raised);
+}
+
+/* The manager↔runbook pairing — the library's central relationship. */
+.doc__meta--pair dd a {
+  color: var(--layer, var(--accent));
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+.doc__meta--pair dd a:hover {
+  color: var(--ink);
+}
+
+/* Layer headers on the unfiltered index — 119 undifferentiated rows is a wall. */
+.ledger__group {
+  position: sticky;
+  top: 3.75rem;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.6rem 0.5rem 0.55rem;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule-strong);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.ledger__group .icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--ink-faint);
+}
+.ledger__count {
+  margin-left: auto;
+  color: var(--ink-faint);
+  letter-spacing: 0;
+}
+
+/* Below this width the nav genuinely overflows. It scrolls, but a hidden
+   scrollbar gave no hint there was more — so fade the cut edge. */
+@media (max-width: 60rem) {
+  .masthead__nav {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.25rem), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 2.25rem), transparent);
+    padding-right: 1.5rem;
+  }
+  .masthead__nav:has(a:last-child:focus-visible) {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 }

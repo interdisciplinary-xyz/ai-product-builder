@@ -76,7 +76,16 @@ function resolveHref(href: string, map: Record<string, string>): string | null {
   return route ? `${route}${hash ? `#${hash}` : ''}` : null;
 }
 
-export function Markdown({ content, links }: { content: string; links: Record<string, string> }) {
+export function Markdown({
+  content,
+  links,
+  self,
+}: {
+  content: string;
+  links: Record<string, string>;
+  /** Route of the document being rendered, so it doesn't link to itself. */
+  self?: string;
+}) {
   return (
     <div className="prose">
       <ReactMarkdown
@@ -116,6 +125,30 @@ export function Markdown({ content, links }: { content: string; links: Record<st
               <Link href={resolved} {...props}>
                 {children}
               </Link>
+            );
+          },
+          // The library names its own files in inline code — "Pairs with:
+          // `RUNBOOK_SECURITY_MODEL.md`" — and never as a markdown link (0 of
+          // 25 managers do). Rendered literally that is an inert pill, which
+          // hides the single most central relationship in the library. So a
+          // code span that names a file we have becomes a link to it.
+          code({ children, className, ...props }) {
+            const text = String(children);
+            const isBlock = text.includes('\n') || /^language-/.test(className ?? '');
+            if (!isBlock) {
+              const route = links[text.trim().toLowerCase()];
+              if (route && route !== self) {
+                return (
+                  <Link href={route} className="code-link">
+                    <code {...props}>{children}</code>
+                  </Link>
+                );
+              }
+            }
+            return (
+              <code className={className} {...props}>
+                {children}
+              </code>
             );
           },
           table({ children, ...props }) {

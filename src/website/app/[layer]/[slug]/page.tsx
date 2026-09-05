@@ -8,6 +8,7 @@ import {
   findDoc,
   linkMap,
   relations,
+  pairing,
   type LayerId,
 } from '@/lib/content';
 import { Markdown, CodeBlock } from '@/components/markdown';
@@ -51,6 +52,7 @@ export default async function DocPage({
   const next = siblings[at + 1];
   const toc = doc.headings.filter((h) => h.depth === 2);
   const { outbound, inbound } = relations(doc);
+  const pair = pairing(doc);
 
   return (
     <div className="shell doc" data-layer={doc.layer} style={layerStyle(layer)}>
@@ -90,6 +92,19 @@ export default async function DocPage({
             <dt>You</dt>
             <dd>{layer.verb} it</dd>
           </div>
+          {pair ? (
+            <div className="doc__meta--pair">
+              <dt>{pair.role}</dt>
+              <dd>
+                {pair.docs.map((d, i) => (
+                  <span key={`${d.layer}/${d.slug}`}>
+                    {i > 0 ? ', ' : ''}
+                    <Link href={`/${d.layer}/${d.slug}/`}>{d.name}</Link>
+                  </span>
+                ))}
+              </dd>
+            </div>
+          ) : null}
           <div>
             <dt>Length</dt>
             <dd>
@@ -104,7 +119,11 @@ export default async function DocPage({
           {doc.language ? (
             <CodeBlock code={doc.body} language={doc.language} />
           ) : (
-            <Markdown content={doc.body} links={linkMap()} />
+            <Markdown
+              content={doc.body}
+              links={linkMap()}
+              self={`/${doc.layer}/${doc.slug}/`}
+            />
           )}
         </article>
 

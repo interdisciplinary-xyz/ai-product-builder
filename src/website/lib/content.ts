@@ -478,6 +478,56 @@ export function relations(doc: Doc): Relations {
   return buildGraph().get(key(doc)) ?? { outbound: [], inbound: [] };
 }
 
+/* -------------------------------------------------------------- the pairing */
+
+/**
+ * "A manager produces the runbook of the same name" is the library's central
+ * claim, but only 3 of 25 names actually match. The real pairing is declared in
+ * each manager's "Pairs with:" line — all 25 have one — where the FIRST runbook
+ * named is the primary artifact and the rest are secondary references. Deriving
+ * it from that line keeps the claim honest: a runbook referenced in passing by
+ * eight managers is not "produced by" eight managers.
+ */
+let pairings: { primary: Map<string, Doc>; producedBy: Map<string, Doc[]> } | null = null;
+
+function buildPairings() {
+  if (pairings) return pairings;
+  const docs = allDocs();
+  const byFile = new Map(docs.map((d) => [d.file.toLowerCase(), d]));
+  const primary = new Map<string, Doc>();
+  const producedBy = new Map<string, Doc[]>();
+
+  for (const manager of docs.filter((d) => d.layer === 'managers')) {
+    const line = manager.body.match(/Pairs with:\*{0,2}([^\n]*)/)?.[1];
+    if (!line) continue;
+    const first = line.match(/`(RUNBOOK_[A-Z0-9_]+\.md)`/);
+    const target = first ? byFile.get(first[1].toLowerCase()) : undefined;
+    if (!target) continue;
+    primary.set(key(manager), target);
+    const list = producedBy.get(key(target)) ?? [];
+    list.push(manager);
+    producedBy.set(key(target), list);
+  }
+
+  pairings = { primary, producedBy };
+  return pairings;
+}
+
+export type Pairing = { role: 'Produces' | 'Produced by'; docs: Doc[] } | null;
+
+export function pairing(doc: Doc): Pairing {
+  const { primary, producedBy } = buildPairings();
+  if (doc.layer === 'managers') {
+    const target = primary.get(key(doc));
+    return target ? { role: 'Produces', docs: [target] } : null;
+  }
+  if (doc.layer === 'runbooks') {
+    const managers = producedBy.get(key(doc)) ?? [];
+    return managers.length ? { role: 'Produced by', docs: managers } : null;
+  }
+  return null;
+}
+
 export type SearchEntry = {
   layer: LayerId;
   slug: string;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { LayerIcon } from '@/components/icons';
 import type { LayerId } from '@/lib/content';
@@ -76,16 +76,40 @@ export function BrowseClient({
     [query],
   );
 
+  /**
+   * Requiring every term to match sank the obvious queries: "release process"
+   * returned CONTRIBUTING and hid RELEASE_MANAGER, because "process" appears in
+   * neither its name nor its one-line description. So score instead — any term
+   * can match, and where it matches decides the rank.
+   */
   const results = useMemo(() => {
     const lowered = terms.map((t) => t.toLowerCase());
-    return items.filter((item) => {
-      if (active && item.layer !== active) return false;
-      if (!lowered.length) return true;
-      const haystack =
-        `${item.name} ${item.file} ${item.description} ${item.deployedAs ?? ''} ${item.layer}`.toLowerCase();
-      return lowered.every((term) => haystack.includes(term));
-    });
+    const scoped = items.filter((item) => !active || item.layer === active);
+    if (!lowered.length) return scoped;
+
+    return scoped
+      .map((item, index) => {
+        let score = 0;
+        const name = item.name.toLowerCase();
+        for (const term of lowered) {
+          if (name === term) score += 12;
+          else if (name.startsWith(term)) score += 8;
+          else if (name.includes(term)) score += 6;
+          if (item.file.toLowerCase().includes(term)) score += 3;
+          if ((item.deployedAs ?? '').toLowerCase().includes(term)) score += 2;
+          if (item.description.toLowerCase().includes(term)) score += 2;
+          if (item.layer.includes(term)) score += 1;
+        }
+        return { item, score, index };
+      })
+      .filter((r) => r.score > 0)
+      .sort((a, b) => b.score - a.score || a.index - b.index)
+      .map((r) => r.item);
   }, [items, terms, active]);
+
+  // Grouping only makes sense on the unranked list; a scored result set is
+  // already in its most useful order.
+  const grouped = terms.length === 0;
 
   return (
     <>
@@ -157,11 +181,21 @@ export function BrowseClient({
       </p>
 
       <div className="ledger">
-        {results.map((item) => {
+        {results.map((item, i) => {
           const layer = byId.get(item.layer);
+          const startsGroup = grouped && (i === 0 || results[i - 1].layer !== item.layer);
           return (
+            <Fragment key={`${item.layer}/${item.slug}`}>
+            {startsGroup ? (
+              <h2 className="ledger__group">
+                <LayerIcon layer={item.layer} />
+                <span>{layer?.label}</span>
+                <span className="ledger__count mono">
+                  {results.filter((r) => r.layer === item.layer).length}
+                </span>
+              </h2>
+            ) : null}
             <Link
-              key={`${item.layer}/${item.slug}`}
               href={`/${item.layer}/${item.slug}/`}
               className="entry"
               data-layer={item.layer}
@@ -186,10 +220,11 @@ export function BrowseClient({
                 ) : null}
               </span>
               <span className="entry__meta">
-                <span>{item.layer}</span>
+                {grouped ? null : <span>{item.layer}</span>}
                 {item.deployedAs ? <span>→ {item.deployedAs}</span> : null}
               </span>
             </Link>
+            </Fragment>
           );
         })}
         {results.length === 0 ? (
