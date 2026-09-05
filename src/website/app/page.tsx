@@ -1,7 +1,7 @@
 import { Link } from '@/components/link';
-import { LAYERS, allDocs, layerCounts, libraryVersion, findDoc } from '@/lib/content';
-import { Entry, Ledger, layerStyle } from '@/components/ui';
-import { DoorIcon } from '@/components/icons';
+import { LAYERS, allDocs, docsForLayer, layerCounts, libraryVersion, findDoc } from '@/lib/content';
+import { DocEntry, Entry, Ledger, layerStyle } from '@/components/ui';
+import { DoorIcon, LayerIcon } from '@/components/icons';
 
 export default function HomePage() {
   const counts = layerCounts();
@@ -111,7 +111,7 @@ export default function HomePage() {
           {LAYERS.filter((l) => l.id !== 'guides').map((layer, i) => (
             <Entry
               key={layer.id}
-              href={`/${layer.id}/`}
+              href={`#contents-${layer.id}`}
               name={`${layer.label.toLowerCase()}/`}
               description={layer.tagline}
               meta={[`${counts[layer.id]} files`, `→ ${layer.target}`, `you ${layer.verb} them`]}
@@ -120,6 +120,37 @@ export default function HomePage() {
             />
           ))}
         </Ledger>
+      </section>
+
+      <section className="section" id="contents">
+        <header className="section__head">
+          <h2 className="display">Contents</h2>
+          <p>
+            Every file in the library, by layer — the same descriptions{' '}
+            <code>CATALOG.md</code> carries.
+          </p>
+        </header>
+        {LAYERS.filter((l) => l.id !== 'guides').map((layer) => (
+          <section
+            key={layer.id}
+            id={`contents-${layer.id}`}
+            aria-labelledby={`contents-${layer.id}-heading`}
+            data-layer={layer.id}
+            style={layerStyle(layer)}
+          >
+            <h3 className="ledger__group" id={`contents-${layer.id}-heading`}>
+              <LayerIcon layer={layer.id} />
+              <Link href={`/${layer.id}/`}>{layer.label}</Link>
+              <span className="ledger__group-note">{layer.tagline}</span>
+              <span className="ledger__count mono">{counts[layer.id]}</span>
+            </h3>
+            <Ledger>
+              {docsForLayer(layer.id).map((doc) => (
+                <DocEntry key={doc.slug} doc={doc} />
+              ))}
+            </Ledger>
+          </section>
+        ))}
       </section>
 
       <section className="section" id="start">

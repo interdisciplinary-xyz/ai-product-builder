@@ -1423,3 +1423,25 @@ main:focus {
 .prose--wide {
   max-width: none;
 }
+
+/* The contents list on the front page: the layer's own line, beside its name. */
+.ledger__group a {
+  color: inherit;
+  text-decoration: none;
+}
+.ledger__group a:hover {
+  color: var(--layer, var(--accent));
+}
+.ledger__group-note {
+  font-family: var(--font-body), serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-faint);
+}
+@media (max-width: 40rem) {
+  .ledger__group-note {
+    display: none;
+  }
+}
