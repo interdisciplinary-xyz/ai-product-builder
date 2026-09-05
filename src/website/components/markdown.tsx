@@ -1,0 +1,169 @@
+import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSlug from 'rehype-slug';
+import type { Root, RootContent } from 'mdast';
+
+/* ---------------------------------------------------------------------------
+   remark plugin: «PLACEHOLDER» tokens
+   The library's whole convention is that an unfilled document looks unfilled.
+   Marking the tokens visually is the single highest-value thing this site can
+   add to the raw markdown, so it gets a plugin rather than a stylesheet hack.
+   ------------------------------------------------------------------------- */
+
+const TOKEN = /«[^»\n]{1,80}»/g;
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"]/g, (c) => `&${{ '&': 'amp', '<': 'lt', '>': 'gt', '"': 'quot' }[c]};`);
+}
+
+function remarkTokens() {
+  return (tree: Root) => {
+    const walk = (node: RootContent | Root) => {
+      if (!('children' in node) || !node.children) return;
+      // Code and inline code keep their literal «» — they are examples, not fills.
+      const next: RootContent[] = [];
+      for (const child of node.children as RootContent[]) {
+        if (child.type === 'text' && TOKEN.test(child.value)) {
+          TOKEN.lastIndex = 0;
+          let last = 0;
+          let match: RegExpExecArray | null;
+          while ((match = TOKEN.exec(child.value))) {
+            if (match.index > last) {
+              next.push({ type: 'text', value: child.value.slice(last, match.index) });
+            }
+            next.push({
+              type: 'html',
+              value: `<span class="token">${escapeHtml(match[0])}</span>`,
+            });
+            last = match.index + match[0].length;
+          }
+          if (last < child.value.length) {
+            next.push({ type: 'text', value: child.value.slice(last) });
+          }
+        } else {
+          if (child.type !== 'code' && child.type !== 'inlineCode') walk(child);
+          next.push(child);
+        }
+      }
+      (node as Root).children = next;
+    };
+    walk(tree);
+  };
+}
+
+/* ------------------------------------------------------------ link rewriting */
+
+const TOKEN_HREF = /«[^»]*»/;
+
+function decodeHref(href: string): string {
+  try {
+    return decodeURI(href);
+  } catch {
+    return href;
+  }
+}
+
+/** `./QUALITY_ASSURANCE.md#gate` → `/runbooks/quality-assurance/#gate`, by basename. */
+function resolveHref(href: string, map: Record<string, string>): string | null {
+  if (/^(https?:|mailto:|#)/.test(href)) return href;
+  const [target, hash] = href.split('#');
+  if (!target) return href;
+  const base = target.split('/').pop()?.toLowerCase();
+  if (!base) return null;
+  const route = map[base];
+  return route ? `${route}${hash ? `#${hash}` : ''}` : null;
+}
+
+export function Markdown({ content, links }: { content: string; links: Record<string, string> }) {
+  return (
+    <div className="prose">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkTokens]}
+        rehypePlugins={[rehypeRaw, rehypeSlug]}
+        components={{
+          a({ href, children, ...props }) {
+            if (!href) return <span {...props}>{children}</span>;
+            if (/^https?:/.test(href)) {
+              return (
+                <a href={href} target="_blank" rel="noreferrer noopener" {...props}>
+                  {children}
+                </a>
+              );
+            }
+            const resolved = resolveHref(href, links);
+            if (!resolved) {
+              const target = decodeHref(href);
+              // Most unresolved links are «PLACEHOLDER» URLs — a link you fill
+              // when you adopt the doc, not a broken one. The rest point at
+              // files that only exist once the library is deployed somewhere.
+              return TOKEN_HREF.test(target) ? (
+                <span className="token" title={`${target} — fill this link when you adopt the doc`}>
+                  {children}
+                </span>
+              ) : (
+                <span className="link-dead" title={`${target} — not a file in this library`}>
+                  {children}
+                </span>
+              );
+            }
+            return resolved.startsWith('#') ? (
+              <a href={resolved} {...props}>
+                {children}
+              </a>
+            ) : (
+              <Link href={resolved} {...props}>
+                {children}
+              </Link>
+            );
+          },
+          table({ children, ...props }) {
+            return (
+              <div className="table-wrap">
+                <table {...props}>{children}</table>
+              </div>
+            );
+          },
+          h2({ children, id, ...props }) {
+            return (
+              <h2 id={id} {...props}>
+                {children}
+                {id ? (
+                  <a className="anchor mono" href={`#${id}`} aria-label="Link to this section">
+                    §
+                  </a>
+                ) : null}
+              </h2>
+            );
+          },
+          h3({ children, id, ...props }) {
+            return (
+              <h3 id={id} {...props}>
+                {children}
+                {id ? (
+                  <a className="anchor mono" href={`#${id}`} aria-label="Link to this section">
+                    §
+                  </a>
+                ) : null}
+              </h3>
+            );
+          },
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+}
+
+/** Non-markdown sources (JSON, Python) are shown verbatim, as one code block. */
+export function CodeBlock({ code, language }: { code: string; language: string }) {
+  return (
+    <div className="prose">
+      <pre>
+        <code className={`language-${language}`}>{code}</code>
+      </pre>
+    </div>
+  );
+}
