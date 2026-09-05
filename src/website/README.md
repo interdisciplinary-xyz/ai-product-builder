@@ -11,8 +11,8 @@ It therefore has to live inside this repository — it reads two directories up.
 ## Run it
 
 ```bash
-npm install
-npm run start:dev        # https://ai-product-builder.local
+pnpm install
+pnpm start:dev           # https://ai-product-builder.local
 ```
 
 Dev runs through [Portless](https://github.com/vercel-labs/portless), like the other apps here —
@@ -21,15 +21,16 @@ a stable HTTPS host, no port numbers. The name comes from `portless.json`. Portl
 so other devices on the same Wi-Fi can open it too. `https://ai-product-builder.localhost` also
 works, and needs no hosts entry at all.
 See [`RUNBOOK_DEV_PORTLESS`](../runbooks/RUNBOOK_DEV_PORTLESS.md) for the one-time
-`npm install -g portless && portless trust`.
+`npm install -g portless && portless trust` (Portless is global, not a project dep).
 
 ```bash
-npm run start:dev:raw    # http://localhost:3006 — plain next dev, no proxy
-npm run build            # static export → ./out
-npm run start            # serve the production build
+pnpm start:dev:raw       # http://localhost:3006 — plain next dev, no proxy
+pnpm build               # static export → ./out
+pnpm start               # serve the production build
+pnpm cache:clean         # rm -rf node_modules .next out
 ```
 
-`npm run build` emits a fully static `out/` directory with no server component, deployable to
+`pnpm build` emits a fully static `out/` directory with no server component, deployable to
 Vercel, Netlify, GitHub Pages or any bucket. Set `LIBRARY_ROOT` to read the library from somewhere
 other than `../..`.
 
