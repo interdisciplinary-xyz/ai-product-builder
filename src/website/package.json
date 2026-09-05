@@ -2,7 +2,7 @@
   "name": "ai-product-builder-website",
   "version": "0.1.0",
   "private": true,
-  "description": "Static site that presents the ai-product-builder library \u2014 reads the repo's markdown at build time.",
+  "description": "Static site that presents the ai-product-builder library — reads the repo's markdown at build time.",
   "scripts": {
     "cache:clean": "rm -rf node_modules .next out && echo 'Caches cleared. Run pnpm install to reinstall.'",
     "start:dev": "portless run --lan -- next dev",
@@ -12,6 +12,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "github-slugger": "^2.0.0",
     "next": "16.3.4",
     "react": "19.1.1",
     "react-dom": "19.1.1",

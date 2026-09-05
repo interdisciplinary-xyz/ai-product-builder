@@ -10,13 +10,14 @@
   --paper-sunk: #eae5d8;
   --ink: #17140f;
   --ink-soft: #4c4638;
-  --ink-faint: #8b8272;
+  --ink-faint: #6d6454;
   --rule: #ded7c7;
   --rule-strong: #c7bea9;
   --accent: #ad3a17;
   --accent-soft: #f0e0d6;
   --shadow: 0 1px 2px rgba(23, 20, 15, 0.06), 0 8px 24px -16px rgba(23, 20, 15, 0.3);
 
+  --masthead-h: 3.75rem;
   --measure: 68ch;
   --gutter: clamp(1.25rem, 4vw, 3.5rem);
   --rail: 15rem;
@@ -31,7 +32,7 @@
     --paper-sunk: #100f0c;
     --ink: #ece7db;
     --ink-soft: #b4ac99;
-    --ink-faint: #7e7666;
+    --ink-faint: #8f8674;
     --rule: #2d2a22;
     --rule-strong: #433d32;
     --accent: #e8734a;
@@ -59,7 +60,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  scroll-padding-top: 5.5rem;
+  scroll-padding-top: calc(var(--masthead-h) + 1.75rem);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -202,7 +203,7 @@ a:hover {
   display: flex;
   align-items: baseline;
   gap: clamp(1rem, 3vw, 2.5rem);
-  height: 3.75rem;
+  height: var(--masthead-h);
 }
 
 .wordmark {
@@ -233,7 +234,7 @@ a:hover {
   text-decoration: none;
   color: var(--ink-soft);
   white-space: nowrap;
-  padding-block: 0.35rem;
+  padding-block: 0.7rem;
   border-bottom: 1px solid transparent;
 }
 .masthead__nav a:hover,
@@ -376,7 +377,7 @@ a:hover {
   letter-spacing: -0.01em;
   margin-top: 2.4em;
   margin-bottom: 0.6em;
-  scroll-margin-top: 5.5rem;
+  scroll-margin-top: calc(var(--masthead-h) + 1.75rem);
 }
 .prose h1 {
   font-size: 2rem;
@@ -670,7 +671,7 @@ a.anchor:focus-visible {
 }
 .specimen pre {
   margin: 0;
-  font-size: 0.775rem;
+  font-size: clamp(0.6rem, 2.4vw, 0.775rem);
   line-height: 1.75;
   overflow-x: auto;
   color: var(--ink-soft);
@@ -742,8 +743,14 @@ a.anchor:focus-visible {
 
 .doors {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
+}
+/* Never two: the third door would sit alone beside a half-row of empty paper. */
+@media (min-width: 62rem) {
+  .doors {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 .door {
   display: block;
@@ -923,7 +930,7 @@ a.anchor:focus-visible {
 
 .toc {
   position: sticky;
-  top: 5rem;
+  top: calc(var(--masthead-h) + 1.25rem);
   max-height: calc(100vh - 7rem);
   overflow-y: auto;
   border-left: 1px solid var(--rule);
@@ -1007,6 +1014,7 @@ a.anchor:focus-visible {
 }
 .search:focus-within {
   border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 .search__icon {
   color: var(--ink-faint);
@@ -1020,7 +1028,6 @@ a.anchor:focus-visible {
   font-family: var(--font-mono), monospace;
   font-size: 0.85rem;
   color: var(--ink);
-  outline: none;
 }
 .search input::placeholder {
   color: var(--ink-faint);
@@ -1052,7 +1059,7 @@ a.anchor:focus-visible {
   font-family: var(--font-mono), monospace;
   font-size: 0.7rem;
   letter-spacing: 0.05em;
-  padding: 0.4rem 0.7rem;
+  padding: 0.6rem 0.85rem;
   border: 1px solid var(--rule);
   border-radius: 999px;
   background: transparent;
@@ -1133,6 +1140,9 @@ a.anchor:focus-visible {
 }
 .toc a[aria-current] {
   color: var(--layer, var(--accent));
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .toc a[aria-current]::before {
   color: var(--layer, var(--accent));
@@ -1258,7 +1268,7 @@ a.anchor:focus-visible {
 /* Layer headers on the unfiltered index — 119 undifferentiated rows is a wall. */
 .ledger__group {
   position: sticky;
-  top: 3.75rem;
+  top: var(--masthead-h);
   z-index: 5;
   display: flex;
   align-items: center;
@@ -1286,16 +1296,110 @@ a.anchor:focus-visible {
   letter-spacing: 0;
 }
 
-/* Below this width the nav genuinely overflows. It scrolls, but a hidden
-   scrollbar gave no hint there was more — so fade the cut edge. */
+/* Below this width the nav shared a row with the wordmark and got 195px of a
+   375px screen — six of nine links off-screen behind a hidden scrollbar. Give
+   it its own full-width row, and fade the cut edge so the scroll is visible. */
 @media (max-width: 60rem) {
+  :root {
+    --masthead-h: 6.1rem;
+  }
+  .masthead__inner {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0.1rem;
+  }
   .masthead__nav {
+    margin-left: 0;
+    gap: 1.15rem;
     -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.25rem), transparent);
     mask-image: linear-gradient(to right, #000 calc(100% - 2.25rem), transparent);
-    padding-right: 1.5rem;
+    padding-right: 1.75rem;
   }
   .masthead__nav:has(a:last-child:focus-visible) {
     -webkit-mask-image: none;
     mask-image: none;
   }
+}
+
+/* ------------------------------------------------------------------ aside */
+
+/* The folded "Reuse & local setup" block. */
+.prose .aside {
+  margin: 1.6em 0;
+  border: 1px solid var(--rule);
+  border-left: 2px solid var(--layer, var(--accent));
+  border-radius: 0 4px 4px 0;
+  background: var(--paper-raised);
+}
+.prose .aside > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.9rem;
+  padding: 0.7rem 1.1rem;
+  cursor: pointer;
+  list-style: none;
+  color: var(--ink-soft);
+}
+.prose .aside > summary::-webkit-details-marker {
+  display: none;
+}
+.prose .aside > summary::before {
+  content: "＋";
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8rem;
+  color: var(--layer, var(--accent));
+}
+.prose .aside[open] > summary::before {
+  content: "−";
+}
+.prose .aside > summary:hover {
+  color: var(--ink);
+}
+.aside__label {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.aside__hint {
+  font-size: 0.68rem;
+  color: var(--ink-faint);
+}
+.prose .aside__body {
+  padding: 0 1.1rem 0.9rem;
+  border-top: 1px solid var(--rule);
+  padding-top: 0.9rem;
+  font-size: 0.95rem;
+}
+.prose .aside__body > * + * {
+  margin-top: 0.7em;
+}
+.prose .aside__body p {
+  color: var(--ink-soft);
+}
+
+/* The skip-link target takes focus programmatically; it is not a control. */
+main:focus {
+  outline: none;
+}
+
+/* The ledger and the doors are lists of documents. */
+.ledger,
+.doors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.doors li {
+  display: flex;
+}
+.doors li > .door {
+  flex: 1;
+}
+
+/* A source file rendered whole: the reading measure only forced it to scroll. */
+.prose--wide {
+  max-width: none;
 }

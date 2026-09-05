@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/components/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -51,6 +51,14 @@ function remarkTokens() {
     };
     walk(tree);
   };
+}
+
+/** Flattens a hast node to its text, to identify a block by what it says. */
+function textOf(node: unknown): string {
+  const n = node as { value?: string; children?: unknown[] } | undefined;
+  if (!n) return '';
+  if (typeof n.value === 'string') return n.value;
+  return (n.children ?? []).map(textOf).join('');
 }
 
 /* ------------------------------------------------------------ link rewriting */
@@ -151,6 +159,25 @@ export function Markdown({
               </code>
             );
           },
+          // Almost every document opens with a "Reuse & local setup" block —
+          // a median of 235 words of adoption boilerplate standing between the
+          // reader and the document itself. It matters when you adopt the doc
+          // and not at all when you are reading it, so it starts folded.
+          blockquote({ children, node, ...props }) {
+            const text = textOf(node).slice(0, 80);
+            if (text.includes('Reuse & local setup')) {
+              return (
+                <details className="aside">
+                  <summary>
+                    <span className="aside__label">Reuse &amp; local setup</span>
+                    <span className="aside__hint mono">placeholders, install target, boundaries</span>
+                  </summary>
+                  <div className="aside__body">{children}</div>
+                </details>
+              );
+            }
+            return <blockquote {...props}>{children}</blockquote>;
+          },
           table({ children, ...props }) {
             return (
               <div className="table-wrap">
@@ -193,7 +220,7 @@ export function Markdown({
 /** Non-markdown sources (JSON, Python) are shown verbatim, as one code block. */
 export function CodeBlock({ code, language }: { code: string; language: string }) {
   return (
-    <div className="prose">
+    <div className="prose prose--wide">
       <pre>
         <code className={`language-${language}`}>{code}</code>
       </pre>

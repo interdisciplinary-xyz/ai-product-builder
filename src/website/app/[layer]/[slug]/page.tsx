@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/components/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import {
@@ -9,6 +9,7 @@ import {
   linkMap,
   relations,
   pairing,
+  deployedPath,
   type LayerId,
 } from '@/lib/content';
 import { Markdown, CodeBlock } from '@/components/markdown';
@@ -83,9 +84,7 @@ export default async function DocPage({
           {doc.deployedAs ? (
             <div>
               <dt>Deployed as</dt>
-              <dd>
-                {layer.target === '—' ? doc.deployedAs : `${layer.target}${doc.deployedAs}`}
-              </dd>
+              <dd>{deployedPath(doc, layer)}</dd>
             </div>
           ) : null}
           <div>

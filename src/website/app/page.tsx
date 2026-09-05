@@ -1,6 +1,6 @@
-import Link from 'next/link';
+import { Link } from '@/components/link';
 import { LAYERS, allDocs, layerCounts, libraryVersion, findDoc } from '@/lib/content';
-import { Entry, layerStyle } from '@/components/ui';
+import { Entry, Ledger, layerStyle } from '@/components/ui';
 import { DoorIcon } from '@/components/icons';
 
 export default function HomePage() {
@@ -107,7 +107,7 @@ export default function HomePage() {
             asked.
           </p>
         </header>
-        <div className="ledger">
+        <Ledger>
           {LAYERS.filter((l) => l.id !== 'guides').map((layer, i) => (
             <Entry
               key={layer.id}
@@ -119,7 +119,7 @@ export default function HomePage() {
               index={i}
             />
           ))}
-        </div>
+        </Ledger>
       </section>
 
       <section className="section" id="start">
@@ -127,12 +127,12 @@ export default function HomePage() {
           <h2 className="display">Start here</h2>
           <p>Three doors, by what you came for.</p>
         </header>
-        <div className="doors">
+        <ul className="doors">
           {doors.map(
             (door) =>
               door.doc && (
+                <li key={door.key}>
                 <Link
-                  key={door.key}
                   href={`/${door.doc.layer}/${door.doc.slug}/`}
                   className="door"
                   data-layer={door.doc.layer}
@@ -145,9 +145,10 @@ export default function HomePage() {
                   <p>{door.body}</p>
                   <span className="door__doc mono">{door.doc.name} →</span>
                 </Link>
+                </li>
               ),
           )}
-        </div>
+        </ul>
       </section>
 
       <section className="section" id="status">

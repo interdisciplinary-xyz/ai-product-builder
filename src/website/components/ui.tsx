@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/components/link';
 import type { CSSProperties } from 'react';
 import { LAYER_BY_ID, type Doc, type Layer, type LayerId } from '@/lib/content';
 import { LayerIcon } from '@/components/icons';
@@ -40,35 +40,42 @@ export function Entry({
   const layer = layerId ? LAYER_BY_ID.get(layerId) : undefined;
   const shown = (meta ?? []).filter(Boolean) as string[];
   return (
-    <Link
-      href={href}
-      className="entry rise"
-      data-layer={layerId}
-      style={{
-        ...layerStyle(layer),
-        animationDelay: index === undefined ? undefined : `${Math.min(index, 14) * 22}ms`,
-      }}
-    >
-      {layerId ? (
-        <span className="entry__icon">
-          <LayerIcon layer={layerId} />
+    <li>
+      <Link
+        href={href}
+        className="entry rise"
+        data-layer={layerId}
+        style={{
+          ...layerStyle(layer),
+          animationDelay: index === undefined ? undefined : `${Math.min(index, 14) * 22}ms`,
+        }}
+      >
+        {layerId ? (
+          <span className="entry__icon">
+            <LayerIcon layer={layerId} />
+          </span>
+        ) : (
+          <span className="entry__icon" />
+        )}
+        <span className="entry__main">
+          <span className="entry__name">{name}</span>
+          {description ? <span className="entry__desc">{description}</span> : null}
         </span>
-      ) : (
-        <span className="entry__icon" />
-      )}
-      <span className="entry__main">
-        <span className="entry__name">{name}</span>
-        {description ? <span className="entry__desc">{description}</span> : null}
-      </span>
-      {shown.length ? (
-        <span className="entry__meta">
-          {shown.map((m) => (
-            <span key={m}>{m}</span>
-          ))}
-        </span>
-      ) : null}
-    </Link>
+        {shown.length ? (
+          <span className="entry__meta">
+            {shown.map((m) => (
+              <span key={m}>{m}</span>
+            ))}
+          </span>
+        ) : null}
+      </Link>
+    </li>
   );
+}
+
+/** The ledger is a list of documents; it should say so to a screen reader. */
+export function Ledger({ children }: { children: React.ReactNode }) {
+  return <ul className="ledger">{children}</ul>;
 }
 
 export function DocEntry({ doc, index }: { doc: Doc; index?: number }) {

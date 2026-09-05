@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { LAYERS, LAYER_BY_ID, docsForLayer, type LayerId } from '@/lib/content';
-import { DocEntry, PageHead, layerStyle } from '@/components/ui';
+import { DocEntry, Ledger, PageHead, layerStyle } from '@/components/ui';
 import { LayerIcon } from '@/components/icons';
 
 export function generateStaticParams() {
@@ -36,11 +36,11 @@ export default async function LayerPage({ params }: { params: Promise<{ layer: s
         }
         lede={layer.blurb}
       />
-      <div className="ledger">
+      <Ledger>
         {docs.map((doc, i) => (
           <DocEntry key={doc.slug} doc={doc} index={i} />
         ))}
-      </div>
+      </Ledger>
     </div>
   );
 }

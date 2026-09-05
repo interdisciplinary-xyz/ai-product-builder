@@ -1,50 +1,62 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /**
- * A 3,000-word runbook is a long scroll. The list of sections alone doesn't say
- * where you are in it — this tracks the heading you're currently reading.
+ * A 3,000-word runbook is a long scroll; the section list alone doesn't say
+ * where you are in it.
+ *
+ * Offsets are measured once (and on resize) so the scroll handler is pure
+ * arithmetic — reading getBoundingClientRect per heading per scroll tick forces
+ * a layout each time, which is exactly the thrash that shows up as jank on a
+ * 14,000px page.
  */
 export function DocToc({ headings }: { headings: { id: string; text: string }[] }) {
   const [active, setActive] = useState<string | null>(headings[0]?.id ?? null);
   const [progress, setProgress] = useState(0);
+  const offsets = useRef<{ id: string; top: number }[]>([]);
+  const frame = useRef(0);
 
   useEffect(() => {
-    const targets = headings
-      .map((h) => document.getElementById(h.id))
-      .filter((el): el is HTMLElement => Boolean(el));
-    if (!targets.length) return;
+    const measure = () => {
+      offsets.current = headings
+        .map((h) => {
+          const el = document.getElementById(h.id);
+          return el ? { id: h.id, top: el.getBoundingClientRect().top + window.scrollY } : null;
+        })
+        .filter((v): v is { id: string; top: number } => v !== null);
+      update();
+    };
 
-    // Whichever heading last crossed the top band is the one being read.
-    const observer = new IntersectionObserver(
-      () => {
-        const line = window.scrollY + 120;
-        let current = targets[0];
-        for (const el of targets) {
-          if (el.getBoundingClientRect().top + window.scrollY <= line) current = el;
-        }
-        setActive(current.id);
-      },
-      { rootMargin: '-100px 0px -70% 0px', threshold: [0, 1] },
-    );
-    targets.forEach((el) => observer.observe(el));
-
-    const onScroll = () => {
+    const update = () => {
+      const line = window.scrollY + 120;
+      let current = offsets.current[0]?.id ?? null;
+      for (const entry of offsets.current) {
+        if (entry.top <= line) current = entry.id;
+        else break;
+      }
+      setActive(current);
       const max = document.documentElement.scrollHeight - window.innerHeight;
       setProgress(max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0);
-      const line = window.scrollY + 120;
-      let current = targets[0];
-      for (const el of targets) {
-        if (el.getBoundingClientRect().top + window.scrollY <= line) current = el;
-      }
-      setActive(current.id);
     };
-    onScroll();
+
+    const onScroll = () => {
+      if (frame.current) return;
+      frame.current = requestAnimationFrame(() => {
+        frame.current = 0;
+        update();
+      });
+    };
+
+    measure();
+    // Fonts land after first paint and move every heading.
+    document.fonts?.ready.then(measure).catch(() => {});
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', measure);
     return () => {
-      observer.disconnect();
+      if (frame.current) cancelAnimationFrame(frame.current);
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', measure);
     };
   }, [headings]);
 

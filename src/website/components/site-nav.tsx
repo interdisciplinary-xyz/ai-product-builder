@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/components/link';
 import { usePathname } from 'next/navigation';
 
 /**
@@ -22,13 +22,18 @@ export function SiteNav({
           <Link
             key={layer.id}
             href={`/${layer.id}/`}
+           
             aria-current={current ? 'page' : undefined}
           >
             {layer.label}
           </Link>
         );
       })}
-      <Link href="/browse/" aria-current={pathname.startsWith('/browse') ? 'page' : undefined}>
+      <Link
+        href="/browse/"
+       
+        aria-current={pathname.startsWith('/browse') ? 'page' : undefined}
+      >
         Search
       </Link>
     </nav>

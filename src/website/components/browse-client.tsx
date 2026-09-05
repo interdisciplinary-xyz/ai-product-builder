@@ -1,7 +1,7 @@
 'use client';
 
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from '@/components/link';
 import { LayerIcon } from '@/components/icons';
 import type { LayerId } from '@/lib/content';
 
@@ -21,6 +21,10 @@ export type BrowseItem = {
   deployedAs: string | null;
 };
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /** Marks the matched substrings so a row shows why it survived the filter. */
 function Highlight({ text, terms }: { text: string; terms: string[] }) {
   if (!terms.length || !text) return <>{text}</>;
@@ -38,17 +42,7 @@ function Highlight({ text, terms }: { text: string; terms: string[] }) {
   );
 }
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-export function BrowseClient({
-  items,
-  layers,
-}: {
-  items: BrowseItem[];
-  layers: BrowseLayer[];
-}) {
+export function BrowseClient({ items, layers }: { items: BrowseItem[]; layers: BrowseLayer[] }) {
   const [query, setQuery] = useState('');
   const [active, setActive] = useState<LayerId | null>(null);
   const input = useRef<HTMLInputElement>(null);
@@ -70,11 +64,7 @@ export function BrowseClient({
   }, []);
 
   const byId = useMemo(() => new Map(layers.map((l) => [l.id, l])), [layers]);
-
-  const terms = useMemo(
-    () => query.split(/\s+/).filter(Boolean),
-    [query],
-  );
+  const terms = useMemo(() => query.split(/\s+/).filter(Boolean), [query]);
 
   /**
    * Requiring every term to match sank the obvious queries: "release process"
@@ -107,9 +97,56 @@ export function BrowseClient({
       .map((r) => r.item);
   }, [items, terms, active]);
 
-  // Grouping only makes sense on the unranked list; a scored result set is
-  // already in its most useful order.
+  // Grouping only helps the unranked list; scored results are already in their
+  // most useful order.
   const grouped = terms.length === 0;
+  const groups = useMemo(() => {
+    if (!grouped) return [];
+    const map = new Map<LayerId, BrowseItem[]>();
+    for (const item of results) {
+      const list = map.get(item.layer) ?? [];
+      list.push(item);
+      map.set(item.layer, list);
+    }
+    return [...map.entries()];
+  }, [grouped, results]);
+
+  const row = (item: BrowseItem) => {
+    const layer = byId.get(item.layer);
+    return (
+      <li key={`${item.layer}/${item.slug}`}>
+        <Link
+          href={`/${item.layer}/${item.slug}/`}
+          className="entry"
+          data-layer={item.layer}
+          style={
+            {
+              '--layer-light': layer?.accent,
+              '--layer-dark': layer?.accentDark,
+            } as React.CSSProperties
+          }
+        >
+          <span className="entry__icon">
+            <LayerIcon layer={item.layer} />
+          </span>
+          <span className="entry__main">
+            <span className="entry__name">
+              <Highlight text={item.name} terms={terms} />
+            </span>
+            {item.description ? (
+              <span className="entry__desc">
+                <Highlight text={item.description} terms={terms} />
+              </span>
+            ) : null}
+          </span>
+          <span className="entry__meta">
+            {grouped ? null : <span>{item.layer}</span>}
+            {item.deployedAs ? <span>→ {item.deployedAs}</span> : null}
+          </span>
+        </Link>
+      </li>
+    );
+  };
 
   return (
     <>
@@ -180,62 +217,36 @@ export function BrowseClient({
         {query ? ` matching “${query}”` : ''}
       </p>
 
-      <div className="ledger">
-        {results.map((item, i) => {
-          const layer = byId.get(item.layer);
-          const startsGroup = grouped && (i === 0 || results[i - 1].layer !== item.layer);
-          return (
-            <Fragment key={`${item.layer}/${item.slug}`}>
-            {startsGroup ? (
-              <h2 className="ledger__group">
-                <LayerIcon layer={item.layer} />
-                <span>{layer?.label}</span>
-                <span className="ledger__count mono">
-                  {results.filter((r) => r.layer === item.layer).length}
-                </span>
-              </h2>
-            ) : null}
-            <Link
-              href={`/${item.layer}/${item.slug}/`}
-              className="entry"
-              data-layer={item.layer}
-              style={
-                {
-                  '--layer-light': layer?.accent,
-                  '--layer-dark': layer?.accentDark,
-                } as React.CSSProperties
-              }
-            >
-              <span className="entry__icon">
-                <LayerIcon layer={item.layer} />
-              </span>
-              <span className="entry__main">
-                <span className="entry__name">
-                  <Highlight text={item.name} terms={terms} />
-                </span>
-                {item.description ? (
-                  <span className="entry__desc">
-                    <Highlight text={item.description} terms={terms} />
-                  </span>
-                ) : null}
-              </span>
-              <span className="entry__meta">
-                {grouped ? null : <span>{item.layer}</span>}
-                {item.deployedAs ? <span>→ {item.deployedAs}</span> : null}
-              </span>
-            </Link>
-            </Fragment>
-          );
-        })}
-        {results.length === 0 ? (
-          <div className="empty">
-            <p className="mono">Nothing matches “{query}”.</p>
-            <button type="button" className="button button--ghost" onClick={() => { setQuery(''); setActive(null); }}>
-              Clear filters
-            </button>
-          </div>
-        ) : null}
-      </div>
+      {grouped ? (
+        groups.map(([layerId, rows]) => (
+          <section key={layerId} aria-labelledby={`group-${layerId}`}>
+            <h2 className="ledger__group" id={`group-${layerId}`}>
+              <LayerIcon layer={layerId} />
+              <span>{byId.get(layerId)?.label}</span>
+              <span className="ledger__count mono">{rows.length}</span>
+            </h2>
+            <ul className="ledger">{rows.map(row)}</ul>
+          </section>
+        ))
+      ) : (
+        <ul className="ledger">{results.map(row)}</ul>
+      )}
+
+      {results.length === 0 ? (
+        <div className="empty">
+          <p className="mono">Nothing matches “{query}”.</p>
+          <button
+            type="button"
+            className="button button--ghost"
+            onClick={() => {
+              setQuery('');
+              setActive(null);
+            }}
+          >
+            Clear filters
+          </button>
+        </div>
+      ) : null}
     </>
   );
 }

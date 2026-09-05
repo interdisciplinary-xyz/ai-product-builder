@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import GithubSlugger from 'github-slugger';
 
 /**
  * The site is a *view* of the library, not a copy of it. Everything below is read
@@ -261,27 +262,39 @@ function frontmatterValue(frontmatter: string | null, key: string): string | nul
   return match ? match[1].trim().replace(/^["']|["']$/g, '') : null;
 }
 
-/** Headings outside fenced code blocks, for the in-page table of contents. */
+/**
+ * Headings outside fenced code blocks, for the in-page table of contents.
+ *
+ * The ids MUST match what rehype-slug puts on the rendered headings, so this
+ * uses the very same slugger rather than approximating it — a hand-rolled
+ * version left 130 of 644 anchors dead, because it collapsed whitespace and
+ * dropped underscores where github-slugger does neither. Every heading level
+ * is fed through in document order so the duplicate counter stays in step,
+ * then the list is narrowed to the levels the contents shows.
+ */
 function extractHeadings(body: string) {
   const headings: { depth: number; text: string; id: string }[] = [];
-  const seen = new Map<string, number>();
+  const slugger = new GithubSlugger();
   let fenced = false;
+  let commented = false;
   for (const line of body.split('\n')) {
     if (/^\s*(```|~~~)/.test(line)) fenced = !fenced;
     if (fenced) continue;
-    const match = line.match(/^(#{2,3})\s+(.+?)\s*#*$/);
+    // Sections are commented out in place ("uncomment if this is a payments
+    // product"); the renderer emits no heading for those, so neither can we.
+    if (!commented && /<!--/.test(line) && !/-->/.test(line)) commented = true;
+    else if (commented && /-->/.test(line)) {
+      commented = false;
+      continue;
+    }
+    if (commented) continue;
+    const match = line.match(/^(#{1,6})\s+(.+?)\s*#*$/);
     if (!match) continue;
-    const text = match[2].replace(/[*`_]/g, '').trim();
-    // Mirrors rehype-slug's GitHub-style ids so the anchors actually resolve.
-    let id = text
-      .toLowerCase()
-      .replace(/[^\p{L}\p{N}\s-]/gu, '')
-      .trim()
-      .replace(/\s+/g, '-');
-    const count = seen.get(id) ?? 0;
-    seen.set(id, count + 1);
-    if (count) id = `${id}-${count}`;
-    headings.push({ depth: match[1].length, text, id });
+    // Strip only what the renderer consumes: emphasis asterisks and code
+    // backticks. NOT underscores — «TARGET_PRICE_POINT» is an identifier here,
+    // and removing them produced ids no heading ever had.
+    const text = match[2].replace(/[*`]/g, '').trim();
+    headings.push({ depth: match[1].length, text, id: slugger.slug(text) });
   }
   return headings;
 }
@@ -371,6 +384,20 @@ export function allDocs(): Doc[] {
 
   cache = docs;
   return docs;
+}
+
+/**
+ * Where a deployed copy lands. Gluing layer.target to deployedAs blindly
+ * produced ".claude/settings.json.claude/settings.json" and
+ * ".claude/commands//board" — the catalog's "Deployed as" cell is a full path
+ * for config and an invocation for commands, not always a bare filename.
+ */
+export function deployedPath(doc: Doc, layer: Layer): string {
+  const name = doc.deployedAs;
+  if (!name) return layer.target;
+  if (name.startsWith('/')) return name; // a slash-command, not a path
+  if (!layer.target.endsWith('/')) return name; // target is itself the file
+  return `${layer.target}${name}`;
 }
 
 export function docsForLayer(layer: LayerId): Doc[] {

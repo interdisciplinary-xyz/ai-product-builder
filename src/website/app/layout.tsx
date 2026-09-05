@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Instrument_Serif, Newsreader, JetBrains_Mono } from 'next/font/google';
-import Link from 'next/link';
+import { Link } from '@/components/link';
 import { LAYERS, libraryVersion, allDocs } from '@/lib/content';
 import { SiteNav } from '@/components/site-nav';
 import './globals.css';
@@ -10,18 +10,21 @@ const display = Instrument_Serif({
   weight: '400',
   variable: '--font-display',
   display: 'swap',
+  fallback: ['Georgia', 'Times New Roman', 'serif'],
 });
 
 const body = Newsreader({
   subsets: ['latin'],
   variable: '--font-body',
   display: 'swap',
+  fallback: ['Georgia', 'Times New Roman', 'serif'],
 });
 
 const mono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
+  fallback: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
 });
 
 export const metadata: Metadata = {
