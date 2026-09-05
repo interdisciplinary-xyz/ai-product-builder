@@ -10,7 +10,7 @@
 >
 > **Pairs with:** every governance MANAGER in the `ai-product-builder` library — they are this MANAGER's *targets* (not its peers). In particular: `RUNBOOK_SESSION_MIGRATION.md` (the session-context doc that drifts fastest), `RUNBOOK_DECISION_LOG.md` (ADRs that get superseded silently), `MANAGER_AI_WORKFLOW.md` (the autonomy matrix that drifts each time a new tool is wired in), `MANAGER_CONTRIBUTING.md` (the contributor entry point), `MANAGER_DEV_ONBOARDING.md` (the doc that decays fastest of all). Boundary: each peer MANAGER owns its doc's *content + freshness cadence*; this MANAGER owns the *cross-doc drift-detection + retirement discipline*.
 >
-> **Owns / defers to:** Owns the cross-doc DRIFT-DETECTION cadence (quarterly), the "last verified" date discipline per doc, the doc-ownership map (CODEOWNERS-driven), the **stale-doc kill rule** (no answer to a question in 30 days → close the doc as `parking-lot`), the periodic 30-minute "doc sweep" ritual, and the retire-vs-rewrite decision matrix. Defers each doc's *content* to its owning MANAGER; defers decisions about WHICH docs to keep vs. retire long-term → `MANAGER_DECISION_LOG` (an ADR for any retire/merge of a governance doc).
+> **Owns / defers to:** Owns the cross-doc DRIFT-DETECTION cadence (quarterly), the "last verified" date discipline per doc, the doc-ownership map (CODEOWNERS-driven), the **stale-doc kill rule** (no answer to a question in 30 days → close the doc as `parking-lot`), the periodic 30-minute "doc sweep" ritual, and the retire-vs-rewrite decision matrix. Defers each doc's *content* to its owning MANAGER; defers decisions about WHICH docs to keep vs. retire long-term → `MANAGER_DECISION_LOG` (an ADR for any retire/merge of a governance doc); defers the **implementation mechanism** for numeric-claim probes (the `<!-- probe:key -->…<!-- /probe -->` markers regenerated from code) → `RUNBOOK_DOC_FRESHNESS_PROBES.md`.
 
 Please act as a Doc Freshness Manager for this repository.
 
@@ -147,6 +147,8 @@ These are the cross-doc claims that drift fastest. Run them every sweep; flag mi
 
 Each mismatch becomes a GitHub issue labeled `doc-drift`, assigned to the doc's CODEOWNERS DRI, with the file + line + the actual reality named.
 
+**Automation — numeric claims are probe-regenerated, not hand-audited.** Any numeric claim in a doc that is derivable from the code (route count, tracked-doc count, release count, domain count) lives inside a `<!-- probe:key -->…<!-- /probe -->` marker; the runner (`«PROBE_SCRIPT»`) rewrites them from a registry of pure functions of the repo state. See `RUNBOOK_DOC_FRESHNESS_PROBES.md` for the mechanism. The quarterly sweep runs the writer; CI runs it in `--check` mode. A healthy repo shows `Markers updated this sweep: 0` because pre-commit already writes them out.
+
 _________
 
 QUARTERLY DOC SWEEP
@@ -254,6 +256,7 @@ OUTPUT FORMAT
 - Last sweep ran on schedule:
 - doc-drift issues filed this sweep:
 - 🔴 stale docs re-verified this sweep:
+- Markers updated this sweep (target: 0):
 
 ### Kill rule
 - Docs in 30-day "no purpose answer" window:

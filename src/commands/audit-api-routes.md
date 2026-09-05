@@ -106,6 +106,20 @@ done
 
 **AUTHZ (the harder half — mostly manual):** for every authenticated route that takes a resource id (`:userId`, `:id`, `orgId`, a slug), confirm it can't reach _another_ user's row. Established safe patterns: id derived from the session (`const { uid } = auth`), an explicit `uid !== userId → 403`, or a `where` clause scoped to the session uid (`where: { user: { equals: uid } }`). Flag any id-taking route that trusts the client's id **without** one of these — that's an IDOR. Spot-check the routes surfaced by recent changes; this is the one check a grep can't fully settle. See `MANAGER_SECURITY.md`.
 
+### 4c. Webhook handler decomposition
+
+Any single webhook handler over ~250 lines carries an audit surface a solo founder cannot review in one pass — flag it. The reference implementations that motivated this rule are 463 and 660 lines; the fix is to split by event type (the shared ledger, per `RUNBOOK_WEBHOOK_IDEMPOTENCY_LEDGER.md`, makes the split safe because each event type claims independently).
+
+```bash
+# webhook handlers over the size threshold
+find «API_ROUTES_DIR» -type f -name route.ts | xargs grep -l '«PROVIDER»-signature\|stripe-signature\|x-webhook-signature\|verifySignature' 2>/dev/null | while read f; do
+  lines=$(wc -l < "$f")
+  [ "$lines" -gt 250 ] && echo "oversize-webhook: $f ($lines lines)"
+done
+```
+
+Verify each hit against the ledger pattern: signature-verify before body-parse, claim before side effect, transient-vs-definitive failure classification. See `RUNBOOK_WEBHOOK_IDEMPOTENCY_LEDGER.md`.
+
 ### 5. Qualitative spot-check
 
 Sample recently-changed routes (`git log --since=… --name-only -- '«API_ROUTES»'`): does each new/changed route have a matching spec entry (if you maintain one) with responses + errors, the right `«OBSERVABILITY»` `domain` + `route`/`endpoint` sub-tag (`.claude/CLAUDE.md` taxonomy), and stable `«STABLE_ERROR_HELPER»` codes? Depth = spot-check for drift trends.
@@ -127,3 +141,4 @@ Keep the terminal summary to Risks/Gaps + Recommended Actions, and state plainly
 - Report-only. If findings warrant fixes, offer a scoped branch — don't edit routes in the audit pass.
 - If run on a dirty working tree, `«QUALITY_CMD:audit-obs-tags»` / `«QUALITY_CMD:types»` reflect the whole tree — note it, or run on a clean branch for attributable results.
 - Sibling audits: `/audit-design-system`, `/audit-performance`. General structure/health: `/audit-structure`.
+- Webhook shape + idempotency: `RUNBOOK_WEBHOOK_IDEMPOTENCY_LEDGER.md`. Env access structure the routes read config through: `RUNBOOK_ENV_TIERED_ACCESS.md`.

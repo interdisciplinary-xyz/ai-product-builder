@@ -242,6 +242,17 @@ A doc that a skill points at is a healthy pairing: keep the trigger and the refu
 
 A bug list. A status snapshot. "The 19 call sites split 7/6/4/2." "These 3 collections are still unlocked." Every one of those is true on the day it is written and a lie within a sprint — and unlike a stale doc, a **stale skill fires by itself and argues with the diff.** It is worse than nothing, because the agent will trust it.
 
+### The sibling anti-pattern — skill sprawl
+
+The portfolio audit surfaced a second failure mode: a repo with 34 skills, several overlapping in scope, none carrying a "last reviewed" date. The result: it is impossible to tell which skills are load-bearing, which have been superseded, and which have quietly stopped firing because their trigger words no longer match how the codebase talks about the concept.
+
+**Two mechanical guards a skill layer needs:**
+
+1. **Every skill carries `**Last reviewed:** «DATE»` at the top** (the anatomy already declares it — enforce it in `bin/build --check`). A skill whose review date is more than 6 months old is a candidate for re-verification or retirement, per `MANAGER_DOC_FRESHNESS.md`.
+2. **The skill count itself is a `<!-- probe:skill-count -->` (per `RUNBOOK_DOC_FRESHNESS_PROBES.md`)** and shows up in the doc-freshness sweep output. A repo growing past ~15 skills without a governance review is drifting toward the empatalk-app pattern (34 skills, 19 without frontmatter, none fire).
+
+If your skill layer has more than 15 entries, half of them are docs in a costume. Retire, don't accumulate.
+
 The distinction is **shape vs. inventory**:
 
 - ✅ *"An assertion that accepts the broken value is not an assertion."* — a shape. True forever.

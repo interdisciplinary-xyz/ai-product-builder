@@ -34,6 +34,19 @@ Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_PULL_REQUEST_TEM
   comments in the rendered text.
 -->
 
+<!--
+  🏷️  PR TITLE — set this at the top of the "Open a pull request" form; GitHub cannot set
+  the title from a body template.
+
+  MUST be:  «PROJECT» - <branch-name>
+  Examples: «PROJECT» - scope/v1.35.0
+            «PROJECT» - release/v1.35.0
+            «PROJECT» - fix/<slug>
+
+  «PROJECT» is the repo's human short name (e.g. empatalk, respect.click, savei, onestpromo),
+  not the full GitHub owner/repo path. Rule + rationale: RUNBOOK_RELEASE_MANAGER.md §1 rule 4.
+-->
+
 ## Summary
 
 <!-- 1–3 sentences. What changed and why now. Link the issue(s) this closes. -->

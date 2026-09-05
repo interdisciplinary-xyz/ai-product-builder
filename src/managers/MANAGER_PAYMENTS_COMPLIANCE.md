@@ -8,7 +8,7 @@
 >
 > **Reusability:** template-ready — generic; no product-specific content. Not legal advice — pair with qualified `«JURISDICTION»` counsel before relying on any finding.
 >
-> **Pairs with:** `RUNBOOK_PAYMENTS_COMPLIANCE.md` (the SaaS-vs-PI boundary, provider models, forbidden patterns), `RUNBOOK_PAYMENTS_LIFECYCLE.md` (operational payment flows + state machine), `RUNBOOK_SECURITY_MODEL.md` (custody-tokens CI gate, payments route auth), `RUNBOOK_LEGAL_RISK.md` (jurisdiction risk register), `RUNBOOK_GDPR_PRE_LAUNCH_CHECKLIST.md` (checkout-time data handling) — boundary: this MANAGER owns *process* (verify/audit/re-audit) for the platform-vs-PI line; the RUNBOOK owns *content shape*.
+> **Pairs with:** `RUNBOOK_PAYMENTS_COMPLIANCE.md` (the SaaS-vs-PI boundary, provider models, forbidden patterns), `RUNBOOK_PAYMENTS_LIFECYCLE.md` (operational payment flows + state machine), `RUNBOOK_SECURITY_MODEL.md` (custody-tokens CI gate, payments route auth), `RUNBOOK_LEGAL_RISK.md` (jurisdiction risk register), `RUNBOOK_GDPR_PRE_LAUNCH_CHECKLIST.md` (checkout-time data handling), `RUNBOOK_COMPILE_TIME_LEGAL_GUARDS.md` (the AST-scan mechanism that implements the forbidden-tokens gate), `RUNBOOK_WEBHOOK_IDEMPOTENCY_LEDGER.md` (two-phase claim/process/complete pattern for provider webhooks) — boundary: this MANAGER owns *process* (verify/audit/re-audit) for the platform-vs-PI line; the RUNBOOK owns *content shape*; COMPILE_TIME_LEGAL_GUARDS owns *the guard mechanism*; WEBHOOK_IDEMPOTENCY_LEDGER owns *the money-path webhook shape*.
 >
 > **Owns / defers to:** Owns verification of the SaaS-vs-PI boundary, custody patterns, forbidden-fields enforcement, jurisdiction fit, and periodic re-audit triggers. Defers: broader legal exposure → `MANAGER` derived from `RUNBOOK_LEGAL_RISK`; security model / IDOR / headers → `MANAGER_SECURITY`; data-handling-at-checkout → `RUNBOOK_GDPR_PRE_LAUNCH_CHECKLIST`; product-level "should we charge a fee?" → founder / product owner.
 >
@@ -120,7 +120,9 @@ _________
 
 FORBIDDEN PATTERNS
 
-Please verify the following are absent from the repository (and that absence is enforced):
+Please verify the following are absent from the repository (and that absence is enforced).
+
+The mechanism for the field-name gate is the AST-scan pattern in `RUNBOOK_COMPILE_TIME_LEGAL_GUARDS.md` (a text `grep` will false-flag the guard's own rationale block). The allowlist is small on purpose — a large allowlist is the guard failing quietly.
 
 **Forbidden field names** — `«FORBIDDEN_TOKENS_SPEC»` must fail the build if any of these appear in non-allowlisted source files:
 

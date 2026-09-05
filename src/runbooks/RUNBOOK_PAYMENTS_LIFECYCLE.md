@@ -7,6 +7,8 @@ Umbrella runbook for the **entire** payment-processor lifecycle. Three phases, i
 - **§3 Live flip + first self-transaction** — the founder $-test that closes the launch milestone.
 
 > **Pricing decisions live elsewhere.** Tier shape, price, anchor, trial policy, currency, metering — see [`PRICING_STRATEGY.md`](./PRICING_STRATEGY.md) "Pricing decisions matrix". This runbook only mechanizes what's decided there.
+>
+> **Webhook idempotency lives elsewhere.** The two-phase claim/process/complete ledger pattern + slow-path SLO + timing-safe signature verification are one runbook up in [`WEBHOOK_IDEMPOTENCY_LEDGER.md`](./WEBHOOK_IDEMPOTENCY_LEDGER.md). This runbook covers the *lifecycle* (setup → verify → live); WEBHOOK_IDEMPOTENCY_LEDGER covers the *handler shape*.
 
 > **🔧 Reuse & local setup**
 >
