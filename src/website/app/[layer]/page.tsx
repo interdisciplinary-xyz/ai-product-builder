@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { LAYERS, LAYER_BY_ID, docsForLayer, type LayerId } from '@/lib/content';
 import { DocEntry, PageHead, layerStyle } from '@/components/ui';
+import { LayerIcon } from '@/components/icons';
 
 export function generateStaticParams() {
   return LAYERS.map((layer) => ({ layer: layer.id }));
@@ -30,10 +31,7 @@ export default async function LayerPage({ params }: { params: Promise<{ layer: s
         eyebrow={`${docs.length} files · deployed to ${layer.target}`}
         title={
           <>
-            <span className="pagehead__icon" aria-hidden="true">
-              {layer.icon}
-            </span>{' '}
-            {layer.label}
+            <LayerIcon layer={id} className="pagehead__icon" /> {layer.label}
           </>
         }
         lede={layer.blurb}

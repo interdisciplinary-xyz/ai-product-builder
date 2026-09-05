@@ -13,7 +13,6 @@ export default function BrowsePage() {
   const layers = LAYERS.map((l) => ({
     id: l.id,
     label: l.label,
-    icon: l.icon,
     accent: l.accent,
     accentDark: l.accentDark,
   }));

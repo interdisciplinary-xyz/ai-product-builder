@@ -2,23 +2,45 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { LayerIcon } from '@/components/icons';
+import type { LayerId } from '@/lib/content';
 
 export type BrowseLayer = {
-  id: string;
+  id: LayerId;
   label: string;
-  icon: string;
   accent: string;
   accentDark: string;
 };
 
 export type BrowseItem = {
-  layer: string;
+  layer: LayerId;
   slug: string;
   name: string;
   file: string;
   description: string;
   deployedAs: string | null;
 };
+
+/** Marks the matched substrings so a row shows why it survived the filter. */
+function Highlight({ text, terms }: { text: string; terms: string[] }) {
+  if (!terms.length || !text) return <>{text}</>;
+  const pattern = new RegExp(`(${terms.map(escapeRegExp).join('|')})`, 'ig');
+  return (
+    <>
+      {text.split(pattern).map((part, i) =>
+        terms.some((t) => t.toLowerCase() === part.toLowerCase()) ? (
+          <mark key={i}>{part}</mark>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  );
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 export function BrowseClient({
   items,
@@ -28,7 +50,7 @@ export function BrowseClient({
   layers: BrowseLayer[];
 }) {
   const [query, setQuery] = useState('');
-  const [active, setActive] = useState<string | null>(null);
+  const [active, setActive] = useState<LayerId | null>(null);
   const input = useRef<HTMLInputElement>(null);
 
   // "/" jumps to the filter, the way every doc site worth using does.
@@ -49,16 +71,21 @@ export function BrowseClient({
 
   const byId = useMemo(() => new Map(layers.map((l) => [l.id, l])), [layers]);
 
+  const terms = useMemo(
+    () => query.split(/\s+/).filter(Boolean),
+    [query],
+  );
+
   const results = useMemo(() => {
-    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+    const lowered = terms.map((t) => t.toLowerCase());
     return items.filter((item) => {
       if (active && item.layer !== active) return false;
-      if (!terms.length) return true;
+      if (!lowered.length) return true;
       const haystack =
         `${item.name} ${item.file} ${item.description} ${item.deployedAs ?? ''} ${item.layer}`.toLowerCase();
-      return terms.every((term) => haystack.includes(term));
+      return lowered.every((term) => haystack.includes(term));
     });
-  }, [items, query, active]);
+  }, [items, terms, active]);
 
   return (
     <>
@@ -77,7 +104,20 @@ export function BrowseClient({
             autoComplete="off"
             spellCheck={false}
           />
-          <kbd className="mono">/</kbd>
+          {query ? (
+            <button
+              type="button"
+              className="search__clear mono"
+              onClick={() => {
+                setQuery('');
+                input.current?.focus();
+              }}
+            >
+              Clear
+            </button>
+          ) : (
+            <kbd className="mono">/</kbd>
+          )}
         </div>
 
         <div className="filters__layers" role="group" aria-label="Filter by layer">
@@ -104,7 +144,7 @@ export function BrowseClient({
               aria-pressed={active === layer.id}
               onClick={() => setActive(active === layer.id ? null : layer.id)}
             >
-              <span aria-hidden="true">{layer.icon}</span> {layer.label}
+              <LayerIcon layer={layer.id} /> {layer.label}
             </button>
           ))}
         </div>
@@ -132,13 +172,17 @@ export function BrowseClient({
                 } as React.CSSProperties
               }
             >
-              <span className="entry__icon" aria-hidden="true">
-                {layer?.icon}
+              <span className="entry__icon">
+                <LayerIcon layer={item.layer} />
               </span>
               <span className="entry__main">
-                <span className="entry__name">{item.name}</span>
+                <span className="entry__name">
+                  <Highlight text={item.name} terms={terms} />
+                </span>
                 {item.description ? (
-                  <span className="entry__desc">{item.description}</span>
+                  <span className="entry__desc">
+                    <Highlight text={item.description} terms={terms} />
+                  </span>
                 ) : null}
               </span>
               <span className="entry__meta">
@@ -149,9 +193,12 @@ export function BrowseClient({
           );
         })}
         {results.length === 0 ? (
-          <p className="empty mono">
-            Nothing matches. The library has no file for that — which is itself an answer.
-          </p>
+          <div className="empty">
+            <p className="mono">Nothing matches “{query}”.</p>
+            <button type="button" className="button button--ghost" onClick={() => { setQuery(''); setActive(null); }}>
+              Clear filters
+            </button>
+          </div>
         ) : null}
       </div>
     </>

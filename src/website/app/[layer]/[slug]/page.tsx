@@ -7,10 +7,13 @@ import {
   docsForLayer,
   findDoc,
   linkMap,
+  relations,
   type LayerId,
 } from '@/lib/content';
 import { Markdown, CodeBlock } from '@/components/markdown';
 import { layerStyle } from '@/components/ui';
+import { LayerIcon } from '@/components/icons';
+import { DocToc } from '@/components/doc-toc';
 
 const GITHUB = 'https://github.com/interdisciplinary-xyz/ai-product-builder/blob/main';
 
@@ -47,14 +50,15 @@ export default async function DocPage({
   const previous = siblings[at - 1];
   const next = siblings[at + 1];
   const toc = doc.headings.filter((h) => h.depth === 2);
+  const { outbound, inbound } = relations(doc);
 
   return (
     <div className="shell doc" data-layer={doc.layer} style={layerStyle(layer)}>
       <nav className="crumbs mono" aria-label="Breadcrumb">
         <Link href="/">index</Link>
         <span aria-hidden="true">/</span>
-        <Link href={`/${doc.layer}/`}>
-          {layer.icon} {doc.layer}
+        <Link href={`/${doc.layer}/`} className="crumbs__layer">
+          <LayerIcon layer={doc.layer} /> {doc.layer}
         </Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{doc.slug}</span>
@@ -105,18 +109,51 @@ export default async function DocPage({
         </article>
 
         {toc.length > 2 ? (
-          <aside className="toc" aria-label="On this page">
-            <p className="eyebrow">On this page</p>
-            <ol>
-              {toc.map((h) => (
-                <li key={h.id}>
-                  <a href={`#${h.id}`}>{h.text}</a>
-                </li>
-              ))}
-            </ol>
-          </aside>
+          <DocToc headings={toc.map(({ id, text }) => ({ id, text }))} />
         ) : null}
       </div>
+
+      {outbound.length || inbound.length ? (
+        <section className="relations" aria-labelledby="relations-heading">
+          <h2 id="relations-heading" className="eyebrow">
+            How this connects
+          </h2>
+          <div className="relations__grid">
+            {outbound.length ? (
+              <div>
+                <h3>This document points at</h3>
+                <ul>
+                  {outbound.map((d) => (
+                    <li key={`${d.layer}/${d.slug}`}>
+                      <Link href={`/${d.layer}/${d.slug}/`} data-layer={d.layer} style={layerStyle(LAYER_BY_ID.get(d.layer))}>
+                        <LayerIcon layer={d.layer} />
+                        <span className="mono">{d.name}</span>
+                        <span className="relations__layer">{d.layer}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {inbound.length ? (
+              <div>
+                <h3>Referenced by {inbound.length} other {inbound.length === 1 ? 'document' : 'documents'}</h3>
+                <ul>
+                  {inbound.map((d) => (
+                    <li key={`${d.layer}/${d.slug}`}>
+                      <Link href={`/${d.layer}/${d.slug}/`} data-layer={d.layer} style={layerStyle(LAYER_BY_ID.get(d.layer))}>
+                        <LayerIcon layer={d.layer} />
+                        <span className="mono">{d.name}</span>
+                        <span className="relations__layer">{d.layer}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
 
       <nav className="pager" aria-label="Nearby documents">
         {previous ? (

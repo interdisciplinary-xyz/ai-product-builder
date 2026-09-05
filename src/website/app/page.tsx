@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { LAYERS, allDocs, layerCounts, libraryVersion, findDoc } from '@/lib/content';
 import { Entry, layerStyle } from '@/components/ui';
+import { DoorIcon } from '@/components/icons';
 
 export default function HomePage() {
   const counts = layerCounts();
@@ -12,21 +13,21 @@ export default function HomePage() {
   const doors = [
     {
       key: 'evaluating',
-      icon: '🔍',
+      icon: 'evaluate' as const,
       title: 'Evaluating?',
       body: 'Read the most opinionated document here. If you can live with it, the rest will fit.',
       doc: findDoc('runbooks', 'release-manager'),
     },
     {
       key: 'adopting',
-      icon: '🚀',
+      icon: 'adopt' as const,
       title: 'Adopting?',
       body: 'The one that earns its keep on day one — the pre-merge gate, with the commands and budgets spelled out.',
       doc: findDoc('runbooks', 'quality-assurance'),
     },
     {
       key: 'best',
-      icon: '💎',
+      icon: 'best' as const,
       title: 'Just the best thing?',
       body: 'Three assertion shapes that pass identically against broken and fixed code. It fires without being asked.',
       doc: findDoc('skills', 'tests-that-cannot-fail'),
@@ -111,7 +112,6 @@ export default function HomePage() {
             <Entry
               key={layer.id}
               href={`/${layer.id}/`}
-              icon={layer.icon}
               name={`${layer.label.toLowerCase()}/`}
               description={layer.tagline}
               meta={[`${counts[layer.id]} files`, `→ ${layer.target}`, `you ${layer.verb} them`]}
@@ -138,8 +138,8 @@ export default function HomePage() {
                   data-layer={door.doc.layer}
                   style={layerStyle(LAYERS.find((l) => l.id === door.doc!.layer))}
                 >
-                  <span className="door__icon" aria-hidden="true">
-                    {door.icon}
+                  <span className="door__icon">
+                    <DoorIcon name={door.icon} />
                   </span>
                   <h3>{door.title}</h3>
                   <p>{door.body}</p>

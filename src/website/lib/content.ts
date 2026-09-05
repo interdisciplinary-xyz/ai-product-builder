@@ -25,7 +25,6 @@ export type LayerId =
 export type Layer = {
   id: LayerId;
   label: string;
-  icon: string;
   /** Directory relative to the repo root. */
   dir: string;
   /** Filename prefix stripped to form the display name, if any. */
@@ -46,7 +45,6 @@ export const LAYERS: Layer[] = [
   {
     id: 'managers',
     label: 'Managers',
-    icon: '🎛️',
     dir: 'src/managers',
     prefix: 'MANAGER_',
     tagline: 'Playbooks you run against a repo.',
@@ -60,7 +58,6 @@ export const LAYERS: Layer[] = [
   {
     id: 'runbooks',
     label: 'Runbooks',
-    icon: '📘',
     dir: 'src/runbooks',
     prefix: 'RUNBOOK_',
     tagline: 'Documents you fill.',
@@ -74,7 +71,6 @@ export const LAYERS: Layer[] = [
   {
     id: 'commands',
     label: 'Commands',
-    icon: '⌨️',
     dir: 'src/commands',
     tagline: 'Slash-commands for Claude Code.',
     blurb:
@@ -87,7 +83,6 @@ export const LAYERS: Layer[] = [
   {
     id: 'skills',
     label: 'Skills',
-    icon: '⚡',
     dir: 'src/skills',
     prefix: 'SKILL_',
     tagline: 'Rules that fire without being asked.',
@@ -101,7 +96,6 @@ export const LAYERS: Layer[] = [
   {
     id: 'agents',
     label: 'Agents',
-    icon: '🎩',
     dir: 'src/agents',
     prefix: 'AGENT_',
     tagline: 'Read-only executive lenses.',
@@ -115,7 +109,6 @@ export const LAYERS: Layer[] = [
   {
     id: 'scripts',
     label: 'Scripts',
-    icon: '🧮',
     dir: 'src/scripts',
     tagline: 'Calculators. Standard library only.',
     blurb:
@@ -128,7 +121,6 @@ export const LAYERS: Layer[] = [
   {
     id: 'config',
     label: 'Config',
-    icon: '🔒',
     dir: 'src/config',
     tagline: 'The permission boundary, in one file.',
     blurb:
@@ -141,7 +133,6 @@ export const LAYERS: Layer[] = [
   {
     id: 'meta',
     label: 'Meta',
-    icon: '🏷️',
     dir: 'src/meta',
     tagline: 'The «token» glossary.',
     blurb:
@@ -154,7 +145,6 @@ export const LAYERS: Layer[] = [
   {
     id: 'guides',
     label: 'Guides',
-    icon: '📄',
     dir: '.',
     tagline: 'The repository’s own front matter.',
     blurb:
@@ -411,6 +401,81 @@ export function linkMap(): Record<string, string> {
     if (doc.layer === 'runbooks') map[`${doc.name.toLowerCase()}.md`] = route;
   }
   return map;
+}
+
+/* ----------------------------------------------------------- the link graph */
+
+type Relations = { outbound: Doc[]; inbound: Doc[] };
+let graph: Map<string, Relations> | null = null;
+
+const key = (d: Doc) => `${d.layer}/${d.slug}`;
+
+/**
+ * The library's structure is not in its file names — only 3 of 25 managers share
+ * a name with a runbook. It is in the cross-references the documents actually
+ * make. So read those: resolve every markdown link to the doc it names, and
+ * invert the result to get "what points here".
+ */
+function buildGraph(): Map<string, Relations> {
+  if (graph) return graph;
+  const docs = allDocs();
+  const map = linkMap();
+  const byRoute = new Map(docs.map((d) => [`/${d.layer}/${d.slug}/`, d]));
+
+  const out = new Map<string, Doc[]>();
+  const inb = new Map<string, Doc[]>();
+  for (const doc of docs) {
+    const seen = new Set<string>();
+    const targets: Doc[] = [];
+    const mention = (raw: string) => {
+      if (/^(https?:|mailto:)/.test(raw)) return;
+      const base = raw.split('/').pop()?.toLowerCase();
+      const route = base ? map[base] : undefined;
+      const target = route ? byRoute.get(route) : undefined;
+      if (!target || key(target) === key(doc) || seen.has(key(target))) return;
+      seen.add(key(target));
+      targets.push(target);
+    };
+    // Markdown links…
+    for (const m of doc.body.matchAll(/\]\(([^)\s#]+)/g)) mention(m[1]);
+    // …and bare filenames in inline code, which is how half the library's
+    // "pairs with" / "defers to" references are actually written.
+    for (const m of doc.body.matchAll(/`([A-Za-z0-9_./-]+\.(?:md|json|py))`/g)) mention(m[1]);
+
+    out.set(key(doc), targets);
+    for (const target of targets) {
+      // The catalog and README link to every file by definition; counting them
+      // as references would drown the signal on every page.
+      if (doc.layer === 'guides') continue;
+      const list = inb.get(key(target)) ?? [];
+      list.push(doc);
+      inb.set(key(target), list);
+    }
+  }
+
+  // A doc referenced by most of the library is boilerplate, not a relation:
+  // every setup block says "or invoke MANAGER_INIT.md". There is a clean cliff
+  // between that (86% of docs) and the next most-referenced (33%).
+  const frequency = new Map<string, number>();
+  for (const targets of out.values()) {
+    for (const t of targets) frequency.set(key(t), (frequency.get(key(t)) ?? 0) + 1);
+  }
+  const boilerplate = (d: Doc) => (frequency.get(key(d)) ?? 0) > docs.length / 2;
+
+  graph = new Map(
+    docs.map((d) => [
+      key(d),
+      {
+        outbound: (out.get(key(d)) ?? []).filter((t) => !boilerplate(t)),
+        inbound: inb.get(key(d)) ?? [],
+      },
+    ]),
+  );
+  return graph;
+}
+
+export function relations(doc: Doc): Relations {
+  return buildGraph().get(key(doc)) ?? { outbound: [], inbound: [] };
 }
 
 export type SearchEntry = {

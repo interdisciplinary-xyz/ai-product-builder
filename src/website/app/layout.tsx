@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Instrument_Serif, Newsreader, JetBrains_Mono } from 'next/font/google';
 import Link from 'next/link';
 import { LAYERS, libraryVersion, allDocs } from '@/lib/content';
+import { SiteNav } from '@/components/site-nav';
 import './globals.css';
 
 const display = Instrument_Serif({
@@ -30,6 +31,17 @@ export const metadata: Metadata = {
   },
   description:
     'Playbooks, runbook templates and agent skills for solo founders shipping products with Claude Code. Eight layers, browsable in full.',
+  applicationName: 'ai-product-builder',
+  openGraph: {
+    title: 'ai-product-builder — a library of playbooks',
+    description:
+      'Every repo re-litigates the same forty decisions. This is those decisions, written once, as documents an agent can execute.',
+    type: 'website',
+  },
+  icons: {
+    // Drawn to the same monoline spec as the layer icons.
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -48,14 +60,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/" className="wordmark">
               ai<span>·</span>product<span>·</span>builder
             </Link>
-            <nav aria-label="Layers">
-              {LAYERS.filter((l) => l.id !== 'guides').map((layer) => (
-                <Link key={layer.id} href={`/${layer.id}/`}>
-                  {layer.label}
-                </Link>
-              ))}
-              <Link href="/browse/">Search</Link>
-            </nav>
+            <SiteNav
+              layers={LAYERS.filter((l) => l.id !== 'guides').map((l) => ({
+                id: l.id,
+                label: l.label,
+              }))}
+            />
           </div>
         </header>
 
