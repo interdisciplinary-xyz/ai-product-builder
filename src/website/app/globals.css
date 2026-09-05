@@ -17,9 +17,15 @@
   --accent-soft: #f0e0d6;
   --shadow: 0 1px 2px rgba(23, 20, 15, 0.06), 0 8px 24px -16px rgba(23, 20, 15, 0.3);
 
-  --masthead-h: 3.75rem;
+  /* One token for the space above and below the header's contents, at every
+     width. --masthead-h stays the authoritative height because the sticky
+     offsets (contents rail, ledger group headers, scroll-padding) key off it. */
+  --masthead-pad: 0.95rem;
+  --masthead-h: 3.9rem; /* padding + the nav row; verified against the rendered bar */
   --measure: 68ch;
   --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  /* The frame runs the full viewport; only the reading measure is capped. */
+  --shell-max: none;
   --rail: 15rem;
 
   color-scheme: light dark;
@@ -170,7 +176,7 @@ a:hover {
 }
 
 .shell {
-  max-width: 76rem;
+  max-width: var(--shell-max);
   margin: 0 auto;
   padding-inline: var(--gutter);
 }
@@ -201,14 +207,20 @@ a:hover {
 
 .masthead__inner {
   display: flex;
-  align-items: baseline;
+  /* Centred, not baseline-aligned: baseline in a fixed-height bar pushed the
+     contents to the top, leaving 1px above the wordmark and 25px below it. */
+  align-items: center;
   gap: clamp(1rem, 3vw, 2.5rem);
-  height: var(--masthead-h);
+  padding-block: var(--masthead-pad);
+  min-height: var(--masthead-h);
 }
 
 .wordmark {
   font-family: var(--font-display), serif;
   font-size: 1.3rem;
+  /* Its own line-height: inheriting the body's 1.65 made a 21px wordmark
+     occupy a 34px box and set the header's height by accident. */
+  line-height: 1.2;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -234,7 +246,7 @@ a:hover {
   text-decoration: none;
   color: var(--ink-soft);
   white-space: nowrap;
-  padding-block: 0.7rem;
+  padding-block: 0.35rem;
   border-bottom: 1px solid transparent;
 }
 .masthead__nav a:hover,
@@ -914,7 +926,11 @@ a.anchor:focus-visible {
 
 .doc__body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--rail);
+  /* The text column is capped by its reading measure, so a 1fr column left a
+     void between the prose and the rail on a wide screen. Size both columns to
+     their content and let the slack fall outside the pair instead. */
+  grid-template-columns: minmax(0, calc(var(--measure) + 3rem)) var(--rail);
+  justify-content: start;
   gap: clamp(2rem, 5vw, 4rem);
   align-items: start;
   padding-top: 2.5rem;
@@ -1301,13 +1317,17 @@ a.anchor:focus-visible {
    it its own full-width row, and fade the cut edge so the scroll is visible. */
 @media (max-width: 60rem) {
   :root {
-    --masthead-h: 6.1rem;
+    /* padding + wordmark + gap + the taller touch-target nav row */
+    --masthead-h: 6.4rem;
   }
   .masthead__inner {
     flex-direction: column;
     align-items: stretch;
-    justify-content: center;
-    gap: 0.1rem;
+    gap: 0.15rem;
+  }
+  .masthead__nav a {
+    /* Touch targets, where there is touch. */
+    padding-block: 0.7rem;
   }
   .masthead__nav {
     margin-left: 0;
