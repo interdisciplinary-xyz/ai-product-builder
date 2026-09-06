@@ -47,14 +47,12 @@ export function BrowseClient({ items, layers }: { items: BrowseItem[]; layers: B
   const [active, setActive] = useState<LayerId | null>(null);
   const input = useRef<HTMLInputElement>(null);
 
-  // "/" jumps to the filter, the way every doc site worth using does.
+  // "/" now opens the site-wide palette, which searches sections and tokens as
+  // well as this page's rows — two things bound to one key is one too many. This
+  // filter keeps Escape, which only means anything while you are inside it.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === '/' && document.activeElement !== input.current) {
-        event.preventDefault();
-        input.current?.focus();
-      }
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' && document.activeElement === input.current) {
         setQuery('');
         input.current?.blur();
       }
@@ -160,7 +158,7 @@ export function BrowseClient({ items, layers }: { items: BrowseItem[]; layers: B
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Filter by name, description or deployed path…"
+            placeholder="Filter these rows by name, description or deployed path…"
             aria-label="Filter documents"
             autoComplete="off"
             spellCheck={false}
@@ -176,9 +174,7 @@ export function BrowseClient({ items, layers }: { items: BrowseItem[]; layers: B
             >
               Clear
             </button>
-          ) : (
-            <kbd className="mono">/</kbd>
-          )}
+          ) : null}
         </div>
 
         <div className="filters__layers" role="group" aria-label="Filter by layer">

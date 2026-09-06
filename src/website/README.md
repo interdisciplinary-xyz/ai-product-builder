@@ -36,6 +36,16 @@ other than `../..`.
 
 ## What it adds to the raw markdown
 
+- **A second axis.** Layers say what a file *is*; [topics](lib/topics.ts) say what it is **for**.
+  Eleven jobs — secure it, launch it, keep the docs true — each cutting across every layer, with
+  all 129 files placed on exactly one. `/topics`, and the grouping inside any layer index past a
+  dozen files.
+- **Search from anywhere.** <kbd>⌘K</kbd> (or `/`) opens a palette over documents, the library's
+  1,223 **section headings**, and its tokens. A section is the unit that actually answers a
+  question, and it was previously unreachable except by scrolling.
+- **The `«token»` index** at `/tokens`: one token, and every document that wants it, joined to
+  its glossary meaning. It also states the uncomfortable number — how many tokens have no row in
+  `PLACEHOLDERS.md`, and so cannot be prompted for by `/ai-init`.
 - **`«PLACEHOLDER»` tokens are marked** wherever they appear, so an unfilled doc looks unfilled —
   the library's central convention, made visible.
 - **Cross-references resolve.** A doc that links to `./QUALITY_ASSURANCE.md` links to that page
@@ -43,28 +53,58 @@ other than `../..`.
   rather than broken, and `«PLACEHOLDER»` URLs render as tokens.
 - **Layer framing.** Each layer states what you do with it (run / fill / invoke / never invoke)
   and where a deployed copy lands.
-- **Filterable index** at `/browse`, over names, descriptions and deploy paths. `/` focuses it.
+- **A sibling rail** on every document page, grouped by topic, with the current file marked —
+  because the document you want is usually one along from the one you opened.
+- **Filterable index** at `/browse`, over names, descriptions and deploy paths.
 
 ## Layout
 
 ```
 app/
-├── page.tsx              the front page — layers, the three doors, status
+├── page.tsx              the front page — doors, topics, layers, contents, status
+├── topics/               the topic index, and one page per topic
+├── tokens/               every «token» and the documents that want it
 ├── browse/               the filterable index
-├── [layer]/page.tsx      one layer's ledger
+├── [layer]/page.tsx      one layer's ledger, grouped by topic past a dozen files
 ├── [layer]/[slug]/       one document
-└── globals.css           the whole design system, ~700 lines, no framework
-lib/content.ts            reads the repo: layers, docs, CATALOG descriptions, link map
+├── search-index.json/    a static route handler — the palette's index, ~195 kB
+└── globals.css           the whole design system, no framework
+lib/
+├── content.ts            reads the repo: layers, docs, CATALOG descriptions, link map
+├── topics.ts             the topic axis — hand-written, one topic per document
+└── tokens.ts             «token» extraction, joined to the PLACEHOLDERS.md glossary
 components/
 ├── markdown.tsx          renderer + the «token» remark plugin + link rewriting
 ├── ui.tsx                the ledger row, used by nearly every page
-└── browse-client.tsx     the only client component
+├── command-palette.tsx   ⌘K over documents, sections and tokens
+├── doc-nav.tsx           the sibling rail on a document page
+├── browse-client.tsx     the /browse filter
+└── tokens-client.tsx     the /tokens filter
 ```
+
+### The search index
+
+The palette searches section headings, which is 150 kB of index — far too much to inline into
+each of 159 pages. `app/search-index.json/route.ts` is a `force-static` route handler, the only
+way to emit a plain JSON file under `output: 'export'`; the palette fetches it on first open and
+the browser caches it from there. Adding a document to the library regenerates it; nothing needs
+to be kept in step by hand.
+
+### Adding a document
+
+The site follows the library — with one exception. `lib/topics.ts` maps every file to a topic and
+is written by hand, because deriving it from keywords filed `EMAIL_DELIVERABILITY` under security
+(SPF, DKIM) and `PRIVACY_CONTRACT_TEST` under testing. A new file that nobody has placed shows up
+in an **Unfiled** group on `/topics` and at the bottom of its layer index; it does not break the
+build.
 
 ## Design
 
-Warm paper ground, ink type, hairline rules — a card catalog rather than a dashboard. Instrument
+White ground, ink type, hairline rules — a card catalog rather than a dashboard. Instrument
 Serif for display, Newsreader for body, JetBrains Mono for anything a machine would read. Each
-layer carries its own accent, set as `--layer` and used for rules, links and hover states. Light
+layer — and each topic — carries its own accent, set as `--layer-light`/`--layer-dark` on an
+element marked `data-layer` or `data-topic`, and resolved to `--layer` in one place. Setting the
+pair without one of those attributes silently falls back to the house accent, which is how eleven
+topics first shipped in a single colour. Light
 and dark both ship; the palette lives entirely in CSS custom properties at the top of
 `globals.css`.

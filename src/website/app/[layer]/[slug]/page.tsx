@@ -16,6 +16,9 @@ import { Markdown, CodeBlock } from '@/components/markdown';
 import { layerStyle } from '@/components/ui';
 import { LayerIcon } from '@/components/icons';
 import { DocToc } from '@/components/doc-toc';
+import { DocNav } from '@/components/doc-nav';
+import { topicOf } from '@/lib/topics';
+import { tokensIn } from '@/lib/tokens';
 
 const GITHUB = 'https://github.com/interdisciplinary-xyz/ai-product-builder/blob/main';
 
@@ -54,6 +57,8 @@ export default async function DocPage({
   const toc = doc.headings.filter((h) => h.depth === 2);
   const { outbound, inbound } = relations(doc);
   const pair = pairing(doc);
+  const topic = topicOf(doc);
+  const tokens = tokensIn(doc);
 
   return (
     <div className="shell doc" data-layer={doc.layer} style={layerStyle(layer)}>
@@ -65,6 +70,11 @@ export default async function DocPage({
         </Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{doc.slug}</span>
+        {topic ? (
+          <Link href={`/topics/${topic.id}/`} className="crumbs__topic">
+            {topic.label}
+          </Link>
+        ) : null}
       </nav>
 
       <header className="doc__head rise">
@@ -110,10 +120,22 @@ export default async function DocPage({
               {doc.words.toLocaleString('en-US')} words · {(doc.bytes / 1024).toFixed(1)} kB
             </dd>
           </div>
+          {tokens.length ? (
+            <div>
+              <dt>To fill</dt>
+              <dd>
+                <Link href="/tokens/">
+                  {tokens.length} «{tokens.length === 1 ? 'token' : 'tokens'}»
+                </Link>
+              </dd>
+            </div>
+          ) : null}
         </dl>
       </header>
 
       <div className="doc__body">
+        <DocNav doc={doc} siblings={siblings} />
+
         <article>
           {doc.language ? (
             <CodeBlock code={doc.body} language={doc.language} />

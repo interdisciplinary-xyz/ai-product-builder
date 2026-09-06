@@ -2,9 +2,11 @@ import { Link } from '@/components/link';
 import { LAYERS, allDocs, docsForLayer, layerCounts, libraryVersion, findDoc } from '@/lib/content';
 import { DocEntry, Entry, Ledger, layerStyle } from '@/components/ui';
 import { DoorIcon, LayerIcon } from '@/components/icons';
+import { TOPICS, topicCounts, docsForTopic } from '@/lib/topics';
 
 export default function HomePage() {
   const counts = layerCounts();
+  const topics = topicCounts();
   const docs = allDocs();
   const total = docs.filter((d) => d.layer !== 'guides').length;
   const version = libraryVersion();
@@ -49,11 +51,11 @@ export default function HomePage() {
             You run a playbook; it produces and then audits the doc your team lives with.
           </p>
           <p className="hero__actions">
-            <Link href="/browse/" className="button">
-              Browse all {total} files
+            <Link href="/topics/" className="button">
+              Start with what you&rsquo;re doing
             </Link>
-            <Link href="/runbooks/release-manager/" className="button button--ghost">
-              Read a runbook →
+            <Link href="/browse/" className="button button--ghost">
+              Browse all {total} files
             </Link>
           </p>
         </div>
@@ -97,6 +99,75 @@ export default function HomePage() {
           <strong className="mono">0</strong>
           <span>repos proven in</span>
         </div>
+      </section>
+
+      <section className="section" id="start">
+        <header className="section__head">
+          <h2 className="display">Start here</h2>
+          <p>Three doors, by what you came for.</p>
+        </header>
+        <ul className="doors">
+          {doors.map(
+            (door) =>
+              door.doc && (
+                <li key={door.key}>
+                <Link
+                  href={`/${door.doc.layer}/${door.doc.slug}/`}
+                  className="door"
+                  data-layer={door.doc.layer}
+                  style={layerStyle(LAYERS.find((l) => l.id === door.doc!.layer))}
+                >
+                  <span className="door__icon">
+                    <DoorIcon name={door.icon} />
+                  </span>
+                  <h3>{door.title}</h3>
+                  <p>{door.body}</p>
+                  <span className="door__doc mono">{door.doc.name} →</span>
+                </Link>
+                </li>
+              ),
+          )}
+        </ul>
+      </section>
+
+      <section className="section" id="topics">
+        <header className="section__head">
+          <h2 className="display">What are you trying to do?</h2>
+          <p>
+            The layers below say what each file <em>is</em>. These say what it is <em>for</em> —
+            and doing any one of these jobs pulls a playbook, its runbooks and a skill or two out
+            of four different layers at once.
+          </p>
+        </header>
+        <ul className="topics topics--compact">
+          {TOPICS.map((topic) => {
+            const lead = docsForTopic(topic.id).find((d) => d.layer === 'managers');
+            return (
+              <li key={topic.id}>
+                <Link
+                  href={`/topics/${topic.id}/`}
+                  className="topic"
+                  data-topic={topic.id}
+                  style={{
+                    ['--layer-light' as string]: topic.accent,
+                    ['--layer-dark' as string]: topic.accentDark,
+                  }}
+                >
+                  <p className="topic__question">{topic.question}</p>
+                  <h3 className="topic__title display">{topic.label}</h3>
+                  <p className="topic__foot mono">
+                    <span>{topics[topic.id]} files</span>
+                    {lead ? (
+                      <span className="topic__lead">
+                        <LayerIcon layer="managers" /> {lead.name}
+                      </span>
+                    ) : null}
+                  </p>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
       <section className="section" id="layers">
@@ -151,35 +222,6 @@ export default function HomePage() {
             </Ledger>
           </section>
         ))}
-      </section>
-
-      <section className="section" id="start">
-        <header className="section__head">
-          <h2 className="display">Start here</h2>
-          <p>Three doors, by what you came for.</p>
-        </header>
-        <ul className="doors">
-          {doors.map(
-            (door) =>
-              door.doc && (
-                <li key={door.key}>
-                <Link
-                  href={`/${door.doc.layer}/${door.doc.slug}/`}
-                  className="door"
-                  data-layer={door.doc.layer}
-                  style={layerStyle(LAYERS.find((l) => l.id === door.doc!.layer))}
-                >
-                  <span className="door__icon">
-                    <DoorIcon name={door.icon} />
-                  </span>
-                  <h3>{door.title}</h3>
-                  <p>{door.body}</p>
-                  <span className="door__doc mono">{door.doc.name} →</span>
-                </Link>
-                </li>
-              ),
-          )}
-        </ul>
       </section>
 
       <section className="section" id="status">

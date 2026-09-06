@@ -2,40 +2,37 @@
 
 import { Link } from '@/components/link';
 import { usePathname } from 'next/navigation';
+import { SearchButton } from '@/components/command-palette';
 
 /**
- * The masthead needs to know where you are — a static <Link> list can't say so.
- * A layer is current for its own index and for every document inside it.
+ * Four destinations, not twelve. The masthead used to list all eight layers,
+ * which meant the header answered "what kinds of file are there" — a question
+ * nobody arrives with — and buried search at the end of the row. Layers are
+ * still one click away from Browse, from every breadcrumb and from the rail on
+ * a document page; the header now carries the two axes (topic, layer) plus the
+ * two indexes, and search is a button rather than a link.
  */
-export function SiteNav({
-  layers,
-}: {
-  layers: { id: string; label: string }[];
-}) {
+const LINKS = [
+  { href: '/topics/', label: 'Topics', match: '/topics' },
+  { href: '/browse/', label: 'Browse', match: '/browse' },
+  { href: '/tokens/', label: 'Placeholders', match: '/tokens' },
+];
+
+export function SiteNav() {
   const pathname = usePathname() ?? '/';
 
   return (
-    <nav className="masthead__nav" aria-label="Layers">
-      {layers.map((layer) => {
-        const current = pathname === `/${layer.id}/` || pathname.startsWith(`/${layer.id}/`);
-        return (
-          <Link
-            key={layer.id}
-            href={`/${layer.id}/`}
-           
-            aria-current={current ? 'page' : undefined}
-          >
-            {layer.label}
-          </Link>
-        );
-      })}
-      <Link
-        href="/browse/"
-       
-        aria-current={pathname.startsWith('/browse') ? 'page' : undefined}
-      >
-        Search
-      </Link>
+    <nav className="masthead__nav" aria-label="Sections">
+      {LINKS.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          aria-current={pathname.startsWith(link.match) ? 'page' : undefined}
+        >
+          {link.label}
+        </Link>
+      ))}
+      <SearchButton />
     </nav>
   );
 }

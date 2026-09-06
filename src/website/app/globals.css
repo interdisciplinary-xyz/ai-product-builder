@@ -1,20 +1,22 @@
 /* ============================================================================
    ai-product-builder — an archive, not a dashboard.
-   Warm paper ground, ink type, hairline rules, mono for anything a machine
+   White ground, ink type, hairline rules, mono for anything a machine
    would read. One accent (vermilion) plus a per-layer hue set on --layer.
    ========================================================================== */
 
 :root {
-  --paper: #f2eee4;
-  --paper-raised: #fbf9f3;
-  --paper-sunk: #eae5d8;
+  /* The ground is white, so elevation runs downward: "raised" surfaces sit a
+     shade off the page rather than above it, and every one carries a rule. */
+  --paper: #ffffff;
+  --paper-raised: #faf9f7;
+  --paper-sunk: #f3f2ef;
   --ink: #17140f;
   --ink-soft: #4c4638;
   --ink-faint: #6d6454;
-  --rule: #ded7c7;
-  --rule-strong: #c7bea9;
+  --rule: #e5e2db;
+  --rule-strong: #ccc7bc;
   --accent: #ad3a17;
-  --accent-soft: #f0e0d6;
+  --accent-soft: #f7e7df;
   --shadow: 0 1px 2px rgba(23, 20, 15, 0.06), 0 8px 24px -16px rgba(23, 20, 15, 0.3);
 
   /* One token for the space above and below the header's contents, at every
@@ -47,12 +49,17 @@
   }
 }
 
-/* Layers carry their own hue; the light/dark pair is set inline, resolved here. */
-[data-layer] {
+/* Layers and topics carry their own hue; the light/dark pair is set inline as
+   --layer-light / --layer-dark and resolved to --layer here. An element that
+   sets the pair without carrying one of these attributes falls back silently to
+   the house accent — which is how eleven topics first shipped in one colour. */
+[data-layer],
+[data-topic] {
   --layer: var(--layer-light);
 }
 @media (prefers-color-scheme: dark) {
-  [data-layer] {
+  [data-layer],
+  [data-topic] {
     --layer: var(--layer-dark);
   }
 }
@@ -93,14 +100,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Paper grain — 2kb of turbulence, kept faint enough to read as texture. */
+/* Paper grain — 2kb of turbulence. Off on the white ground (multiply noise
+   there reads as dirt, not texture); kept for the dark ground below. */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.28;
+  opacity: 0;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
 }
@@ -549,6 +557,16 @@ a.anchor:focus-visible {
   padding: 0.05em 0.2em;
   border-radius: 2px;
   white-space: nowrap;
+  max-width: 100%;
+}
+/* nowrap keeps a token whole, which is right until the token is wider than the
+   screen: «SPEC_INVENTORY»-sized names pushed a document page to 672px of
+   horizontal scroll on a 390px phone. Below the reading width they wrap. */
+@media (max-width: 40rem) {
+  .token {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 
 /* ------------------------------------------------------------ animation */
@@ -1444,4 +1462,585 @@ main:focus {
   .ledger__group-note {
     display: none;
   }
+}
+
+/* ========================================================================== */
+/* NAVIGATION — added in v0.3: the topic axis, the palette, the sibling rail   */
+/* and the placeholder index. Everything below reuses the tokens above; a new  */
+/* surface that needs a new colour is a surface that does not belong here.     */
+/* ========================================================================== */
+
+/* ------------------------------------------------------------ search button */
+
+.searchbutton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.35rem;
+  padding: 0.32rem 0.55rem 0.32rem 0.6rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  background: var(--paper-raised);
+  color: var(--ink-soft);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: border-color 130ms ease, color 130ms ease;
+}
+.searchbutton:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.searchbutton__icon {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+.searchbutton kbd {
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0 0.28rem;
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+}
+@media (max-width: 40rem) {
+  .searchbutton__label,
+  .searchbutton kbd {
+    display: none;
+  }
+  .searchbutton {
+    padding: 0.32rem 0.5rem;
+  }
+}
+
+/* --------------------------------------------------------- command palette */
+
+.palette {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  padding: clamp(3rem, 12vh, 9rem) 1rem 2rem;
+  background: color-mix(in srgb, var(--ink) 34%, transparent);
+  backdrop-filter: blur(2px);
+  animation: fade 120ms ease both;
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+.palette__box {
+  width: min(42rem, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+  border-radius: 6px;
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+.palette__field {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.palette__icon {
+  font-size: 1.05rem;
+  color: var(--ink-faint);
+}
+.palette__field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-body), serif;
+  font-size: 1rem;
+}
+.palette__field input:focus {
+  outline: none;
+}
+.palette__field input::placeholder {
+  color: var(--ink-faint);
+}
+.palette__esc {
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: none;
+  color: var(--ink-faint);
+  font-size: 0.66rem;
+  padding: 0.15rem 0.4rem;
+  cursor: pointer;
+}
+
+.palette__results {
+  list-style: none;
+  margin: 0;
+  padding: 0.4rem;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+}
+.palette__group {
+  margin: 0.7rem 0 0.3rem;
+  padding-inline: 0.6rem;
+}
+.palette__hit {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.55rem 0.6rem;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+.palette__hit[aria-selected='true'] {
+  background: var(--paper-sunk);
+}
+.palette__hit-icon {
+  display: flex;
+  padding-top: 0.15rem;
+  color: var(--ink-faint);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8rem;
+}
+.palette__hit-icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+.palette__hit[aria-selected='true'] .palette__hit-icon {
+  color: var(--accent);
+}
+.palette__hit-main {
+  flex: 1;
+  min-width: 0;
+}
+.palette__hit-title {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+.palette__hit[data-kind='section'] .palette__hit-title {
+  font-family: var(--font-body), serif;
+  font-size: 0.92rem;
+}
+.palette__hit-detail {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.palette__hit-kind {
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding-top: 0.2rem;
+}
+.palette__empty {
+  padding: 1.5rem 0.6rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+}
+.palette__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  border-top: 1px solid var(--rule);
+  background: var(--paper-sunk);
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+}
+.palette__foot kbd {
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  padding: 0 0.25rem;
+  margin-right: 0.15rem;
+}
+.palette__foot-hint {
+  margin-left: auto;
+}
+
+/* ------------------------------------------------------------ topic cards */
+
+.topics {
+  list-style: none;
+  margin: 0;
+  padding: 1px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(19rem, 100%), 1fr));
+  gap: 1px;
+}
+/* Hairlines come from a ring on each card, not from a coloured grid showing
+   through its gaps: eleven cards in a four-column grid leave one cell empty,
+   and the grid-background trick paints that empty cell as a grey slab. */
+.topics > li {
+  display: flex;
+}
+.topic {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1.3rem 1.4rem 1.15rem;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--rule);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 140ms ease;
+}
+.topic:hover {
+  background: var(--paper-raised);
+}
+.topic__question {
+  margin: 0;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--ink-faint);
+}
+.topic__title {
+  margin: 0;
+  font-size: 1.45rem;
+  color: var(--layer, var(--accent));
+}
+.topic__blurb {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+.topic__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin: auto 0 0;
+  padding-top: 0.7rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+.topic__lead {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.topic__lead svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--layer, var(--accent));
+}
+.topics--compact .topic {
+  padding: 1.1rem 1.2rem 1rem;
+}
+.topics--compact .topic__title {
+  font-size: 1.2rem;
+}
+
+.topichead__lead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem 1.2rem;
+  margin: 1.6rem 0 0;
+}
+.topichead__note {
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  max-width: 40ch;
+}
+
+.topicpager {
+  margin-top: 4rem;
+  border-top: 1px solid var(--rule);
+  padding-top: 1.5rem;
+}
+.topicpager ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.8rem 0 0;
+  padding: 0;
+}
+
+/* The topic jump-bar at the top of a long layer index. */
+.jumpbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem 1rem;
+  padding: 1rem 0 1.4rem;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 0.5rem;
+}
+.jumpbar ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+}
+.jumpbar .chip span {
+  color: var(--ink-faint);
+  font-size: 0.9em;
+}
+
+/* ------------------------------------------------------- doc sibling rail */
+
+.docnav {
+  order: -1;
+  /* Below the three-column breakpoint the rail sits above the prose as a short
+     scroll box; it must span the grid, or auto-placement drops it into the text
+     column and wraps the table of contents onto a row underneath it. */
+  grid-column: 1 / -1;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--paper-raised);
+  margin-bottom: 1.5rem;
+  max-height: 15rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.docnav__body {
+  padding: 0.8rem 0.9rem;
+}
+.docnav__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+}
+.docnav__head a {
+  color: inherit;
+  text-decoration: none;
+}
+.docnav__head a:hover {
+  color: var(--accent);
+}
+.docnav__group {
+  border-top: 1px solid var(--rule);
+}
+.docnav__grouphead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  list-style: none;
+}
+.docnav__grouphead::-webkit-details-marker {
+  display: none;
+}
+.docnav__group[open] > .docnav__grouphead {
+  color: var(--layer, var(--accent));
+}
+.docnav__grouphead .mono {
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+}
+.docnav__list {
+  list-style: none;
+  margin: 0 0 0.6rem;
+  padding: 0;
+}
+.docnav__link {
+  display: block;
+  padding: 0.22rem 0 0.22rem 0.7rem;
+  border-left: 1px solid var(--rule);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.docnav__link:hover {
+  color: var(--layer, var(--accent));
+  border-left-color: var(--layer, var(--accent));
+}
+.docnav__link[aria-current='page'] {
+  color: var(--layer, var(--accent));
+  border-left: 2px solid var(--layer, var(--accent));
+  padding-left: calc(0.7rem - 1px);
+}
+
+/* Wide screens promote the box to a full-height sticky rail. */
+@media (min-width: 90rem) {
+  .doc__body {
+    grid-template-columns: 14rem minmax(0, calc(var(--measure) + 3rem)) var(--rail);
+  }
+  .docnav {
+    order: 0;
+    grid-column: auto;
+    position: sticky;
+    top: calc(var(--masthead-h) + 1.25rem);
+    max-height: calc(100vh - 8rem);
+    margin-bottom: 0;
+    background: none;
+    border: 0;
+    border-right: 1px solid var(--rule);
+    border-radius: 0;
+  }
+  .docnav__body {
+    padding: 0 1.2rem 0 0;
+  }
+}
+
+.crumbs__topic {
+  margin-left: auto;
+  color: var(--ink-faint) !important;
+  border-bottom: 1px dotted var(--rule-strong);
+}
+.crumbs__topic:hover {
+  color: var(--layer, var(--accent)) !important;
+}
+
+/* ------------------------------------------------------- placeholder index */
+
+.tokenstats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+  gap: 1px;
+  margin: 2.5rem 0 2rem;
+  padding: 1px;
+}
+.tokenstats p {
+  box-shadow: 0 0 0 1px var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 1.1rem 1.2rem;
+  background: var(--paper);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+.tokenstats strong {
+  font-size: 1.7rem;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.tokenstats code {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.85em;
+}
+
+.tokentable {
+  border-top: 1px solid var(--rule);
+}
+.tokenrow {
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  gap: 0.5rem 1.5rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: calc(var(--masthead-h) + 2rem);
+}
+@media (max-width: 52rem) {
+  .tokenrow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.tokenrow:target {
+  background: var(--accent-soft);
+  box-shadow: -0.6rem 0 0 var(--accent-soft), 0.6rem 0 0 var(--accent-soft);
+}
+.tokenrow__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.tokenrow__head .token {
+  font-size: 0.78rem;
+}
+.tokenrow__flag {
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border: 1px dashed var(--rule-strong);
+  border-radius: 2px;
+  padding: 0.05rem 0.3rem;
+}
+.tokenrow__meaning {
+  margin: 0 0 0.45rem;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+.tokenrow__nomeaning {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+.tokenrow__example {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  margin-top: 0.2rem;
+}
+.tokenrow__docs {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.7rem;
+  margin: 0;
+  padding: 0;
+}
+.tokenrow__more {
+  margin: 0;
+}
+.tokenrow__more > summary {
+  cursor: pointer;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  list-style: none;
+}
+.tokenrow__more > summary::-webkit-details-marker {
+  display: none;
+}
+.tokenrow__more > summary::before {
+  content: "\25B8  ";
+}
+.tokenrow__more[open] > summary::before {
+  content: "\25BE  ";
+}
+.tokenrow__more > summary:hover {
+  color: var(--accent);
+}
+.tokenrow__more .tokenrow__docs {
+  margin-top: 0.45rem;
+}
+.tokenrow__docs a {
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+.tokenrow__docs a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* The footer's layer row: eight links that would crowd the masthead. */
+.colophon__layers {
+  max-width: 32rem;
 }
