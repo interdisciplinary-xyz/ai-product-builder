@@ -25,7 +25,7 @@ export default function TokensPage() {
       docs,
     }));
 
-  const unregistered = rows.filter((r) => !r.registered).length;
+  const unregistered = stats.repoUnregistered;
   // The lede's example is the most-shared token, read from the corpus rather
   // than typed — the number behind it moves every time a document is added.
   const busiest = rows[0];

@@ -4,6 +4,7 @@ import { Link } from '@/components/link';
 import { LAYERS, libraryVersion, allDocs, findDoc } from '@/lib/content';
 import { SiteNav } from '@/components/site-nav';
 import { CommandPalette, type Jump } from '@/components/command-palette';
+import { DevBar } from '@/components/dev-bar';
 import { TOPICS } from '@/lib/topics';
 import './globals.css';
 
@@ -94,6 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main">{children}</main>
 
         <CommandPalette jumps={defaultJumps()} />
+        <DevBar version={version} files={total} />
 
         <footer className="colophon">
           <div className="shell colophon__grid">
@@ -122,7 +124,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div>
                 <Link href="/guides/readme/">Readme</Link> ·{' '}
                 <Link href="/guides/catalog/">Catalog</Link> ·{' '}
-                <Link href="/guides/contributing/">Contributing</Link>
+                <Link href="/guides/contributing/">Contributing</Link> ·{' '}
+                <Link href="/design-system/">Design system</Link> ·{' '}
+                <Link href="/brand-voice/">Brand voice</Link>
               </div>
               <div>
                 <a href="https://github.com/interdisciplinary-xyz/ai-product-builder">

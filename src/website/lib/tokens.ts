@@ -149,6 +149,14 @@ export function tokenStats() {
     repo: repo.length,
     inline: index.length - repo.length,
     registered: index.filter((t) => t.registered).length,
+    /**
+     * Repo-wide tokens with no glossary row — the number /ai-init cannot prompt
+     * for. Scoped to the repo-wide kind because that is the only kind it could
+     * ever prompt for, and because it is the figure /tokens lists: two pages
+     * quoting different numbers for one fact is exactly the drift this site
+     * claims not to have.
+     */
+    repoUnregistered: repo.filter((t) => !t.registered).length,
     shared: index.filter((t) => t.docs.length > 1).length,
     /** Docs carrying at least one token. */
     docs: new Set(index.flatMap((t) => t.docs.map((d) => `${d.layer}/${d.slug}`))).size,

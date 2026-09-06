@@ -64,6 +64,8 @@ app/
 ├── page.tsx              the front page — doors, topics, layers, contents, status
 ├── topics/               the topic index, and one page per topic
 ├── tokens/               every «token» and the documents that want it
+├── design-system/        the tokens, type and components, read out of globals.css
+├── brand-voice/          how the site writes, with the copy that shipped
 ├── browse/               the filterable index
 ├── [layer]/page.tsx      one layer's ledger, grouped by topic past a dozen files
 ├── [layer]/[slug]/       one document
@@ -78,6 +80,7 @@ components/
 ├── ui.tsx                the ledger row, used by nearly every page
 ├── command-palette.tsx   ⌘K over documents, sections and tokens
 ├── doc-nav.tsx           the sibling rail on a document page
+├── dev-bar.tsx           the sticky workbench strip along the bottom
 ├── browse-client.tsx     the /browse filter
 └── tokens-client.tsx     the /tokens filter
 ```
@@ -89,6 +92,21 @@ each of 159 pages. `app/search-index.json/route.ts` is a `force-static` route ha
 way to emit a plain JSON file under `output: 'export'`; the palette fetches it on first open and
 the browser caches it from there. Adding a document to the library regenerates it; nothing needs
 to be kept in step by hand.
+
+### The two reference pages
+
+`/design-system` and `/brand-voice` document the site itself, and are reachable from the dev bar
+pinned to the bottom of every page (and from the footer, since the bar can be hidden — it
+remembers). The bar also carries the three facts worth having while styling: the current route,
+the viewport in px and rem against the stylesheet's own breakpoints, and the resolved colour
+scheme. To make it a local-only tool, gate the mount effect in `components/dev-bar.tsx` on
+`process.env.NODE_ENV === 'development'`.
+
+The design system holds to the same rule as the rest of the site: it is a **view**. Swatches,
+values, breakpoints and counts are parsed out of `app/globals.css` at build time by
+`lib/design.ts`, and every component specimen is the real markup with the real class — so a
+component breaks on that page before it breaks anywhere else. A token added to `:root` tomorrow
+appears there with no edit; if it matches no group it shows under "Everything else".
 
 ### Adding a document
 
