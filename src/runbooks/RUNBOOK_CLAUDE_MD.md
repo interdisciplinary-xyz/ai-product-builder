@@ -155,6 +155,24 @@ Only the commands a contributor or agent runs **daily**. Anything used once per 
 «BUILD_CMD»            # production build (catches server-only / barrel-leak issues)
 ```
 
+## Branching
+
+Four lines, because this is the file an agent loads before it opens a terminal — and an agent that
+does not know the flow will branch off `«TRUNK»` and open a PR straight at it.
+
+```
+scope/vX.Y.Z  →  release/vX.Y.Z  →  «TRUNK»
+```
+
+- Work happens on `scope/vX.Y.Z`. Post-scope fixes are `fix/<slug>`; production emergencies are `hotfix/<slug>`.
+- PR titles are `«PROJECT» - <branch-name>` — e.g. `«PROJECT» - scope/vX.Y.Z`.
+- Commits are Conventional Commits: `type(scope): description`.
+- Never commit directly to `«TRUNK»`.
+
+Every string shape above is owned by [`NAMING_CONVENTIONS.md`](./NAMING_CONVENTIONS.md) §1; the
+reason the flow has two stages is in [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §1. This section
+is a pointer, not a second copy — if it disagrees with those two, they win.
+
 ## Architecture
 
 A 5-10 line orientation pointing at the **shape**, not the details. Anything longer goes in `docs/ARCHITECTURE.md` (which this section links to).

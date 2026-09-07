@@ -321,6 +321,46 @@ if offenders:
         more = f' (+{len(hits)-3} more)' if len(hits) > 3 else ''
         warn_lines.append(f"    «{tok}»  {preview}{more}")
 
+# --- D) one branch model, library-wide --- (FAIL)
+# The library documents scope/vX.Y.Z → release/vX.Y.Z → «TRUNK». RUNBOOK_TEAM_PLAYBOOK
+# used to ship a rival model — a MAIN_BRANCH / FEATURE_BRANCH_PATTERN pair describing
+# feature branches merged straight to main, i.e. GitHub Flow — declared in neither
+# PLACEHOLDERS.md nor NAMING_CONVENTIONS.md. A repo set up from that playbook and one
+# set up from RELEASE_MANAGER ended up on two different models. Nothing caught it,
+# because a contradiction between two documents is invisible to a per-document check.
+RIVAL_BRANCH = re.compile(
+    r'«(MAIN_BRANCH|FEATURE_BRANCH_PATTERN|DEVELOP_BRANCH)»'
+    r'|feature branches \(merge to (?:main|trunk)'
+    r'|git.?flow',
+    re.I)
+for f in library_docs(src):
+    stripped = re.sub(r'```.*?```', '', f.read_text(), flags=re.S)
+    for lineno, line in enumerate(stripped.splitlines(), 1):
+        m = RIVAL_BRANCH.search(line)
+        if m:
+            print(f"  {f.relative_to(root)}:{lineno}: describes a branch model other than "
+                  f"scope/ → release/ → trunk ({m.group(0)!r}) — defer to NAMING_CONVENTIONS.md §1")
+
+# --- E) every layer doc carries a Reuse block --- (FAIL)
+# CONTRIBUTING §Conventions: "Every layer doc carries a 🔧 Reuse & local setup block."
+for f in library_docs(src):
+    if 'TEMPLATE' in f.name.upper() or f.name == 'README.md':
+        continue
+    if 'Reuse & local setup' not in f.read_text():
+        print(f"  {f.relative_to(root)}: no `🔧 Reuse & local setup` block (CONTRIBUTING §Conventions)")
+
+# --- F) boundary discipline --- (WARN — a ratchet, not a gate)
+# CONTRIBUTING requires every layer doc to declare what it owns and defers to. All 25
+# MANAGERs do; at the time this check landed, 0 of 77 RUNBOOKs did. Making it blocking
+# would fail every PR, so it reports a count that must only go down.
+_no_owns = [f for f in library_docs(src)
+            if 'Owns / defers to' not in f.read_text() and 'TEMPLATE' not in f.name.upper()]
+if _no_owns:
+    warn_lines.append(f"  no `Owns / defers to` boundary ({len(_no_owns)} docs — ratchet down, never up):")
+    from collections import Counter as _C
+    for _layer, _n in sorted(_C(f.relative_to(src).parts[0] for f in _no_owns).items()):
+        warn_lines.append(f"    {_layer}: {_n}")
+
 # --- B) SKILL `**Last reviewed:**` presence --- (FAIL — small number, easy to fix)
 for f in sorted((src / "skills").glob("SKILL_*.md")):
     if f.name == "SKILL_TEMPLATE.md":
