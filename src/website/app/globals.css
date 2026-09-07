@@ -24,6 +24,56 @@
      offsets (contents rail, ledger group headers, scroll-padding) key off it. */
   --masthead-pad: 0.95rem;
   --masthead-h: 3.9rem; /* padding + the nav row; verified against the rendered bar */
+  /* ------------------------------------------------------------ type scale
+     Before this existed the stylesheet carried 46 distinct font-size values
+     across 132 declarations — 0.66, 0.68, 0.7, 0.72, 0.75, 0.78, 0.8, 0.82,
+     0.85 — which is not a scale, it is 46 separate decisions nobody can
+     remember making. These eleven steps replace all of them, and
+     `pnpm type:check` fails the build on a literal that is not one of them.
+
+     The steps tighten as they get smaller, because at 11px a 1px difference
+     is a different size and at 40px it is not. Named by role, not by number:
+     a step called --text-sm survives a change of ratio; one called --text-7
+     does not. */
+  --text-3xs: 0.6875rem; /* 11px — eyebrows, the smallest legible mono */
+  --text-2xs: 0.75rem; /* 12px — badges, dense mono chrome */
+  --text-xs: 0.8125rem; /* 13px — meta rows, captions, card metadata */
+  --text-sm: 0.875rem; /* 14px — secondary body, list rows */
+  --text-md: 0.9375rem; /* 15px — dense body, table cells */
+  --text-base: 1.0625rem; /* 17px — reading body; the prose measure is set to it */
+  --text-lg: 1.25rem; /* 20px — ledes, h3 */
+  --text-xl: 1.5rem; /* 24px — h2, section heads */
+
+  /* Display is fluid: a 4rem headline on a 390px phone is not a headline. */
+  --display-sm: clamp(1.6rem, 3.2vw, 2.2rem);
+  --display-md: clamp(1.75rem, 3.5vw, 2.5rem);
+  --display-lg: clamp(2.4rem, 5.6vw, 4.15rem);
+
+  /* One fluid step that is not display: monospace diagrams. ASCII art has a
+     fixed column count, so it has to shrink with the viewport or overflow —
+     it cannot reflow the way a sentence can. Sized down to 9.6px on a phone,
+     which is illegible as prose and perfectly readable as a shape. */
+  --text-diagram: clamp(0.6rem, 2.4vw, 0.775rem);
+
+  /* Leading is a property of the role, not of the element. Display gets less
+     than 1.1 because large type needs no help separating lines; prose gets
+     1.65 because 68ch of 17px text does. */
+  --leading-flat: 1.02;
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.5;
+  --leading-body: 1.65;
+  --leading-loose: 1.9;
+
+  /* Tracking runs the other way: tight for display, open for uppercase mono,
+     because caps have no ascenders or descenders to space them. */
+  --tracking-display: -0.02em;
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+  --tracking-caps: 0.1em;
+  --tracking-eyebrow: 0.16em;
+
   --measure: 68ch;
   --gutter: clamp(1.25rem, 4vw, 3.5rem);
   /* The frame runs the full viewport; only the reading measure is capped. */
@@ -92,12 +142,18 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-body), Georgia, "Times New Roman", serif;
-  font-size: 1.0625rem;
-  line-height: 1.65;
+  font-family: var(--font-body), ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  /* Never let the browser fake a weight the family does not have — a
+     synthesised semibold is a smeared 400, and IBM Plex Sans ships 400/500/600
+     so there is nothing to fake. */
   font-synthesis-weight: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  /* Lining figures of one width, so a column of counts stays a column. The
+     library is full of them: file counts, word counts, token counts. */
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 /* Paper grain — 2kb of turbulence. Off on the white ground (multiply noise
@@ -170,17 +226,19 @@ a:hover {
 
 .eyebrow {
   font-family: var(--font-mono), monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.16em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
   color: var(--ink-faint);
 }
 
 .display {
-  font-family: var(--font-display), Georgia, serif;
-  font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -0.015em;
+  font-family: var(--font-display), ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  /* Archivo carries a weight axis, which Instrument Serif did not: 500 gives a
+     heading presence without the shout of a 700. */
+  font-weight: 500;
+  line-height: var(--leading-flat);
+  letter-spacing: var(--tracking-display);
 }
 
 .shell {
@@ -224,11 +282,11 @@ a:hover {
 }
 
 .wordmark {
-  font-family: var(--font-display), serif;
-  font-size: 1.3rem;
+  font-family: var(--font-display), ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--text-lg);
   /* Its own line-height: inheriting the body's 1.65 made a 21px wordmark
      occupy a 34px box and set the header's height by accident. */
-  line-height: 1.2;
+  line-height: var(--leading-tight);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -248,8 +306,8 @@ a:hover {
 }
 .masthead__nav a {
   font-family: var(--font-mono), monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   text-decoration: none;
   color: var(--ink-soft);
@@ -268,9 +326,9 @@ a:hover {
   margin-top: 6rem;
   padding-block: 2.5rem 4rem;
   font-family: var(--font-mono), monospace;
-  font-size: 0.75rem;
+  font-size: var(--text-2xs);
   color: var(--ink-faint);
-  line-height: 1.9;
+  line-height: var(--leading-loose);
 }
 .colophon__grid {
   display: flex;
@@ -302,7 +360,7 @@ a:hover {
 .entry__icon {
   display: flex;
   padding-top: 0.28rem;
-  font-size: 1.05rem;
+  font-size: var(--text-base);
   color: var(--layer, var(--ink-faint));
   opacity: 0.9;
   transition: opacity 140ms ease;
@@ -313,8 +371,8 @@ a:hover {
 .entry__name {
   display: block;
   font-family: var(--font-mono), monospace;
-  font-size: 0.9rem;
-  letter-spacing: -0.01em;
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-tight);
   color: var(--ink);
 }
 .entry:hover .entry__name {
@@ -323,15 +381,15 @@ a:hover {
 .entry__desc {
   display: block;
   color: var(--ink-soft);
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
   margin-top: 0.15rem;
   max-width: 62ch;
 }
 .entry__meta {
   grid-column: 2;
   font-family: var(--font-mono), monospace;
-  font-size: 0.6875rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
   margin-top: 0.35rem;
   display: flex;
@@ -363,8 +421,8 @@ a:hover {
   align-items: center;
   gap: 0.4em;
   font-family: var(--font-mono), monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.1em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--layer, var(--accent));
   text-decoration: none;
@@ -382,7 +440,7 @@ a:hover {
 
 .prose {
   max-width: var(--measure);
-  font-size: 1.0625rem;
+  font-size: var(--text-base);
 }
 .prose > * + * {
   margin-top: 1.1em;
@@ -391,30 +449,30 @@ a:hover {
 .prose h2,
 .prose h3,
 .prose h4 {
-  font-family: var(--font-display), serif;
+  font-family: var(--font-display), ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
   margin-top: 2.4em;
   margin-bottom: 0.6em;
   scroll-margin-top: calc(var(--masthead-h) + 1.75rem);
 }
 .prose h1 {
-  font-size: 2rem;
+  font-size: var(--text-xl);
   margin-top: 0;
 }
 .prose h2 {
-  font-size: 1.6rem;
+  font-size: var(--text-xl);
   padding-bottom: 0.25em;
   border-bottom: 1px solid var(--rule);
 }
 .prose h3 {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
 }
 .prose h4 {
-  font-size: 1.05rem;
+  font-size: var(--text-base);
   font-family: var(--font-mono), monospace;
-  letter-spacing: 0;
+  letter-spacing: var(--tracking-normal);
   color: var(--ink-soft);
 }
 .prose h2 a.anchor,
@@ -481,8 +539,8 @@ a.anchor:focus-visible {
   border-radius: 4px;
   padding: 1rem 1.1rem;
   overflow-x: auto;
-  font-size: 0.85rem;
-  line-height: 1.6;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
 }
 .prose pre code {
   background: none;
@@ -500,7 +558,7 @@ a.anchor:focus-visible {
   border: 1px solid var(--rule);
   border-left: 2px solid var(--layer, var(--accent));
   border-radius: 0 4px 4px 0;
-  font-size: 0.95rem;
+  font-size: var(--text-md);
 }
 .prose blockquote > * + * {
   margin-top: 0.7em;
@@ -525,9 +583,9 @@ a.anchor:focus-visible {
 .prose table {
   border-collapse: collapse;
   width: 100%;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-family: var(--font-mono), monospace;
-  line-height: 1.5;
+  line-height: var(--leading-normal);
 }
 .prose th,
 .prose td {
@@ -538,8 +596,8 @@ a.anchor:focus-visible {
 }
 .prose th {
   font-weight: 500;
-  font-size: 0.6875rem;
-  letter-spacing: 0.09em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--ink-faint);
   background: var(--paper-sunk);
@@ -606,13 +664,13 @@ a.anchor:focus-visible {
   margin-bottom: 2.25rem;
 }
 .pagehead__title {
-  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-size: var(--display-lg);
   margin: 0.35rem 0 0;
 }
 .pagehead__lede {
   max-width: 56ch;
   margin: 1.2rem 0 0;
-  font-size: 1.15rem;
+  font-size: var(--text-base);
   color: var(--ink-soft);
 }
 
@@ -633,7 +691,7 @@ a.anchor:focus-visible {
 }
 
 .hero__title {
-  font-size: clamp(2.4rem, 5.6vw, 4.15rem);
+  font-size: var(--display-lg);
   margin: 0.5rem 0 0;
   text-wrap: balance;
 }
@@ -644,7 +702,7 @@ a.anchor:focus-visible {
 .hero__lede {
   max-width: 54ch;
   margin-top: 1.5rem;
-  font-size: 1.15rem;
+  font-size: var(--text-base);
   color: var(--ink-soft);
 }
 .hero__actions {
@@ -657,8 +715,8 @@ a.anchor:focus-visible {
 .button {
   display: inline-block;
   font-family: var(--font-mono), monospace;
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   text-decoration: none;
   padding: 0.7rem 1.15rem;
@@ -708,8 +766,8 @@ a.anchor:focus-visible {
 }
 .specimen pre {
   margin: 0;
-  font-size: clamp(0.6rem, 2.4vw, 0.775rem);
-  line-height: 1.75;
+  font-size: var(--text-diagram);
+  line-height: var(--leading-body);
   overflow-x: auto;
   color: var(--ink-soft);
 }
@@ -717,7 +775,7 @@ a.anchor:focus-visible {
   margin: 1.1rem 0 0;
   padding-top: 0.9rem;
   border-top: 1px solid var(--rule);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: var(--ink-soft);
 }
 .specimen__note code {
@@ -740,14 +798,14 @@ a.anchor:focus-visible {
   gap: 0.55rem;
 }
 .stats strong {
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   font-weight: 500;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-display);
 }
 .stats span {
   font-family: var(--font-mono), monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--ink-faint);
 }
@@ -766,14 +824,14 @@ a.anchor:focus-visible {
   margin-bottom: 1.75rem;
 }
 .section__head h2 {
-  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-size: var(--display-md);
   margin: 0;
 }
 .section__head p {
   margin: 0;
   max-width: 46ch;
   color: var(--ink-faint);
-  font-size: 0.95rem;
+  font-size: var(--text-md);
 }
 
 /* ------------------------------------------------------------------ doors */
@@ -805,25 +863,25 @@ a.anchor:focus-visible {
 }
 .door__icon {
   display: block;
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   color: var(--layer, var(--accent));
 }
 .door h3 {
-  font-family: var(--font-display), serif;
+  font-family: var(--font-display), ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
-  font-size: 1.4rem;
+  font-size: var(--text-xl);
   margin: 0.4rem 0 0.5rem;
 }
 .door p {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: var(--text-md);
   color: var(--ink-soft);
 }
 .door__doc {
   display: block;
   margin-top: 1.1rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wide);
   color: var(--layer, var(--accent));
 }
 
@@ -845,7 +903,7 @@ a.anchor:focus-visible {
   }
 }
 .panel__title {
-  font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+  font-size: var(--display-sm);
   margin: 0.4rem 0 0.9rem;
 }
 .panel p {
@@ -853,11 +911,15 @@ a.anchor:focus-visible {
   color: var(--ink-soft);
   max-width: 50ch;
 }
+/* A panel may run to two paragraphs; without this they set as one block. */
+.panel p + p {
+  margin-top: 0.8rem;
+}
 .panel__list {
   list-style: none;
   margin: 0;
   padding: 0;
-  font-size: 0.82rem;
+  font-size: var(--text-xs);
   color: var(--ink-soft);
 }
 .panel__list li {
@@ -893,8 +955,8 @@ a.anchor:focus-visible {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.05em;
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wide);
   color: var(--ink-faint);
   padding-top: 1.75rem;
 }
@@ -911,16 +973,16 @@ a.anchor:focus-visible {
   border-bottom: 1px solid var(--rule);
 }
 .doc__title {
-  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-size: var(--display-md);
   font-weight: 500;
-  letter-spacing: -0.035em;
+  letter-spacing: var(--tracking-display);
   margin: 0;
   word-break: break-word;
 }
 .doc__desc {
   max-width: 60ch;
   margin: 0.85rem 0 0;
-  font-size: 1.1rem;
+  font-size: var(--text-base);
   color: var(--ink-soft);
 }
 .doc__meta {
@@ -928,13 +990,13 @@ a.anchor:focus-visible {
   flex-wrap: wrap;
   gap: 0.9rem 2.25rem;
   margin: 1.6rem 0 0;
-  font-size: 0.72rem;
+  font-size: var(--text-2xs);
 }
 .doc__meta dt {
-  letter-spacing: 0.11em;
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--ink-faint);
-  font-size: 0.62rem;
+  font-size: var(--text-3xs);
   margin-bottom: 0.25rem;
 }
 .doc__meta dd {
@@ -990,11 +1052,11 @@ a.anchor:focus-visible {
 .toc li {
   counter-increment: toc;
   margin-bottom: 0.55rem;
-  line-height: 1.35;
+  line-height: var(--leading-snug);
 }
 .toc a {
   font-family: var(--font-mono), monospace;
-  font-size: 0.72rem;
+  font-size: var(--text-2xs);
   color: var(--ink-soft);
   text-decoration: none;
   display: block;
@@ -1023,7 +1085,7 @@ a.anchor:focus-visible {
   border: 1px solid var(--rule);
   border-radius: 4px;
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   transition: border-color 140ms ease, color 140ms ease;
 }
 .pager__link:hover {
@@ -1059,7 +1121,7 @@ a.anchor:focus-visible {
 }
 .search__icon {
   color: var(--ink-faint);
-  font-size: 1rem;
+  font-size: var(--text-md);
 }
 .search input {
   flex: 1;
@@ -1067,7 +1129,7 @@ a.anchor:focus-visible {
   border: 0;
   background: none;
   font-family: var(--font-mono), monospace;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--ink);
 }
 .search input::placeholder {
@@ -1080,7 +1142,7 @@ a.anchor:focus-visible {
   border: 1px solid var(--rule);
   border-radius: 3px;
   padding: 0.1rem 0.4rem;
-  font-size: 0.7rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
   background: var(--paper-sunk);
 }
@@ -1098,8 +1160,8 @@ a.anchor:focus-visible {
   align-items: center;
   gap: 0.45em;
   font-family: var(--font-mono), monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.05em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-wide);
   padding: 0.6rem 0.85rem;
   border: 1px solid var(--rule);
   border-radius: 999px;
@@ -1119,7 +1181,7 @@ a.anchor:focus-visible {
 }
 
 .filters__count {
-  font-size: 0.72rem;
+  font-size: var(--text-2xs);
   color: var(--ink-faint);
   margin: 0 0 0.75rem;
 }
@@ -1127,7 +1189,7 @@ a.anchor:focus-visible {
 .empty {
   padding: 3rem 0;
   color: var(--ink-faint);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   border-bottom: 1px solid var(--rule);
 }
 
@@ -1156,7 +1218,7 @@ a.anchor:focus-visible {
     text-align: left;
   }
   .doc__title {
-    font-size: 1.35rem;
+    font-size: var(--text-lg);
   }
   .stats {
     gap: 0.5rem 2rem;
@@ -1206,9 +1268,9 @@ a.anchor:focus-visible {
   gap: 1.5rem 2.5rem;
 }
 .relations h3 {
-  font-family: var(--font-body), serif;
+  font-family: var(--font-body), ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
-  font-size: 0.95rem;
+  font-size: var(--text-md);
   color: var(--ink-faint);
   margin: 0 0 0.6rem;
 }
@@ -1226,7 +1288,7 @@ a.anchor:focus-visible {
   gap: 0.6rem;
   padding: 0.5rem 0;
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
   color: var(--ink-soft);
 }
 .relations a:hover {
@@ -1240,8 +1302,8 @@ a.anchor:focus-visible {
 .relations__layer {
   margin-left: auto;
   font-family: var(--font-mono), monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.09em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--ink-faint);
 }
@@ -1258,8 +1320,8 @@ a.anchor:focus-visible {
   border: 1px solid var(--rule);
   border-radius: 3px;
   padding: 0.2rem 0.5rem;
-  font-size: 0.66rem;
-  letter-spacing: 0.08em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--ink-soft);
   background: var(--paper-sunk);
@@ -1276,7 +1338,7 @@ a.anchor:focus-visible {
   gap: 1rem;
   padding: 3rem 0;
   color: var(--ink-faint);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   border-bottom: 1px solid var(--rule);
 }
 
@@ -1320,9 +1382,9 @@ a.anchor:focus-visible {
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--rule-strong);
   font-family: var(--font-mono), monospace;
-  font-size: 0.68rem;
+  font-size: var(--text-3xs);
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
   color: var(--ink-soft);
 }
@@ -1334,7 +1396,7 @@ a.anchor:focus-visible {
 .ledger__count {
   margin-left: auto;
   color: var(--ink-faint);
-  letter-spacing: 0;
+  letter-spacing: var(--tracking-normal);
 }
 
 /* Below this width the nav shared a row with the wordmark and got 195px of a
@@ -1393,7 +1455,7 @@ a.anchor:focus-visible {
 .prose .aside > summary::before {
   content: "＋";
   font-family: var(--font-mono), monospace;
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
   color: var(--layer, var(--accent));
 }
 .prose .aside[open] > summary::before {
@@ -1404,19 +1466,19 @@ a.anchor:focus-visible {
 }
 .aside__label {
   font-family: var(--font-mono), monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
 }
 .aside__hint {
-  font-size: 0.68rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
 }
 .prose .aside__body {
   padding: 0 1.1rem 0.9rem;
   border-top: 1px solid var(--rule);
   padding-top: 0.9rem;
-  font-size: 0.95rem;
+  font-size: var(--text-md);
 }
 .prose .aside__body > * + * {
   margin-top: 0.7em;
@@ -1458,10 +1520,10 @@ main:focus {
   color: var(--layer, var(--accent));
 }
 .ledger__group-note {
-  font-family: var(--font-body), serif;
-  font-size: 0.85rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--text-sm);
   font-weight: 400;
-  letter-spacing: 0;
+  letter-spacing: var(--tracking-normal);
   text-transform: none;
   color: var(--ink-faint);
 }
@@ -1490,7 +1552,7 @@ main:focus {
   background: var(--paper-raised);
   color: var(--ink-soft);
   font-family: var(--font-mono), monospace;
-  font-size: 0.72rem;
+  font-size: var(--text-2xs);
   cursor: pointer;
   transition: border-color 130ms ease, color 130ms ease;
 }
@@ -1499,14 +1561,14 @@ main:focus {
   color: var(--ink);
 }
 .searchbutton__icon {
-  font-size: 0.9rem;
-  line-height: 1;
+  font-size: var(--text-sm);
+  line-height: var(--leading-flat);
 }
 .searchbutton kbd {
   border: 1px solid var(--rule);
   border-radius: 3px;
   padding: 0 0.28rem;
-  font-size: 0.66rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
 }
 @media (max-width: 40rem) {
@@ -1556,7 +1618,7 @@ main:focus {
   border-bottom: 1px solid var(--rule);
 }
 .palette__icon {
-  font-size: 1.05rem;
+  font-size: var(--text-base);
   color: var(--ink-faint);
 }
 .palette__field input {
@@ -1565,8 +1627,8 @@ main:focus {
   border: 0;
   background: none;
   color: var(--ink);
-  font-family: var(--font-body), serif;
-  font-size: 1rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--text-md);
 }
 .palette__field input:focus {
   outline: none;
@@ -1579,7 +1641,7 @@ main:focus {
   border-radius: 3px;
   background: none;
   color: var(--ink-faint);
-  font-size: 0.66rem;
+  font-size: var(--text-3xs);
   padding: 0.15rem 0.4rem;
   cursor: pointer;
 }
@@ -1617,7 +1679,7 @@ main:focus {
   padding-top: 0.15rem;
   color: var(--ink-faint);
   font-family: var(--font-mono), monospace;
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
 }
 .palette__hit-icon svg {
   width: 1rem;
@@ -1632,24 +1694,24 @@ main:focus {
 }
 .palette__hit-title {
   display: block;
-  font-size: 0.82rem;
+  font-size: var(--text-xs);
   color: var(--ink);
 }
 .palette__hit[data-kind='section'] .palette__hit-title {
-  font-family: var(--font-body), serif;
-  font-size: 0.92rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--text-md);
 }
 .palette__hit-detail {
   display: block;
-  font-size: 0.78rem;
+  font-size: var(--text-2xs);
   color: var(--ink-faint);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .palette__hit-kind {
-  font-size: 0.64rem;
-  letter-spacing: 0.08em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--ink-faint);
   padding-top: 0.2rem;
@@ -1657,7 +1719,7 @@ main:focus {
 .palette__empty {
   padding: 1.5rem 0.6rem;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
   color: var(--ink-faint);
 }
 .palette__foot {
@@ -1668,7 +1730,7 @@ main:focus {
   padding: 0.55rem 1rem;
   border-top: 1px solid var(--rule);
   background: var(--paper-sunk);
-  font-size: 0.66rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
 }
 .palette__foot kbd {
@@ -1714,18 +1776,18 @@ main:focus {
 }
 .topic__question {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
   font-style: italic;
   color: var(--ink-faint);
 }
 .topic__title {
   margin: 0;
-  font-size: 1.45rem;
+  font-size: var(--text-xl);
   color: var(--layer, var(--accent));
 }
 .topic__blurb {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: var(--ink-soft);
 }
 .topic__foot {
@@ -1734,8 +1796,8 @@ main:focus {
   gap: 0.4rem 1rem;
   margin: auto 0 0;
   padding-top: 0.7rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-wide);
   color: var(--ink-faint);
 }
 .topic__lead {
@@ -1752,7 +1814,7 @@ main:focus {
   padding: 1.1rem 1.2rem 1rem;
 }
 .topics--compact .topic__title {
-  font-size: 1.2rem;
+  font-size: var(--text-lg);
 }
 
 .topichead__lead {
@@ -1763,7 +1825,7 @@ main:focus {
   margin: 1.6rem 0 0;
 }
 .topichead__note {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--ink-faint);
   max-width: 40ch;
 }
@@ -1848,7 +1910,7 @@ main:focus {
   gap: 0.5rem;
   padding: 0.5rem 0;
   cursor: pointer;
-  font-size: 0.78rem;
+  font-size: var(--text-2xs);
   color: var(--ink-soft);
   list-style: none;
 }
@@ -1859,7 +1921,7 @@ main:focus {
   color: var(--layer, var(--accent));
 }
 .docnav__grouphead .mono {
-  font-size: 0.66rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
 }
 .docnav__list {
@@ -1872,8 +1934,8 @@ main:focus {
   padding: 0.22rem 0 0.22rem 0.7rem;
   border-left: 1px solid var(--rule);
   font-family: var(--font-mono), monospace;
-  font-size: 0.7rem;
-  line-height: 1.4;
+  font-size: var(--text-3xs);
+  line-height: var(--leading-snug);
   color: var(--ink-soft);
   text-decoration: none;
   overflow-wrap: anywhere;
@@ -1936,14 +1998,14 @@ main:focus {
   margin: 0;
   padding: 1.1rem 1.2rem;
   background: var(--paper);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--ink-soft);
 }
 .tokenstats strong {
-  font-size: 1.7rem;
+  font-size: var(--text-xl);
   font-weight: 500;
   color: var(--ink);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-display);
 }
 .tokenstats code {
   font-family: var(--font-mono), monospace;
@@ -1977,11 +2039,11 @@ main:focus {
   gap: 0.5rem;
 }
 .tokenrow__head .token {
-  font-size: 0.78rem;
+  font-size: var(--text-2xs);
 }
 .tokenrow__flag {
-  font-size: 0.6rem;
-  letter-spacing: 0.08em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--ink-faint);
   border: 1px dashed var(--rule-strong);
@@ -1990,7 +2052,7 @@ main:focus {
 }
 .tokenrow__meaning {
   margin: 0 0 0.45rem;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: var(--ink-soft);
 }
 .tokenrow__nomeaning {
@@ -1999,7 +2061,7 @@ main:focus {
 }
 .tokenrow__example {
   display: block;
-  font-size: 0.72rem;
+  font-size: var(--text-2xs);
   color: var(--ink-faint);
   margin-top: 0.2rem;
 }
@@ -2017,7 +2079,7 @@ main:focus {
 .tokenrow__more > summary {
   cursor: pointer;
   font-family: var(--font-mono), monospace;
-  font-size: 0.7rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
   list-style: none;
 }
@@ -2037,7 +2099,7 @@ main:focus {
   margin-top: 0.45rem;
 }
 .tokenrow__docs a {
-  font-size: 0.7rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
   text-decoration: none;
   border-bottom: 1px solid var(--rule);
@@ -2074,7 +2136,7 @@ main:focus {
   background: color-mix(in srgb, var(--paper) 92%, transparent);
   backdrop-filter: blur(10px) saturate(1.2);
   border-top: 1px solid var(--rule-strong);
-  font-size: 0.68rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
 }
 .devbar__brand {
@@ -2123,8 +2185,8 @@ main:focus {
   white-space: nowrap;
 }
 .devbar__fact > span {
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--rule-strong);
 }
@@ -2138,8 +2200,8 @@ main:focus {
   background: var(--paper-raised);
   color: var(--ink-faint);
   font-family: var(--font-mono), monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   padding: 0.15rem 0.4rem;
   cursor: pointer;
@@ -2203,14 +2265,14 @@ main:focus {
   grid-row: 1;
   content: counter(rule, decimal-leading-zero);
   font-family: var(--font-mono), monospace;
-  font-size: 0.7rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
   padding-top: 0.35rem;
 }
 .rules h3,
 .voicerules h3 {
   margin: 0 0 0.4rem;
-  font-size: 1.05rem;
+  font-size: var(--text-base);
   font-weight: 500;
 }
 .rules p,
@@ -2218,14 +2280,14 @@ main:focus {
   margin: 0;
   max-width: 72ch;
   color: var(--ink-soft);
-  font-size: 0.95rem;
+  font-size: var(--text-md);
 }
 
 .sourcenote {
   margin: 3.5rem 0 1rem;
   padding-top: 1.25rem;
   border-top: 1px solid var(--rule);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--ink-faint);
 }
 
@@ -2236,13 +2298,13 @@ main:focus {
 }
 .notes h3 {
   margin: 0 0 0.6rem;
-  font-size: 0.95rem;
+  font-size: var(--text-md);
   font-weight: 500;
 }
 .notes p,
 .notes li {
   color: var(--ink-soft);
-  font-size: 0.92rem;
+  font-size: var(--text-md);
 }
 .notes ul {
   margin: 0;
@@ -2278,7 +2340,7 @@ main:focus {
   }
 }
 .swatch dt {
-  font-size: 0.78rem;
+  font-size: var(--text-2xs);
 }
 .swatch dd {
   margin: 0;
@@ -2304,7 +2366,7 @@ main:focus {
 .swatch__values {
   display: inline-flex;
   gap: 0.75rem;
-  font-size: 0.72rem;
+  font-size: var(--text-2xs);
   color: var(--ink-soft);
 }
 .swatch__dark {
@@ -2312,7 +2374,7 @@ main:focus {
 }
 .swatch__note {
   flex-basis: 100%;
-  font-size: 0.82rem;
+  font-size: var(--text-xs);
   color: var(--ink-faint);
   max-width: 70ch;
 }
@@ -2340,7 +2402,7 @@ main:focus {
   padding: 0.5rem 0;
   text-decoration: none;
   color: var(--ink);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 .huelist a:hover {
   color: var(--layer, var(--accent));
@@ -2363,14 +2425,14 @@ main:focus {
   min-width: 0;
 }
 .huelist__hex {
-  font-size: 0.68rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
 }
 .huelist__hex--dark {
   opacity: 0.6;
 }
 .huelist__count {
-  font-size: 0.68rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
   min-width: 1.5rem;
   text-align: right;
@@ -2401,7 +2463,7 @@ main:focus {
 }
 .typespec__meta p {
   margin: 0 0 0.35rem;
-  font-size: 0.75rem;
+  font-size: var(--text-2xs);
   color: var(--ink-soft);
 }
 .typespec__note {
@@ -2410,15 +2472,15 @@ main:focus {
 }
 .typespec__sample {
   margin: 0;
-  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-size: var(--display-md);
 }
 .typespec__sample--body {
-  font-size: 1.0625rem;
+  font-size: var(--text-base);
   max-width: var(--measure);
   color: var(--ink-soft);
 }
 .typespec__sample--mono {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--ink-soft);
   overflow-wrap: anywhere;
 }
@@ -2434,7 +2496,7 @@ main:focus {
   list-style: none;
   margin: 0.7rem 0 0;
   padding: 0;
-  font-size: 0.78rem;
+  font-size: var(--text-2xs);
   border-top: 1px solid var(--rule);
 }
 .breakpoints li {
@@ -2448,8 +2510,8 @@ main:focus {
 }
 .breakpoints li span {
   color: var(--ink-faint);
-  font-family: var(--font-body), serif;
-  font-size: 0.8rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--text-xs);
 }
 
 /* -------------------------------------------------------- component specs */
@@ -2471,12 +2533,12 @@ main:focus {
   }
 }
 .spec__name {
-  font-size: 0.75rem;
+  font-size: var(--text-2xs);
   color: var(--accent);
 }
 .spec__note {
   margin: 0.4rem 0 0;
-  font-size: 0.82rem;
+  font-size: var(--text-xs);
   color: var(--ink-faint);
   max-width: 38ch;
 }
@@ -2519,7 +2581,7 @@ main:focus {
   gap: 0.6rem;
   padding: 1.25rem 0.5rem;
   box-shadow: 0 0 0 1px var(--rule);
-  font-size: 0.66rem;
+  font-size: var(--text-3xs);
   color: var(--ink-faint);
 }
 .iconset svg {
@@ -2543,7 +2605,7 @@ main:focus {
   border-left-width: 2px;
   border-radius: 0 3px 3px 0;
   background: var(--paper-raised);
-  font-size: 0.92rem;
+  font-size: var(--text-md);
 }
 .pair blockquote p {
   margin: 0;
@@ -2564,8 +2626,8 @@ main:focus {
 }
 .pair blockquote footer {
   margin-top: 0.6rem;
-  font-size: 0.64rem;
-  letter-spacing: 0.08em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--ink-faint);
   text-decoration: none;
@@ -2573,7 +2635,7 @@ main:focus {
 .pair__why {
   grid-column: 1 / -1;
   margin: 0.8rem 0 0;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--ink-faint);
   max-width: 72ch;
 }
@@ -2581,7 +2643,7 @@ main:focus {
 .voicetable {
   border-collapse: collapse;
   width: 100%;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
 }
 .voicetable th,
 .voicetable td {
@@ -2592,8 +2654,8 @@ main:focus {
 }
 .voicetable thead th {
   font-family: var(--font-mono), monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.09em;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--ink-faint);
   background: var(--paper-sunk);
@@ -2610,7 +2672,7 @@ main:focus {
   color: var(--layer, var(--accent));
 }
 .voicetable td.mono {
-  font-size: 0.78rem;
+  font-size: var(--text-2xs);
   color: var(--ink-soft);
   white-space: nowrap;
 }
@@ -2632,12 +2694,12 @@ main:focus {
   }
 }
 .conventions dt {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 500;
 }
 .conventions dd {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: var(--text-md);
   color: var(--ink-soft);
   max-width: 70ch;
 }
@@ -2653,7 +2715,7 @@ main:focus {
 .nevers li {
   display: flex;
   gap: 0.6rem;
-  font-size: 0.92rem;
+  font-size: var(--text-md);
   color: var(--ink-faint);
   padding: 0.35rem 0;
   border-bottom: 1px solid var(--rule);
@@ -2665,4 +2727,295 @@ main:focus {
   margin: 1.5rem 0 0;
   max-width: 72ch;
   color: var(--ink-soft);
+}
+
+/* ---------------------------------------------------------- the type scale */
+
+.typescale__lede {
+  max-width: 62ch;
+  margin: 0.4rem 0 1.1rem;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+.typescale {
+  width: 100%;
+  border-collapse: collapse;
+}
+.typescale th {
+  text-align: left;
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 400;
+  padding: 0 1rem 0.5rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.typescale td {
+  padding: 0.55rem 1rem 0.55rem 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: baseline;
+}
+.typescale__value {
+  color: var(--ink-faint);
+  font-size: var(--text-2xs);
+  white-space: nowrap;
+}
+/* The specimen cell is the only place on the site where a row's height is
+   supposed to vary — it is showing the step, so it has to be set in it. */
+.typescale td:last-child {
+  line-height: var(--leading-tight);
+  overflow: hidden;
+}
+
+/* A ground rule names the writing rule it descends from, so the design system
+   and the brand voice cannot be read as two unrelated documents. */
+.rules__voice {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 0.7rem 0 0;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+.rules__voice .eyebrow {
+  flex: none;
+}
+.rules__voice--none {
+  color: var(--ink-faint);
+}
+
+/* -------------------------------------------------------------- favorites */
+
+/* The title and its star share a row; the star never wraps under the name. */
+.doc__titlerow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.favbutton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: none;
+  padding: 0.4rem 0.7rem;
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  color: var(--ink-faint);
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.favbutton:hover {
+  color: var(--accent);
+  border-color: var(--rule-strong);
+}
+.favbutton[aria-pressed='true'] {
+  color: var(--accent);
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
+}
+.favbutton__icon {
+  width: 1.15em;
+  height: 1.15em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .favbutton {
+    transition: none;
+  }
+}
+
+/* The masthead count. Small, and only present once it has something to say. */
+.favcount {
+  font-size: var(--text-3xs);
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  color: var(--ink-faint);
+}
+
+.favlist__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--rule);
+}
+.favlist__clear {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--ink-faint);
+  font-size: var(--text-2xs);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 0.25em;
+}
+.favlist__clear:hover {
+  color: var(--accent);
+}
+
+.favlist {
+  list-style: none;
+  margin: 0 0 2rem;
+  padding: 0;
+}
+.favlist > li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+/* The row is a link and the star is a button; a button cannot live inside an
+   anchor, so they are siblings and the link takes the free space. */
+.favlist__doc {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.9rem 0;
+  text-decoration: none;
+  color: inherit;
+}
+.favlist__doc:hover .favlist__name {
+  color: var(--layer, var(--accent));
+}
+.favlist__icon {
+  flex: none;
+  font-size: var(--text-lg);
+  color: var(--layer, var(--ink-faint));
+}
+.favlist__main {
+  display: grid;
+  gap: 0.15rem;
+  /* Takes the free space so the layer label sits against the star rather than
+     wherever the description happened to stop. */
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.favlist__name {
+  font-size: var(--text-sm);
+}
+.favlist__desc {
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.favlist__layer {
+  flex: none;
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.favlist__missing {
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+}
+
+.favempty {
+  max-width: 58ch;
+  padding: 1.6rem 0;
+  border-top: 1px solid var(--rule);
+}
+.favempty p {
+  color: var(--ink-soft);
+}
+.favempty__lede {
+  font-size: var(--text-lg);
+  color: var(--ink) !important;
+}
+
+@media (max-width: 40rem) {
+  .favlist__desc,
+  .favlist__layer {
+    display: none;
+  }
+}
+
+/* A ledger row that carries an action beside its link. The <li> becomes the
+   flex container and takes over the rule between rows, because .entry drawing
+   its own border would stop short of the button and leave the line broken. */
+.entry-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--rule);
+}
+.entry-row .entry {
+  flex: 1 1 auto;
+  min-width: 0;
+  border-bottom: 0;
+}
+.entry-row:hover .entry {
+  background: var(--paper-raised);
+}
+
+/* The icon-only star, for lists. A bordered pill on 136 rows is a shadow by
+   another name — see the design system's "hairlines divide, nothing else does".
+   Unmarked it is the faintest ink on the page; marked it is the accent. */
+.favbutton--icon {
+  align-self: center;
+  padding: 0.45rem;
+  margin-right: 0.25rem;
+  border-color: transparent;
+  color: var(--rule-strong);
+}
+.favbutton--icon:hover {
+  border-color: transparent;
+  background: var(--paper-sunk);
+}
+.favbutton--icon[aria-pressed='true'] {
+  background: none;
+  border-color: transparent;
+  color: var(--accent);
+}
+.favbutton--icon[aria-pressed='true']:hover {
+  background: var(--accent-soft);
+}
+
+/* A star with nowhere to write to. Dimmed rather than hidden, so the feature is
+   visibly present-but-unavailable instead of mysteriously absent. */
+.favbutton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.favbutton:disabled:hover {
+  color: var(--ink-faint);
+  border-color: var(--rule);
+  background: none;
+}
+.favbutton--icon:disabled:hover {
+  color: var(--rule-strong);
+  border-color: transparent;
+}
+
+.favlist__ro {
+  color: var(--ink-faint);
+  text-transform: none;
+  letter-spacing: var(--tracking-normal);
+}
+/* A failed write gets the accent, because the star already moved and the reader
+   has to know the file did not. */
+.favlist__error {
+  margin: 0.8rem 0 0;
+  padding: 0.6rem 0.75rem;
+  font-size: var(--text-xs);
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-left: 2px solid var(--accent);
 }

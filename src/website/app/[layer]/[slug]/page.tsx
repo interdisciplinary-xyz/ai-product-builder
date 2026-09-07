@@ -1,24 +1,27 @@
-import { Link } from '@/components/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { Link } from '@/domains/ui';
 import {
   LAYER_BY_ID,
+  Markdown,
+  CodeBlock,
+  LayerIcon,
+  layerStyle,
+  deployedPath,
+  type LayerId,
+} from '@/domains/content';
+import {
   allDocs,
   docsForLayer,
   findDoc,
   linkMap,
   relations,
   pairing,
-  deployedPath,
-  type LayerId,
-} from '@/lib/content';
-import { Markdown, CodeBlock } from '@/components/markdown';
-import { layerStyle } from '@/components/ui';
-import { LayerIcon } from '@/components/icons';
-import { DocToc } from '@/components/doc-toc';
-import { DocNav } from '@/components/doc-nav';
-import { topicOf } from '@/lib/topics';
-import { tokensIn } from '@/lib/tokens';
+} from '@/domains/content/server';
+import { DocToc, DocNav } from '@/domains/navigation';
+import { FavoriteButton } from '@/domains/favorites';
+import { topicOf } from '@/domains/topics';
+import { tokensIn } from '@/domains/tokens';
 
 const GITHUB = 'https://github.com/interdisciplinary-xyz/ai-product-builder/blob/main';
 
@@ -78,7 +81,10 @@ export default async function DocPage({
       </nav>
 
       <header className="doc__head rise">
-        <h1 className="doc__title mono">{doc.name}</h1>
+        <div className="doc__titlerow">
+          <h1 className="doc__title mono">{doc.name}</h1>
+          <FavoriteButton doc={doc} />
+        </div>
         {doc.description ?? doc.heading ? (
           <p className="doc__desc">{doc.description ?? doc.heading}</p>
         ) : null}

@@ -1,26 +1,46 @@
 import type { Metadata } from 'next';
-import { Instrument_Serif, Newsreader, JetBrains_Mono } from 'next/font/google';
-import { Link } from '@/components/link';
-import { LAYERS, libraryVersion, allDocs, findDoc } from '@/lib/content';
-import { SiteNav } from '@/components/site-nav';
-import { CommandPalette, type Jump } from '@/components/command-palette';
-import { DevBar } from '@/components/dev-bar';
-import { TOPICS } from '@/lib/topics';
+import { Archivo, IBM_Plex_Sans, JetBrains_Mono } from 'next/font/google';
+import { Link } from '@/domains/ui';
+import { LAYERS } from '@/domains/content';
+import { libraryVersion, allDocs, findDoc } from '@/domains/content/server';
+import { SiteNav } from '@/domains/navigation';
+import { CommandPalette, type Jump } from '@/domains/search';
+import { DevBar } from '@/domains/design';
+import { FavoritesHydrator } from '@/domains/favorites';
+import { readFavorites } from '@/domains/favorites/server';
+import { TOPICS } from '@/domains/topics';
 import './globals.css';
 
-const display = Instrument_Serif({
+/**
+ * Three sans faces, one job each. See RUNBOOK_TYPOGRAPHY for why these and
+ * not others; the short version:
+ *
+ * Archivo is a grotesque with signage ancestry — institutional rather than
+ * friendly, which is the register a card catalog wants. It carries a weight
+ * axis, so the display voice is no longer stuck at 400 the way Instrument
+ * Serif left it.
+ *
+ * IBM Plex Sans is built for technical documentation and holds up over the
+ * 2,000–4,000-word runbooks that are most of this site. Its humanist details
+ * keep it clearly distinct from Archivo, so display and body do not blur.
+ *
+ * `adjustFontFallback` is on (the default) so Next generates a metric-matched
+ * local fallback and the swap does not reflow the page. See
+ * SKILL_FONT_FALLBACK_SHIFT.
+ */
+const display = Archivo({
   subsets: ['latin'],
-  weight: '400',
   variable: '--font-display',
   display: 'swap',
-  fallback: ['Georgia', 'Times New Roman', 'serif'],
+  fallback: ['ui-sans-serif', 'system-ui', 'Helvetica Neue', 'Arial', 'sans-serif'],
 });
 
-const body = Newsreader({
+const body = IBM_Plex_Sans({
   subsets: ['latin'],
+  weight: ['400', '500', '600'],
   variable: '--font-body',
   display: 'swap',
-  fallback: ['Georgia', 'Times New Roman', 'serif'],
+  fallback: ['ui-sans-serif', 'system-ui', 'Helvetica Neue', 'Arial', 'sans-serif'],
 });
 
 const mono = JetBrains_Mono({
@@ -75,6 +95,8 @@ function defaultJumps(): Jump[] {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const version = libraryVersion();
   const total = allDocs().filter((d) => d.layer !== 'guides').length;
+  // Read once, above every page, so a star anywhere starts from the file.
+  const favorites = readFavorites().favorites;
 
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
@@ -95,6 +117,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main">{children}</main>
 
         <CommandPalette jumps={defaultJumps()} />
+        <FavoritesHydrator initial={favorites} />
         <DevBar version={version} files={total} />
 
         <footer className="colophon">

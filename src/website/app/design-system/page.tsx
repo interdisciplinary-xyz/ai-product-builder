@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
-import { Link } from '@/components/link';
-import { PageHead, Ledger, Entry, layerStyle } from '@/components/ui';
-import { LayerIcon, DoorIcon } from '@/components/icons';
-import { LAYERS, layerCounts } from '@/lib/content';
-import { TOPICS, topicCounts } from '@/lib/topics';
-import { tokenGroups, isColour, stylesheetFacts } from '@/lib/design';
+import { Link, PageHead, Ledger, Entry, DoorIcon } from '@/domains/ui';
+import { LAYERS, LAYER_BY_ID, LayerIcon, layerStyle } from '@/domains/content';
+import { layerCounts } from '@/domains/content/server';
+import { TOPICS } from '@/domains/topics';
+import { topicCounts } from '@/domains/topics/server';
+import { tokenGroups, isColour, stylesheetFacts, typeScale } from '@/domains/design/server';
 
 export const metadata: Metadata = {
   title: 'Design system',
   description:
-    'The tokens, type scale and components this site is built from — read out of globals.css at build time, so the swatches cannot drift from the stylesheet.',
+    'The tokens, type scale and components this site is built from — read out of globals.css at build time, with each ground rule traced to the writing rule it comes from.',
 };
 
 /** One specimen: what it is called, the live thing, and the class to reach it. */
@@ -34,6 +34,7 @@ function Spec({
 }
 
 export default function DesignSystemPage() {
+  const scale = typeScale();
   const groups = tokenGroups();
   const facts = stylesheetFacts();
   const layerTotals = layerCounts();
@@ -44,13 +45,15 @@ export default function DesignSystemPage() {
   return (
     <div className="shell">
       <PageHead
-        eyebrow={`${facts.properties} custom properties · ${facts.classes} classes · one stylesheet`}
+        eyebrow={`${facts.properties} custom properties · ${scale.text.length + scale.display.length} type steps · ${facts.classes} classes · one stylesheet`}
         title="Design system"
         lede={
           <>
-            An archive, not a dashboard. Everything below is read out of{' '}
-            <code>app/globals.css</code> when the site builds, so a swatch here cannot disagree
-            with the stylesheet it documents — the same rule the library applies to itself.
+            An archive, not a dashboard — and the visual half of one voice, not a separate
+            aesthetic. Everything below is read out of <code>app/globals.css</code> when the site
+            builds, so a swatch here cannot disagree with the stylesheet it documents. What the
+            page cannot enforce by being a view, two audits enforce by{' '}
+            <a href="#held">failing the build</a>.
           </>
         }
       />
@@ -67,6 +70,7 @@ export default function DesignSystemPage() {
             ['components', 'Components'],
             ['icons', 'Icons'],
             ['motion', 'Motion & access'],
+            ['held', 'How it holds'],
           ].map(([id, label]) => (
             <li key={id}>
               <a href={`#${id}`} className="chip">
@@ -81,44 +85,64 @@ export default function DesignSystemPage() {
       <section className="section" id="rules">
         <header className="section__head">
           <h2 className="display">Ground rules</h2>
-          <p>Six decisions the rest of the system follows from.</p>
+          <p>
+            Six decisions the rest of the system follows from. Five of them are a{' '}
+            <Link href="/brand-voice/#rules">writing rule</Link> in visual form — the voice came
+            first, and a design that contradicted it would make the copy a lie. The sixth is
+            native to the page.
+          </p>
         </header>
         <ol className="rules">
           {[
             {
-              rule: 'A card catalogue, not a dashboard.',
-              why: 'The content is 205,000 words of policy. The interface’s job is to get out of the way of reading, so: a white ground, ink type, hairline rules, and no panel, card shadow or coloured banner that is not carrying information.',
+              rule: 'State the number, not the adjective.',
+              why: 'Every count on this site is derived at build time — files, words, tokens, broken links, and the 46 font sizes this stylesheet used to carry. A design that has to be told its own numbers will be told the wrong ones. Practically: tabular lining figures wherever numbers stack, so a column of counts stays a column.',
+              voice: 'A number beats an adjective, every time.',
             },
             {
-              rule: 'Hairlines divide; nothing else does.',
-              why: 'One border colour separates rows and sections. Elevation runs downward from a white page — a raised surface is a shade off the ground, never a shadow floating above it.',
+              rule: 'The worst number gets the same weight as the best.',
+              why: 'The front-page stat row sets “0 repos proven in” in the same size, colour and position as “133 files”. There is no muted variant for an unflattering fact, because the moment one exists every unflattering fact ends up in it.',
+              voice: 'Say the weakness before someone finds it.',
+            },
+            {
+              rule: 'The reader’s question comes before our taxonomy.',
+              why: 'Topics are above layers on the front page and first in the masthead, because “where is this going to leak?” is a question someone arrives with and “runbook” is a word only this library uses. Layer is how a file works; topic is why you wanted it.',
+              voice: 'Lead with the reader’s question, not our taxonomy.',
+            },
+            {
+              rule: 'Every token carries the reason it exists.',
+              why: 'The comment above a custom property in globals.css is parsed and shown beside it on this page — so the rationale ships with the value instead of rotting in a doc. If a token cannot be explained in a sentence, it is two tokens or none.',
+              voice: 'Explain the decision, not the feature.',
+            },
+            {
+              rule: 'Hairlines divide. Nothing else does.',
+              why: 'A shadow, a gradient, a filled badge and a coloured banner are the visual form of “very”, “really” and “seamless” — emphasis with no information in it. One border colour separates rows and sections; elevation runs downward from a white page, so a raised surface is a shade off the ground rather than a card floating above it.',
+              voice: 'One idea per sentence. Cut the intensifier.',
             },
             {
               rule: 'Mono is for anything a machine would read.',
-              why: 'Filenames, paths, tokens, counts, keyboard hints, slugs. Prose is set in a serif. If you cannot tell which one a string is, it belongs in mono.',
-            },
-            {
-              rule: 'One accent, plus a hue per layer and per topic.',
-              why: 'Vermilion carries interaction and emphasis. Everything else takes its colour from the layer or topic it belongs to, set as --layer-light / --layer-dark on an element marked data-layer or data-topic.',
-            },
-            {
-              rule: 'The frame is full width; the measure is not.',
-              why: 'The shell runs edge to edge and only the reading column is capped, at 68ch. A rail or a ledger may use the width; a paragraph never does.',
-            },
-            {
-              rule: 'State the number, not the adjective.',
-              why: 'Every count on this site is derived at build time — files, words, tokens, broken links. A design that has to be told its own numbers will be told the wrong ones.',
+              why: 'Filenames, paths, tokens, counts, keyboard hints, slugs — mono is a semantic here, not a texture. Prose is set in the body sans. If you cannot tell which one a string is, it belongs in mono. This one has no parent in the voice: it is a distinction the page can draw and a sentence cannot.',
+              voice: null,
             },
           ].map((item, i) => (
             <li key={i}>
               <h3>{item.rule}</h3>
               <p>{item.why}</p>
+              {item.voice ? (
+                <p className="rules__voice">
+                  <span className="eyebrow">From the voice</span>
+                  <Link href="/brand-voice/#rules">{item.voice}</Link>
+                </p>
+              ) : (
+                <p className="rules__voice rules__voice--none">
+                  <span className="eyebrow">Native to the design</span>
+                </p>
+              )}
             </li>
           ))}
         </ol>
       </section>
 
-      {/* ----------------------------------------------------------- colour */}
       <section className="section" id="colour">
         <header className="section__head">
           <h2 className="display">Colour</h2>
@@ -224,17 +248,23 @@ export default function DesignSystemPage() {
       <section className="section" id="type">
         <header className="section__head">
           <h2 className="display">Typography</h2>
-          <p>Three families, each with one job. Nothing is bold that could be a different family.</p>
+          <p>
+            Three sans faces, each with one job, and {scale.text.length + scale.display.length}{' '}
+            sizes for the whole site. The steps below are read out of <code>globals.css</code> at
+            build time — the same declarations <code>pnpm type:check</code> enforces, so this page
+            cannot show a step the stylesheet does not have.
+          </p>
         </header>
 
         <div className="typespec">
           <div className="typespec__row">
             <div className="typespec__meta">
               <p className="eyebrow">Display</p>
-              <p className="mono">Instrument Serif · 400</p>
+              <p className="mono">Archivo · 500</p>
               <p className="typespec__note">
-                Page and section titles only. <code>clamp(2.4rem, 5.6vw, 4.15rem)</code> in the
-                hero, <code>clamp(1.75rem, 3.5vw, 2.5rem)</code> for a section.
+                Page and section titles only. A grotesque with signage ancestry — institutional
+                rather than friendly, and it carries a weight axis, which the serif it replaced
+                did not.
               </p>
             </div>
             <p className="display typespec__sample">Every repo re-litigates the same forty decisions.</p>
@@ -243,10 +273,10 @@ export default function DesignSystemPage() {
           <div className="typespec__row">
             <div className="typespec__meta">
               <p className="eyebrow">Body</p>
-              <p className="mono">Newsreader · 1.0625rem / 1.65</p>
+              <p className="mono">IBM Plex Sans · 400/500/600</p>
               <p className="typespec__note">
-                Every sentence on the site. Capped at <code>68ch</code>; ledes run to{' '}
-                <code>56ch</code> at <code>1.15rem</code>.
+                Every sentence on the site. Built for technical documentation, which is what the
+                2,000–4,000-word runbooks are. Capped at <code>68ch</code>.
               </p>
             </div>
             <p className="typespec__sample typespec__sample--body">
@@ -262,13 +292,80 @@ export default function DesignSystemPage() {
               <p className="mono">JetBrains Mono</p>
               <p className="typespec__note">
                 Anything a machine would read, plus the <span className="eyebrow">eyebrow</span>{' '}
-                style: <code>0.6875rem</code>, <code>0.16em</code> tracking, uppercase.
+                style: <code>--text-3xs</code>, <code>--tracking-eyebrow</code>, uppercase.
               </p>
             </div>
             <p className="typespec__sample mono typespec__sample--mono">
               src/runbooks/RUNBOOK_SECURITY_MODEL.md → docs/SECURITY_MODEL.md · 2,598 words
             </p>
           </div>
+        </div>
+
+        <h3 className="ledger__group">The scale</h3>
+        <p className="typescale__lede">
+          Before these steps existed the stylesheet carried <strong>46 distinct font sizes</strong>{' '}
+          across 132 declarations — 0.66, 0.68, 0.7, 0.72, 0.75, 0.78, 0.8, 0.82, 0.85. That is not
+          a scale, it is 46 separate decisions nobody can remember making. Steps tighten as they
+          shrink, because at 11px a 1px difference is a different size and at 40px it is not.
+        </p>
+        <div className="table-wrap">
+          <table className="typescale">
+            <thead>
+              <tr>
+                <th>Step</th>
+                <th>Value</th>
+                <th>Specimen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...scale.text, ...scale.display].map((step) => (
+                <tr key={step.name}>
+                  <td>
+                    <code>{step.name}</code>
+                  </td>
+                  <td className="mono typescale__value">{step.light}</td>
+                  <td>
+                    <span
+                      className={step.name.startsWith('--display') ? 'display' : undefined}
+                      style={{ fontSize: `var(${step.name})` }}
+                    >
+                      Every repo
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h3 className="ledger__group">Leading and tracking</h3>
+        <p className="typescale__lede">
+          These drift exactly as fast as size — the first audit found 12 line-heights and 15
+          letter-spacings alongside the 46 sizes — so they are steps too.
+        </p>
+        <div className="table-wrap">
+          <table className="typescale">
+            <thead>
+              <tr>
+                <th>Step</th>
+                <th>Value</th>
+                <th>Step</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scale.leading.map((lead, i) => (
+                <tr key={lead.name}>
+                  <td>
+                    <code>{lead.name}</code>
+                  </td>
+                  <td className="mono typescale__value">{lead.light}</td>
+                  <td>{scale.tracking[i] ? <code>{scale.tracking[i].name}</code> : null}</td>
+                  <td className="mono typescale__value">{scale.tracking[i]?.light ?? ''}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -382,14 +479,18 @@ export default function DesignSystemPage() {
               name="RELEASE_MANAGER"
               description="Branch flow from implementation to production, plus the CI cost-control policy."
               meta={['→ RELEASE_MANAGER.md', '11 min read']}
-              layerId="runbooks"
+              tone="runbooks"
+              accent={LAYER_BY_ID.get('runbooks')}
+              icon={<LayerIcon layer="runbooks" />}
             />
             <Entry
               href="/skills/tests-that-cannot-fail/"
               name="TESTS_THAT_CANNOT_FAIL"
               description="A guard never observed failing against the pre-fix code asserts nothing."
               meta={['→ tests-that-cannot-fail/']}
-              layerId="skills"
+              tone="skills"
+              accent={LAYER_BY_ID.get('skills')}
+              icon={<LayerIcon layer="skills" />}
             />
           </Ledger>
         </Spec>
@@ -559,10 +660,58 @@ export default function DesignSystemPage() {
         </div>
       </section>
 
+      {/* ----------------------------------------------------------- held */}
+      <section className="section" id="held">
+        <div className="panel">
+          <div>
+            <p className="eyebrow">How it holds</p>
+            <h2 className="display panel__title">A rule nothing checks is a preference.</h2>
+            <p>
+              This page is a <em>view</em> — the swatches, steps and counts are parsed out of{' '}
+              <code>app/globals.css</code> when the site builds, so it cannot describe a system the
+              stylesheet does not have. That stops the page drifting. It does not stop the
+              stylesheet drifting, which is what the two audits are for.
+            </p>
+            <p>
+              Before <code>type:check</code> existed, this one hand-written file carried{' '}
+              <strong>46 distinct font sizes across 132 declarations</strong> — no framework, no
+              preprocessor, one careful author. Drift is not a discipline problem.
+            </p>
+          </div>
+          <ul className="panel__list mono">
+            <li>
+              <strong>type:check</strong> — every size, leading and tracking names one of{' '}
+              {scale.text.length + scale.display.length + scale.leading.length + scale.tracking.length}{' '}
+              steps. A literal fails the build.
+            </li>
+            <li>
+              <strong>type:check</strong> — three face variables, no raw family name, no serif
+              fallback under a sans stack.
+            </li>
+            <li>
+              <strong>type:check</strong> — a step declared and unused is a violation too: drift
+              waiting to happen.
+            </li>
+            <li>
+              <strong>arch:check</strong> — the components on this page are reachable only through
+              their domain barrel.
+            </li>
+            <li>
+              <strong>ci:quality</strong> — both run <code>--strict</code>, before the build, on
+              every change.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+
       <p className="sourcenote">
         Parsed from <code>app/globals.css</code> — {facts.lines.toLocaleString('en-US')} lines,{' '}
-        {facts.classes} classes, no framework and no preprocessor. The voice these components carry
-        is on the <Link href="/brand-voice/">brand voice</Link> page.
+        {facts.classes} classes, no framework and no preprocessor. The rules are written down in{' '}
+        <Link href="/runbooks/typography/">RUNBOOK_TYPOGRAPHY</Link>, and the mistake nobody can
+        see — a webfont that reflows every cold visit — in{' '}
+        <Link href="/skills/font-fallback-shift/">SKILL_FONT_FALLBACK_SHIFT</Link>. The voice these
+        components carry is on the <Link href="/brand-voice/">brand voice</Link> page.
       </p>
     </div>
   );

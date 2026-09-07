@@ -1,6 +1,6 @@
-import { allDocs } from '@/lib/content';
-import { topicOf } from '@/lib/topics';
-import { tokenIndex } from '@/lib/tokens';
+import { allDocs } from '@/domains/content/server';
+import { topicOf } from '@/domains/topics';
+import { tokenIndex } from '@/domains/tokens/server';
 
 /**
  * The palette searches sections, not just titles: 1,468 of them across the

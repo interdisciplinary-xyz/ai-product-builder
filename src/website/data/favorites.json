@@ -1,0 +1,23 @@
+{
+  "favorites": [
+    "managers/a11y-audit",
+    "managers/design-system",
+    "managers/performance",
+    "managers/product-context",
+    "managers/security",
+    "managers/seo",
+    "runbooks/domain-architecture",
+    "runbooks/e2e",
+    "runbooks/icp",
+    "runbooks/release-manager",
+    "runbooks/seo-audit",
+    "runbooks/typography",
+    "runbooks/ux-principles",
+    "runbooks/web-vitals-audit",
+    "agents/ceo",
+    "agents/cfo",
+    "agents/cpo",
+    "agents/cto"
+  ],
+  "updated": "2026-09-07T08:24:42.744Z"
+}

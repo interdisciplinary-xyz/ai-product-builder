@@ -1,8 +1,8 @@
-import { Link } from '@/components/link';
-import { LAYERS, allDocs, docsForLayer, layerCounts, libraryVersion, findDoc } from '@/lib/content';
-import { DocEntry, Entry, Ledger, layerStyle } from '@/components/ui';
-import { DoorIcon, LayerIcon } from '@/components/icons';
-import { TOPICS, topicCounts, docsForTopic } from '@/lib/topics';
+import { Link, Entry, Ledger, DoorIcon } from '@/domains/ui';
+import { LAYERS, LAYER_BY_ID, DocEntry, LayerIcon, layerStyle } from '@/domains/content';
+import { allDocs, docsForLayer, layerCounts, libraryVersion, findDoc } from '@/domains/content/server';
+import { TOPICS } from '@/domains/topics';
+import { topicCounts, docsForTopic } from '@/domains/topics/server';
 
 export default function HomePage() {
   const counts = layerCounts();
@@ -186,7 +186,9 @@ export default function HomePage() {
               name={`${layer.label.toLowerCase()}/`}
               description={layer.tagline}
               meta={[`${counts[layer.id]} files`, `→ ${layer.target}`, `you ${layer.verb} them`]}
-              layerId={layer.id}
+              tone={layer.id}
+              accent={layer}
+              icon={<LayerIcon layer={layer.id} />}
               index={i}
             />
           ))}

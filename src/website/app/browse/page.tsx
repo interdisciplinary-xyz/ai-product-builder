@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
-import { LAYERS, searchIndex } from '@/lib/content';
-import { PageHead } from '@/components/ui';
-import { BrowseClient } from '@/components/browse-client';
+import { PageHead } from '@/domains/ui';
+import { LAYERS } from '@/domains/content';
+import { searchIndex } from '@/domains/content/server';
+import { BrowseList } from '@/domains/search';
 
 export const metadata: Metadata = {
   title: 'Browse',
@@ -24,7 +25,7 @@ export default function BrowsePage() {
         title="The whole library"
         lede="Descriptions come straight from CATALOG.md, so this index cannot drift from the catalog it renders."
       />
-      <BrowseClient items={items} layers={layers} />
+      <BrowseList items={items} layers={layers} />
     </div>
   );
 }

@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import { Link } from '@/components/link';
-import { PageHead } from '@/components/ui';
-import { tokenIndex, tokenStats } from '@/lib/tokens';
-import { TokensClient, type TokenRow } from '@/components/tokens-client';
+import { Link, PageHead } from '@/domains/ui';
+import { TokenTable, type TokenRow } from '@/domains/tokens';
+import { tokenIndex, tokenStats } from '@/domains/tokens/server';
 
 export const metadata: Metadata = {
   title: 'Placeholders',
@@ -74,7 +73,7 @@ export default function TokensPage() {
         </p>
       </div>
 
-      <TokensClient rows={rows} />
+      <TokenTable rows={rows} />
     </div>
   );
 }

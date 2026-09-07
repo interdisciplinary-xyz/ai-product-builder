@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { Link } from '@/components/link';
-import { DocEntry, Ledger, PageHead } from '@/components/ui';
-import { LayerIcon } from '@/components/icons';
-import { TOPICS, TOPIC_BY_ID, docsForTopicByLayer, docsForTopic, type TopicId } from '@/lib/topics';
+import { Link, Ledger, PageHead } from '@/domains/ui';
+import { DocEntry, LayerIcon } from '@/domains/content';
+import { TOPICS, TOPIC_BY_ID, type TopicId } from '@/domains/topics';
+import { docsForTopicByLayer, docsForTopic } from '@/domains/topics/server';
 
 export function generateStaticParams() {
   return TOPICS.map((topic) => ({ topic: topic.id }));

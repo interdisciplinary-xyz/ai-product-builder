@@ -1,5 +1,5 @@
-import { Link } from '@/components/link';
-import { allDocs } from '@/lib/content';
+import { Link } from '@/domains/ui';
+import { allDocs } from '@/domains/content/server';
 
 export default function NotFound() {
   const total = allDocs().filter((d) => d.layer !== 'guides').length;

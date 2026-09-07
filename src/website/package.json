@@ -2,14 +2,18 @@
   "name": "ai-product-builder-website",
   "version": "0.1.0",
   "private": true,
-  "description": "Static site that presents the ai-product-builder library — reads the repo's markdown at build time.",
+  "description": "Static site that presents the ai-product-builder library \u2014 reads the repo's markdown at build time.",
   "scripts": {
     "cache:clean": "rm -rf node_modules .next out && echo 'Caches cleared. Run pnpm install to reinstall.'",
     "start:dev": "portless run --lan -- next dev",
     "start:dev:raw": "next dev --port 3006",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "types": "tsc --noEmit",
+    "lint": "eslint .",
+    "arch:check": "node scripts/tools/audit-domain-graph.mjs",
+    "type:check": "node scripts/tools/audit-type-scale.mjs",
+    "ci:quality": "pnpm types && pnpm lint && pnpm arch:check --strict && pnpm type:check --strict && pnpm build"
   },
   "dependencies": {
     "github-slugger": "^2.0.0",
@@ -26,7 +30,9 @@
     "@types/node": "22.15.3",
     "@types/react": "19.1.1",
     "@types/react-dom": "19.1.1",
-    "typescript": "5.8.3"
+    "eslint": "^9.39.5",
+    "typescript": "5.8.3",
+    "typescript-eslint": "^8.69.0"
   },
   "packageManager": "pnpm@10.22.0"
 }

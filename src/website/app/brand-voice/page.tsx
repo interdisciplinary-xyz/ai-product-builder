@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
-import { Link } from '@/components/link';
-import { PageHead } from '@/components/ui';
-import { LayerIcon } from '@/components/icons';
-import { LAYERS, allDocs, libraryVersion, layerCounts } from '@/lib/content';
-import { TOPICS } from '@/lib/topics';
-import { tokenStats } from '@/lib/tokens';
+import { Link, PageHead } from '@/domains/ui';
+import { LAYERS, LayerIcon } from '@/domains/content';
+import { allDocs, libraryVersion, layerCounts } from '@/domains/content/server';
+import { TOPICS } from '@/domains/topics';
+import { tokenStats } from '@/domains/tokens/server';
 
 export const metadata: Metadata = {
   title: 'Brand voice',
@@ -306,7 +305,12 @@ export default function BrandVoicePage() {
       <section className="section" id="typography">
         <header className="section__head">
           <h2 className="display">Conventions</h2>
-          <p>The small mechanical rules, so nobody has to decide twice.</p>
+          <p>
+            The small mechanical rules, so nobody has to decide twice. These govern the words;
+            the type they are set in — three sans faces and{' '}
+            <Link href="/design-system/#type">21 steps</Link> — is the{' '}
+            <Link href="/design-system/">design system</Link>&rsquo;s half of the same voice.
+          </p>
         </header>
 
         <dl className="conventions">
@@ -412,8 +416,11 @@ export default function BrandVoicePage() {
       </section>
 
       <p className="sourcenote">
-        The type, colour and components this voice is set in are on the{' '}
-        <Link href="/design-system/">design system</Link> page.
+        Five of these six rules have a visual form, and the{' '}
+        <Link href="/design-system/#rules">design system</Link> names which one each of its ground
+        rules descends from — a shadow is the visual &ldquo;very&rdquo;, an unflattering number
+        gets the same weight as a flattering one, and every design token carries the reason it
+        exists. One voice, set twice.
       </p>
     </div>
   );

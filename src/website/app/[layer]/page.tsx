@@ -1,10 +1,9 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { Link } from '@/components/link';
-import { LAYERS, LAYER_BY_ID, docsForLayer, type LayerId } from '@/lib/content';
-import { DocEntry, Ledger, PageHead, layerStyle } from '@/components/ui';
-import { LayerIcon } from '@/components/icons';
-import { groupByTopic } from '@/lib/topics';
+import { Link, Ledger, PageHead } from '@/domains/ui';
+import { LAYERS, LAYER_BY_ID, DocEntry, LayerIcon, layerStyle, type LayerId } from '@/domains/content';
+import { docsForLayer } from '@/domains/content/server';
+import { groupByTopic } from '@/domains/topics';
 
 export function generateStaticParams() {
   return LAYERS.map((layer) => ({ layer: layer.id }));

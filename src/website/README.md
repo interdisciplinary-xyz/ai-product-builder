@@ -36,7 +36,7 @@ other than `../..`.
 
 ## What it adds to the raw markdown
 
-- **A second axis.** Layers say what a file *is*; [topics](lib/topics.ts) say what it is **for**.
+- **A second axis.** Layers say what a file *is*; [topics](domains/topics/constants.ts) say what it is **for**.
   Eleven jobs — secure it, launch it, keep the docs true — each cutting across every layer, with
   all 129 files placed on exactly one. `/topics`, and the grouping inside any layer index past a
   dozen files.
@@ -60,7 +60,7 @@ other than `../..`.
 ## Layout
 
 ```
-app/
+app/                      the routes — the composition root, and nothing else
 ├── page.tsx              the front page — doors, topics, layers, contents, status
 ├── topics/               the topic index, and one page per topic
 ├── tokens/               every «token» and the documents that want it
@@ -71,19 +71,71 @@ app/
 ├── [layer]/[slug]/       one document
 ├── search-index.json/    a static route handler — the palette's index, ~195 kB
 └── globals.css           the whole design system, no framework
-lib/
-├── content.ts            reads the repo: layers, docs, CATALOG descriptions, link map
-├── topics.ts             the topic axis — hand-written, one topic per document
-└── tokens.ts             «token» extraction, joined to the PLACEHOLDERS.md glossary
-components/
-├── markdown.tsx          renderer + the «token» remark plugin + link rewriting
-├── ui.tsx                the ledger row, used by nearly every page
-├── command-palette.tsx   ⌘K over documents, sections and tokens
-├── doc-nav.tsx           the sibling rail on a document page
-├── dev-bar.tsx           the sticky workbench strip along the bottom
-├── browse-client.tsx     the /browse filter
-└── tokens-client.tsx     the /tokens filter
+domains/                  one directory per feature, one barrel each — see domains/README.md
+├── ui/                   the base leaf: Link, Entry, Ledger, PageHead, the icon spec
+│   ├── components/       each component a kebab folder; index.ts re-exports them all
+│   └── index.ts          the domain barrel — `export * from './components'`
+├── content/              the library itself — taxonomy, corpus, Markdown renderer
+│   └── server/           reads the repo off disk; never re-exported from the barrel
+├── topics/               the topic axis, hand-written, one topic per document
+├── tokens/               «token» extraction, joined to the PLACEHOLDERS.md glossary
+├── search/               ⌘K over documents, sections and tokens, plus /browse
+├── navigation/           masthead, the sibling rail, the in-page contents
+└── design/               the dev bar, and globals.css parsed at build time
+scripts/tools/
+└── audit-domain-graph.mjs  the boundary gate — `pnpm arch:check --strict`
 ```
+
+### Domain boundaries
+
+The app implements [`RUNBOOK_DOMAIN_ARCHITECTURE`](../runbooks/RUNBOOK_DOMAIN_ARCHITECTURE.md):
+every feature is a directory under `domains/`, its public surface is one barrel, and deep imports
+do not exist. Every directory is kebab-case and re-exports the directories beneath it one level at
+a time — component folder → `components/index.ts` → the domain barrel — so a component can move
+without any consumer noticing. Anything filesystem-backed lives behind a `/server` sub-entrypoint
+that the client-safe barrel never re-exports — one line of convenience there would put `node:fs`
+and the whole repository into the browser bundle.
+
+The graph is data, not prose: `ALLOWED` in `scripts/tools/audit-domain-graph.mjs`. The audit
+parses the TypeScript AST rather than grepping for paths, and `pnpm arch:check --strict` runs in
+`ci:quality` alongside `tsc` and the local ESLint rule that reports the same violations as you
+type them. `domains/README.md` has the whole DAG and the list of checks.
+
+```bash
+pnpm arch:check          # domain boundaries — counts, for trending
+pnpm arch:check --strict # exits non-zero on any violation
+pnpm type:check --strict # the type scale — every size names a step
+pnpm ci:quality          # types → lint → arch:check → type:check → build
+```
+
+### Favorites
+
+Marked from the star on any document page or any row in `/browse`, and written to
+`data/favorites.json` — committed with the rest of the repository, so the list is in git rather
+than in one browser and its history says when each document was marked.
+
+That needs a server to write the file, and `output: 'export'` removes route handlers *everywhere*,
+including from `next dev` — a POST there falls through to the `[layer]/[slug]` catch-all and 500s.
+So the export is production-only (`next.config.mjs`), dev runs as an ordinary Node server, and
+`pnpm build` drops `app/api/favorites/` from `out/` again. A built copy is therefore **read-only**:
+it ships whatever was committed, and every star is disabled with a title saying why, rather than
+flipping and saving nothing.
+
+There is deliberately no `localStorage` here — two stores means two answers to the same question,
+and the browser copy is the one that gets lost. The consequence is that this is **one list, not one
+per reader**, which is right while the site has one reader and is the thing to replace on the day
+it does not.
+
+### Typography
+
+The site implements [`RUNBOOK_TYPOGRAPHY`](../runbooks/RUNBOOK_TYPOGRAPHY.md). Three sans faces —
+Archivo, IBM Plex Sans, JetBrains Mono — and 21 steps for every size, leading and tracking on the
+site. The first audit of this stylesheet found **46 distinct font sizes across 132 declarations**;
+`scripts/tools/audit-type-scale.mjs` now fails the build on any literal that is not a step, and on
+a serif fallback creeping back under a sans stack.
+
+`/design-system` reads those steps out of `globals.css` at build time, so the specimen page cannot
+show a size the stylesheet does not have.
 
 ### The search index
 
@@ -99,18 +151,18 @@ to be kept in step by hand.
 pinned to the bottom of every page (and from the footer, since the bar can be hidden — it
 remembers). The bar also carries the three facts worth having while styling: the current route,
 the viewport in px and rem against the stylesheet's own breakpoints, and the resolved colour
-scheme. To make it a local-only tool, gate the mount effect in `components/dev-bar.tsx` on
+scheme. To make it a local-only tool, gate the mount effect in `domains/design/components/dev-bar/dev-bar.tsx` on
 `process.env.NODE_ENV === 'development'`.
 
 The design system holds to the same rule as the rest of the site: it is a **view**. Swatches,
 values, breakpoints and counts are parsed out of `app/globals.css` at build time by
-`lib/design.ts`, and every component specimen is the real markup with the real class — so a
+`domains/design/server/stylesheet.ts`, and every component specimen is the real markup with the real class — so a
 component breaks on that page before it breaks anywhere else. A token added to `:root` tomorrow
 appears there with no edit; if it matches no group it shows under "Everything else".
 
 ### Adding a document
 
-The site follows the library — with one exception. `lib/topics.ts` maps every file to a topic and
+The site follows the library — with one exception. `domains/topics/constants.ts` maps every file to a topic and
 is written by hand, because deriving it from keywords filed `EMAIL_DELIVERABILITY` under security
 (SPF, DKIM) and `PRIVACY_CONTRACT_TEST` under testing. A new file that nobody has placed shows up
 in an **Unfiled** group on `/topics` and at the bottom of its layer index; it does not break the
@@ -118,8 +170,11 @@ build.
 
 ## Design
 
-White ground, ink type, hairline rules — a card catalog rather than a dashboard. Instrument
-Serif for display, Newsreader for body, JetBrains Mono for anything a machine would read. Each
+White ground, ink type, hairline rules — a card catalog rather than a dashboard. Three sans
+faces, one job each: Archivo for display, IBM Plex Sans for body, JetBrains Mono for anything a
+machine would read — see [`RUNBOOK_TYPOGRAPHY`](../runbooks/RUNBOOK_TYPOGRAPHY.md) for why those
+and how the scale is enforced. Every size, leading and tracking names one of 21 steps declared on
+`:root`; `pnpm type:check --strict` fails the build on a literal. Each
 layer — and each topic — carries its own accent, set as `--layer-light`/`--layer-dark` on an
 element marked `data-layer` or `data-topic`, and resolved to `--layer` in one place. Setting the
 pair without one of those attributes silently falls back to the house accent, which is how eleven

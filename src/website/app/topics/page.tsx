@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { Link } from '@/components/link';
-import { PageHead, Ledger, DocEntry } from '@/components/ui';
-import { TOPICS, topicCounts, docsForTopic, unfiledDocs } from '@/lib/topics';
-import { LayerIcon } from '@/components/icons';
+import { Link, PageHead, Ledger } from '@/domains/ui';
+import { DocEntry, LayerIcon } from '@/domains/content';
+import { TOPICS } from '@/domains/topics';
+import { topicCounts, docsForTopic, unfiledDocs } from '@/domains/topics/server';
 
 export const metadata: Metadata = {
   title: 'By topic',
