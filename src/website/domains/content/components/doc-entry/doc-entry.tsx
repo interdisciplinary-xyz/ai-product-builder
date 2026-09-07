@@ -1,4 +1,5 @@
 import { Entry } from '@/domains/ui';
+import { FavoriteButton, favoriteKey } from '@/domains/favorites';
 import { LayerIcon } from '../layer-icon';
 import { LAYER_BY_ID } from '../../constants';
 import { docHref } from '../../taxonomy';
@@ -22,6 +23,7 @@ export function DocEntry({ doc, index }: { doc: Doc; index?: number }) {
       tone={doc.layer}
       accent={LAYER_BY_ID.get(doc.layer)}
       icon={<LayerIcon layer={doc.layer} />}
+      action={<FavoriteButton item={{ key: favoriteKey(doc.layer, doc.slug), name: doc.name }} label={false} />}
       index={index}
     />
   );

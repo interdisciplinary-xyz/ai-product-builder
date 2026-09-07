@@ -1,36 +1,41 @@
 'use client';
 
 import { Link } from '@/domains/ui';
-import { LayerIcon, docHref, LAYER_BY_ID } from '@/domains/content';
-import type { FavoriteDoc } from '../../types';
 import { FavoriteButton } from '../favorite-button';
-import { favoriteKey, useFavorites } from '../../use-favorites';
+import { useFavorites } from '../../use-favorites';
+import type { FavoriteGroup } from '../../types';
 
 /**
- * The whole corpus is handed in from the page — ~130 rows of name and
- * description, the same payload /browse already ships — and the list is the
- * intersection with what this browser has marked. Doing it this way means a key
- * for a document that has since left the library simply does not match, rather
- * than rendering a row that 404s.
+ * The page hands in every markable thing, grouped and pre-rendered — rows carry
+ * their own href, tag and icon. Doing it that way is what lets this domain
+ * depend on `ui` alone: it never learns what a document or a topic is, so
+ * `content` is free to import the star for its own DocEntry.
+ *
+ * The list is the intersection with what has been marked, so a key for
+ * something that has since left the library simply does not match rather than
+ * rendering a row that 404s.
  */
-export function FavoriteList({ docs }: { docs: FavoriteDoc[] }) {
+export function FavoriteList({ groups }: { groups: FavoriteGroup[] }) {
   const { keys, count, clear, writable, error } = useFavorites();
-  const marked = keys.length ? docs.filter((doc) => keys.includes(favoriteKey(doc))) : [];
-  const missing = count - marked.length;
+
+  const shown = groups
+    .map((group) => ({ ...group, rows: group.rows.filter((row) => keys.includes(row.key)) }))
+    .filter((group) => group.rows.length);
+  const total = shown.reduce((n, g) => n + g.rows.length, 0);
+  const missing = count - total;
 
   if (!count) {
     return (
       <div className="favempty">
         <p className="favempty__lede">Nothing marked yet.</p>
         <p>
-          Every document page carries a star beside its title, and every row in browse carries
-          one too. Marking a document rewrites <code>data/favorites.json</code>, which you then
-          commit like any other change — so the list travels with the repository rather than with
-          a browser.
+          Every document page carries a star beside its title, every row in a ledger carries one,
+          and so does every scenario on the front page. Marking something rewrites{' '}
+          <code>data/favorites.json</code>, which you then commit like any other change — so the
+          list travels with the repository rather than with a browser.
         </p>
         <p>
-          <Link href="/topics/">Start from a topic</Link> or{' '}
-          <Link href="/browse/">browse all {docs.length} files</Link>.
+          <Link href="/topics/">Start from a scenario</Link> or <Link href="/browse/">browse</Link>.
         </p>
       </div>
     );
@@ -40,7 +45,7 @@ export function FavoriteList({ docs }: { docs: FavoriteDoc[] }) {
     <>
       <div className="favlist__head">
         <p className="eyebrow">
-          {marked.length} {marked.length === 1 ? 'document' : 'documents'}
+          {total} {total === 1 ? 'item' : 'items'}
           {writable ? null : <span className="favlist__ro"> · read-only build</span>}
         </p>
         {writable ? (
@@ -56,33 +61,36 @@ export function FavoriteList({ docs }: { docs: FavoriteDoc[] }) {
         </p>
       ) : null}
 
-      <ul className="favlist">
-        {marked.map((doc) => {
-          const layer = LAYER_BY_ID.get(doc.layer);
-          return (
-            <li key={favoriteKey(doc)} data-layer={doc.layer}>
-              <Link href={docHref(doc)} className="favlist__doc">
-                <span className="favlist__icon">
-                  <LayerIcon layer={doc.layer} />
-                </span>
-                <span className="favlist__main">
-                  <span className="favlist__name mono">{doc.name}</span>
-                  {doc.description ? (
-                    <span className="favlist__desc">{doc.description}</span>
-                  ) : null}
-                </span>
-                <span className="favlist__layer mono">{layer?.label ?? doc.layer}</span>
-              </Link>
-              <FavoriteButton doc={doc} label={false} />
-            </li>
-          );
-        })}
-      </ul>
+      {shown.map((group) => (
+        <section key={group.label} className="favgroup">
+          <h2 className="ledger__group favgroup__head">
+            {group.label}
+            <span className="mono">{group.rows.length}</span>
+          </h2>
+          <ul className="favlist">
+            {group.rows.map((row) => (
+              <li key={row.key} data-layer={row.tone} data-topic={row.tone}>
+                <Link href={row.href} className="favlist__doc">
+                  <span className="favlist__icon">{row.icon}</span>
+                  <span className="favlist__main">
+                    <span className="favlist__name mono">{row.name}</span>
+                    {row.description ? (
+                      <span className="favlist__desc">{row.description}</span>
+                    ) : null}
+                  </span>
+                  {row.tag ? <span className="favlist__layer mono">{row.tag}</span> : null}
+                </Link>
+                <FavoriteButton item={row} label={false} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
 
       {missing > 0 ? (
         <p className="favlist__missing">
-          {missing} marked {missing === 1 ? 'document is' : 'documents are'} no longer in the
-          library. Clearing removes them.
+          {missing} marked {missing === 1 ? 'item is' : 'items are'} no longer in the library.
+          Clearing removes them.
         </p>
       ) : null}
     </>

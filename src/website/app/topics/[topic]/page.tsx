@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Link, Ledger, PageHead } from '@/domains/ui';
 import { DocEntry, LayerIcon } from '@/domains/content';
 import { TOPICS, TOPIC_BY_ID, type TopicId } from '@/domains/topics';
+import { FavoriteButton, favoriteKey } from '@/domains/favorites';
 import { docsForTopicByLayer, docsForTopic } from '@/domains/topics/server';
 
 export function generateStaticParams() {
@@ -46,7 +47,12 @@ export default async function TopicPage({ params }: { params: Promise<{ topic: s
 
       <PageHead
         eyebrow={`${all.length} files across ${groups.length} ${groups.length === 1 ? 'layer' : 'layers'}`}
-        title={topic.label}
+        title={
+          <span className="pagehead__titlerow">
+            {topic.label}
+            <FavoriteButton item={{ key: favoriteKey('topics', topic.id), name: topic.label }} />
+          </span>
+        }
         lede={topic.blurb}
       >
         {lead ? (

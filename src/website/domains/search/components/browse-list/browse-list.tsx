@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from '@/domains/ui';
 import { LayerIcon } from '@/domains/content';
-import { FavoriteButton } from '@/domains/favorites';
+import { FavoriteButton, favoriteKey } from '@/domains/favorites';
 import type { LayerId } from '@/domains/content';
 import type { BrowseItem, BrowseLayer } from './browse-list.constants';
 
@@ -131,7 +131,7 @@ export function BrowseList({ items, layers }: { items: BrowseItem[]; layers: Bro
             {item.deployedAs ? <span>→ {item.deployedAs}</span> : null}
           </span>
         </Link>
-        <FavoriteButton doc={item} label={false} />
+        <FavoriteButton item={{ key: favoriteKey(item.layer, item.slug), name: item.name }} label={false} />
       </li>
     );
   };

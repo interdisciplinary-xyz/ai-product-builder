@@ -3019,3 +3019,49 @@ main:focus {
   background: var(--accent-soft);
   border-left: 2px solid var(--accent);
 }
+
+/* A scenario card is a link, so its star is a sibling and the <li> becomes the
+   positioning context. Top-right, out of the reading path: the card's job is
+   the question it asks, and the star must not compete with it. */
+.topics > li {
+  position: relative;
+}
+.topics > li .favbutton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1;
+}
+/* Reserve the corner. Without this the question runs under the star on every
+   card whose text wraps — "Does this survive contact with a spreadsheet?" sat
+   directly beneath it. */
+.topics > li .topic__question {
+  padding-right: 1.9rem;
+}
+
+/* The document title and its star share a row on a topic page, same as on a
+   document page. */
+.pagehead__titlerow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* /favorites groups documents under scenarios — two kinds of marked thing, and
+   a reader looking for one is not looking for the other. */
+.favgroup {
+  margin-bottom: 2rem;
+}
+.favgroup__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+/* A scenario row has no glyph; the cell still holds its width so names line up
+   with the documents below. */
+.favlist__icon:empty {
+  width: 1em;
+}

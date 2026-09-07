@@ -1,26 +1,25 @@
 'use client';
 
 import { Icon } from '@/domains/ui';
-import { favoriteKey, useFavorites } from '../../use-favorites';
-import type { FavoriteDoc } from '../../types';
+import { useFavorites } from '../../use-favorites';
+import type { FavoriteItem } from '../../types';
 
 /**
- * The star writes through to `data/favorites.json`. Where there is no endpoint
- * to write to — a production build drops it, because the site exports to static
- * files — the button is disabled and says why. A star that flips and saves
- * nothing is the failure this whole feature was moved off localStorage to
- * avoid.
+ * Marks anything with a key — a document, a scenario, whatever gets a route
+ * next. It writes through to `data/favorites.json`; where there is no endpoint
+ * to write to (a production build drops it, because the site exports to static
+ * files) the button is disabled and says why. A star that flips and saves
+ * nothing is the failure this feature was moved off localStorage to avoid.
  */
-export function FavoriteButton({ doc, label = true }: { doc: FavoriteDoc; label?: boolean }) {
-  const key = favoriteKey(doc);
+export function FavoriteButton({ item, label = true }: { item: FavoriteItem; label?: boolean }) {
   const { has, toggle, writable } = useFavorites();
-  const marked = has(key);
+  const marked = has(item.key);
 
   const title = !writable
-    ? `Read-only: this build has no write endpoint, so ${doc.name} cannot be marked here.`
+    ? `Read-only: this build has no write endpoint, so ${item.name} cannot be marked here.`
     : marked
-      ? `Remove ${doc.name} from favorites`
-      : `Add ${doc.name} to favorites`;
+      ? `Remove ${item.name} from favorites`
+      : `Add ${item.name} to favorites`;
 
   return (
     <button
@@ -28,7 +27,7 @@ export function FavoriteButton({ doc, label = true }: { doc: FavoriteDoc; label?
       className={label ? 'favbutton' : 'favbutton favbutton--icon'}
       aria-pressed={marked}
       disabled={!writable}
-      onClick={() => toggle(key)}
+      onClick={() => toggle(item.key)}
       title={title}
     >
       {/* The one filled glyph in the set. A star that only ever outlines cannot

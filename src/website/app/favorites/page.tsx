@@ -1,22 +1,49 @@
 import type { Metadata } from 'next';
 import { PageHead } from '@/domains/ui';
+import { LAYER_BY_ID, LayerIcon, docHref } from '@/domains/content';
 import { allDocs } from '@/domains/content/server';
-import { FavoriteList, type FavoriteDoc } from '@/domains/favorites';
+import { TOPICS } from '@/domains/topics';
+import { topicCounts } from '@/domains/topics/server';
+import { FavoriteList, favoriteKey, type FavoriteGroup } from '@/domains/favorites';
 
 export const metadata: Metadata = {
   title: 'Favorites',
   description:
-    'The documents marked in data/favorites.json — committed to the repository, so the list is in git rather than in one browser.',
+    'The documents and scenarios marked in data/favorites.json — committed to the repository, so the list is in git rather than in one browser.',
 };
 
 export default function FavoritesPage() {
-  // The list is computed in the browser, so the page ships the corpus and lets
-  // the client intersect it — four fields per document, because that is what a
-  // row renders. Sending whole `Doc`s put 77 kB of repo paths, heading trees and
-  // word counts into a page that is empty for most readers.
-  const docs: FavoriteDoc[] = allDocs()
-    .filter((d) => d.layer !== 'guides')
-    .map(({ layer, slug, name, description }) => ({ layer, slug, name, description }));
+  // Everything markable is shipped to the browser so the client can intersect
+  // it with the marked keys — four fields and an icon per row, because that is
+  // what a row renders.
+  const counts = topicCounts();
+  const groups: FavoriteGroup[] = [
+    {
+      label: 'Scenarios',
+      rows: TOPICS.map((topic) => ({
+        key: favoriteKey('topics', topic.id),
+        name: topic.label,
+        description: topic.question,
+        href: `/topics/${topic.id}/`,
+        tag: `${counts[topic.id]} files`,
+        tone: topic.id,
+      })),
+    },
+    {
+      label: 'Documents',
+      rows: allDocs()
+        .filter((d) => d.layer !== 'guides')
+        .map((doc) => ({
+          key: favoriteKey(doc.layer, doc.slug),
+          name: doc.name,
+          description: doc.description,
+          href: docHref(doc),
+          tag: LAYER_BY_ID.get(doc.layer)?.label ?? doc.layer,
+          tone: doc.layer,
+          icon: <LayerIcon layer={doc.layer} />,
+        })),
+    },
+  ];
 
   return (
     <div className="shell">
@@ -25,15 +52,15 @@ export default function FavoritesPage() {
         title="Favorites"
         lede={
           <>
-            Marked from the star on any document page, or from any row in{' '}
-            <a href="/browse/">browse</a>. The list is written to{' '}
-            <code>data/favorites.json</code> and committed with the rest of the repository — so it
-            is in git, it survives clearing your browser, and its history says when each document
-            was marked. One list, not one per reader: right while this site has one.
+            Marked from the star on any document, any ledger row, or any scenario on the front
+            page. The list is written to <code>data/favorites.json</code> and committed with the
+            rest of the repository — so it is in git, it survives clearing your browser, and its
+            history says when each thing was marked. One list, not one per reader: right while this
+            site has one.
           </>
         }
       />
-      <FavoriteList docs={docs} />
+      <FavoriteList groups={groups} />
     </div>
   );
 }

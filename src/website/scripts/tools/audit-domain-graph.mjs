@@ -37,11 +37,11 @@ const DOMAINS_DIR = path.join(ROOT, 'domains');
 export const ALLOWED = {
   //   domain      may import:
   ui: [],
-  content: ['ui'],
+  content: ['ui', 'favorites'],
   topics: ['ui', 'content'],
   tokens: ['ui', 'content'],
   search: ['ui', 'content', 'favorites'],
-  favorites: ['ui', 'content'],
+  favorites: ['ui'],
   navigation: ['ui', 'content', 'topics', 'search', 'favorites'],
   design: ['ui'],
 };

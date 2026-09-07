@@ -19,7 +19,7 @@ import {
   pairing,
 } from '@/domains/content/server';
 import { DocToc, DocNav } from '@/domains/navigation';
-import { FavoriteButton } from '@/domains/favorites';
+import { FavoriteButton, favoriteKey } from '@/domains/favorites';
 import { topicOf } from '@/domains/topics';
 import { tokensIn } from '@/domains/tokens';
 
@@ -83,7 +83,7 @@ export default async function DocPage({
       <header className="doc__head rise">
         <div className="doc__titlerow">
           <h1 className="doc__title mono">{doc.name}</h1>
-          <FavoriteButton doc={doc} />
+          <FavoriteButton item={{ key: favoriteKey(doc.layer, doc.slug), name: doc.name }} />
         </div>
         {doc.description ?? doc.heading ? (
           <p className="doc__desc">{doc.description ?? doc.heading}</p>

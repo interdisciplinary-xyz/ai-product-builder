@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Link, PageHead, Ledger } from '@/domains/ui';
 import { DocEntry, LayerIcon } from '@/domains/content';
+import { FavoriteButton, favoriteKey } from '@/domains/favorites';
 import { TOPICS } from '@/domains/topics';
 import { topicCounts, docsForTopic, unfiledDocs } from '@/domains/topics/server';
 
@@ -49,6 +50,10 @@ export default function TopicsPage() {
                   ) : null}
                 </p>
               </Link>
+              <FavoriteButton
+                item={{ key: favoriteKey('topics', topic.id), name: topic.label }}
+                label={false}
+              />
             </li>
           );
         })}

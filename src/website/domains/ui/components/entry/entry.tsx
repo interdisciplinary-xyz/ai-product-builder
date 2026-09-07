@@ -19,6 +19,7 @@ export function Entry({
   tone,
   accent,
   icon,
+  action,
   index,
 }: {
   href: string;
@@ -29,11 +30,18 @@ export function Entry({
   tone?: string;
   accent?: Accent;
   icon?: ReactNode;
+  /**
+   * Rendered beside the link, not inside it — a button cannot live in an
+   * anchor. The <li> becomes the flex container and takes over the rule
+   * between rows, because .entry drawing its own border would stop short of
+   * the action and leave the line broken.
+   */
+  action?: ReactNode;
   index?: number;
 }) {
   const shown = (meta ?? []).filter(Boolean) as string[];
   return (
-    <li>
+    <li className={action ? 'entry-row' : undefined}>
       <Link
         href={href}
         className="entry rise"
@@ -57,6 +65,7 @@ export function Entry({
           </span>
         ) : null}
       </Link>
+      {action}
     </li>
   );
 }

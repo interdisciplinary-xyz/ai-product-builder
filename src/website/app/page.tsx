@@ -1,6 +1,7 @@
 import { Link, Entry, Ledger, DoorIcon } from '@/domains/ui';
 import { LAYERS, LAYER_BY_ID, DocEntry, LayerIcon, layerStyle } from '@/domains/content';
 import { allDocs, docsForLayer, layerCounts, libraryVersion, findDoc } from '@/domains/content/server';
+import { FavoriteButton, favoriteKey } from '@/domains/favorites';
 import { TOPICS } from '@/domains/topics';
 import { topicCounts, docsForTopic } from '@/domains/topics/server';
 
@@ -164,6 +165,10 @@ export default function HomePage() {
                     ) : null}
                   </p>
                 </Link>
+                <FavoriteButton
+                  item={{ key: favoriteKey('topics', topic.id), name: topic.label }}
+                  label={false}
+                />
               </li>
             );
           })}
