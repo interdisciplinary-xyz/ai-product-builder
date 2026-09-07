@@ -67,6 +67,7 @@ app/                      the routes — the composition root, and nothing else
 ├── design-system/        the tokens, type and components, read out of globals.css
 ├── brand-voice/          how the site writes, with the copy that shipped
 ├── browse/               the filterable index
+├── review/               the triage pass — /review, then /review/<layer>/<slug>
 ├── [layer]/page.tsx      one layer's ledger, grouped by topic past a dozen files
 ├── [layer]/[slug]/       one document
 ├── search-index.json/    a static route handler — the palette's index, ~195 kB
@@ -80,6 +81,10 @@ domains/                  one directory per feature, one barrel each — see dom
 ├── topics/               the topic axis, hand-written, one topic per document
 ├── tokens/               «token» extraction, joined to the PLACEHOLDERS.md glossary
 ├── search/               ⌘K over documents, sections and tokens, plus /browse
+├── favorites/            the star, and the list in data/favorites.json
+│   └── server/           the committed list; the barrel stays client-safe
+├── review/               the triage pass — verdicts in data/reviews.json
+│   └── server/           the verdict file, and the queue built from the corpus
 ├── navigation/           masthead, the sibling rail, the in-page contents
 └── design/               the dev bar, and globals.css parsed at build time
 scripts/tools/
@@ -125,6 +130,28 @@ There is deliberately no `localStorage` here — two stores means two answers to
 and the browser copy is the one that gets lost. The consequence is that this is **one list, not one
 per reader**, which is right while the site has one reader and is the thing to replace on the day
 it does not.
+
+### Review
+
+`/review` runs a triage pass over the library: one question per document — does
+this earn its place, **keep** / **rework** / **cut**, and why. `/review/<layer>/<slug>`
+renders the document with a verdict console pinned to the bottom of the page, so the
+call is made against the text rather than against a description of it. <kbd>k</kbd>,
+<kbd>r</kbd> and <kbd>c</kbd> record a verdict and jump to the next undecided file;
+<kbd>n</kbd> and <kbd>p</kbd> move without deciding.
+
+The route is a catch-all rather than `/review/<slug>` because slugs are not unique:
+`MANAGER_A11Y_AUDIT` and `RUNBOOK_A11Y_AUDIT` both slugify to `a11y-audit`, as do
+`decision-log` and `payments-compliance`. Six files, three collisions.
+
+Verdicts are written to `data/reviews.json` on the same terms as the favorites list —
+committed to the repository, PUT-only endpoint, gone from a static build. That
+matters more here: reading 138 documents is hours of judgment, and the verdicts are
+the cheap, losable part. In a file the pass diffs, survives a closed tab, and
+`git log data/reviews.json` says when each call was made.
+
+When the pass is done the filter on `/review` is the deliverable: **Cut** is the list
+of files to delete, **Rework** is the next milestone.
 
 ### Typography
 

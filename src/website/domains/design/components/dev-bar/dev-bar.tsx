@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Link } from '@/domains/ui';
 import { STORAGE_KEY, bandFor } from './dev-bar.constants';
@@ -25,6 +25,7 @@ export function DevBar({ version, files }: { version: string; files: number }) {
   const [open, setOpen] = useState(true);
   const [width, setWidth] = useState(0);
   const [scheme, setScheme] = useState<'light' | 'dark'>('light');
+  const barRef = useRef<HTMLElement>(null);
   const pathname = usePathname() ?? '/';
 
   useEffect(() => {
@@ -48,6 +49,33 @@ export function DevBar({ version, files }: { version: string; files: number }) {
       dark.removeEventListener('change', measure);
     };
   }, []);
+
+  /**
+   * Publishes the bar's own height as `--devbar-h`, so anything else pinned to
+   * the bottom of the viewport can sit above it. The review console needs this:
+   * the bar is `position: fixed` at z-index 40 and was covering the console's
+   * pager row entirely.
+   *
+   * Measured rather than hard-coded, because the bar wraps to two rows on a
+   * narrow viewport — and set back to zero when it is closed, so nothing
+   * reserves space for a bar that is not there.
+   */
+  useEffect(() => {
+    const root = document.documentElement;
+    const el = barRef.current;
+    if (!el) {
+      root.style.setProperty('--devbar-h', '0px');
+      return;
+    }
+    const measure = () => root.style.setProperty('--devbar-h', `${el.offsetHeight}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      root.style.setProperty('--devbar-h', '0px');
+    };
+  }, [mounted, open]);
 
   const toggle = () => {
     const next = !open;
@@ -74,7 +102,7 @@ export function DevBar({ version, files }: { version: string; files: number }) {
   }
 
   return (
-    <aside className="devbar mono" aria-label="Developer bar">
+    <aside ref={barRef} className="devbar mono" aria-label="Developer bar">
       <span className="devbar__brand">
         <span className="devbar__dot" aria-hidden="true" />
         v{version}

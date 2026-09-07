@@ -12,6 +12,9 @@ import { seed } from '../../store';
  * client module, and the file can only be read on the server.
  */
 export function FavoritesHydrator({ initial }: { initial: string[] }) {
-  seed(initial);
+  // Forced on the server, where this module outlives the request and the file
+  // is the only truth; guarded on the client, where a click is newer than the
+  // file. See `seed`.
+  seed(initial, typeof window === 'undefined');
   return null;
 }

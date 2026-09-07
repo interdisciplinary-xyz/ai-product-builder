@@ -22,14 +22,25 @@ values, in one place:
 ## The graph
 
 ```
-ui                                       ← base leaf
-└─ content            → ui
-   ├─ topics          → ui, content
-   ├─ tokens          → ui, content
-   └─ search          → ui, content
-      └─ navigation   → ui, content, topics, search
-design                → ui
+ui            → —                                    ← base leaf
+favorites     → ui
+design        → ui
+content       → ui, favorites
+topics        → ui, content
+tokens        → ui, content
+review        → ui, content
+search        → ui, content, favorites
+navigation    → ui, content, topics, search, favorites
 ```
+
+`content → favorites`, and not the other way round, is the one edge worth
+explaining. A document row carries a star, so `DocEntry` needs the button —
+and `favorites` needs to know nothing about documents, because a key is
+`<group>/<id>` and that is also the route. Pointing the edge the other way
+would have made the graph cyclic for no gain.
+
+`review` reaches `content` only from its `/server` surface, to build the queue
+from the corpus; the client-safe barrel takes the queue as plain data.
 
 The map itself lives in `scripts/tools/audit-domain-graph.mjs` as `ALLOWED`,
 because a graph in prose is a graph nothing checks. Add a domain, add a row.

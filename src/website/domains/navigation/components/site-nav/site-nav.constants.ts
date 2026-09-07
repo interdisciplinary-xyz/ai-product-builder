@@ -10,4 +10,5 @@ export const SITE_LINKS = [
   { href: '/topics/', label: 'Topics', match: '/topics' },
   { href: '/browse/', label: 'Browse', match: '/browse' },
   { href: '/tokens/', label: 'Placeholders', match: '/tokens' },
+  { href: '/review/', label: 'Review', match: '/review' },
 ];

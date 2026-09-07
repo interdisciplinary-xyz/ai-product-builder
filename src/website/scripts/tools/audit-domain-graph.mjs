@@ -42,6 +42,7 @@ export const ALLOWED = {
   tokens: ['ui', 'content'],
   search: ['ui', 'content', 'favorites'],
   favorites: ['ui'],
+  review: ['ui', 'content'],
   navigation: ['ui', 'content', 'topics', 'search', 'favorites'],
   design: ['ui'],
 };
@@ -54,6 +55,7 @@ export const ALLOWED = {
 export const SERVER_DEPS_ALLOWED = {
   'topics/server': ['content/server'],
   'tokens/server': ['content/server'],
+  'review/server': ['content/server'],
 };
 
 /** Deep imports past a barrel, each with a reason. Keep this under five (§9). */
