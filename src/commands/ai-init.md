@@ -5,6 +5,20 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 # /ai-init
 
+> **🔧 Reuse & local setup**
+>
+> Canonical copy — vendored at `docs/ai-product-builder/commands/ai-init.md` (source of truth template). To activate as a slash command: copy to `.claude/commands/ai-init.md`.
+>
+> **Reusability:** template-ready — the prompt loop, the answer-file shape and the render step are generic; nothing here is per repo except the answers it writes.
+>
+> **Pairs with:** `MANAGER_INIT.md` (the full spec this command is the shortcut to) and `PLACEHOLDERS.md` (the canonical token glossary it prompts against). Boundary: MANAGER_INIT owns *what the init system is*; this file owns *the slash-command surface*.
+>
+> **Owns / defers to:** Owns the interactive prompt loop, `.claude/ai-init.local.json` and the optional `.local.md` render. Defers *the token glossary* → `PLACEHOLDERS.md`; *the two-tier core-vs-per-doc declaration rule* → `MANAGER_INIT.md`; *which tokens a given doc needs* → that doc's own Reuse block.
+>
+> **Local definitions to provide per repo:** none — this command reads every value it needs from the doc it is initialising.
+
+**Last reviewed:** «DATE»
+
 Bootstrap (or incrementally refresh) the repo-wide `«placeholder»` values for one or more docs in the `ai-product-builder` library. Follow `MANAGER_INIT.md` for the full spec — this command is the convenient shortcut.
 
 ## Argument

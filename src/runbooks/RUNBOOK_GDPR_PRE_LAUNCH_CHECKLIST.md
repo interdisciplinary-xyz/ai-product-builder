@@ -38,6 +38,11 @@
 - [ ] Public profile (`«PUBLIC_PROFILE_ROUTE»`) shows only what the user chose to publish
 - [ ] Data export (`«ACCOUNT_ROUTE»` or support process) documented in privacy policy
 - [ ] Deletion request path documented (support email + «DB_CMS» admin purge runbook)
+- [ ] **Structural avoidance first** — before adding any schema field that could hold free-form user prose, apply [`SCHEMA_FIRST_GDPR_AVOIDANCE.md`](./SCHEMA_FIRST_GDPR_AVOIDANCE.md): can this be a bounded enum / regex-validated string / URL fragment instead of free text? The safest special-category data is the data that structurally does not fit into your schema.
+
+## Provable claims
+
+Every privacy claim in `«PRIVACY_ROUTE»` MUST have a matching integration test that runs against a real database and asserts what the user actually sees — not what the code intends to show. See [`PRIVACY_CONTRACT_TEST.md`](./PRIVACY_CONTRACT_TEST.md) for the three test shapes (intersection-only reveal, cascade delete, non-derivability). A privacy claim without a matching test is a claim the code does not enforce.
 
 ## Processors & DPAs
 

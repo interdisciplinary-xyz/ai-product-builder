@@ -1,8 +1,8 @@
 # QUALITY_ASSURANCE.md — Standards & pre-merge gate
 
-> **Canonical / source-of-truth copy** (lives in the `ai-product-builder` library). Unified from the
-> multiple project variants across the codebase. To adopt in a repo,
-> copy to `docs/QUALITY_ASSURANCE.md` and fill the `«placeholders»`.
+> **Canonical / source-of-truth copy** — vendored at `docs/ai-product-builder/RUNBOOK_QUALITY_ASSURANCE.md`
+> in every deployed repo (source of truth). Unified from the multiple project variants across the
+> codebase. Fill the `«placeholders»` in place via `/ai-init`.
 >
 > **Scope:** *what "good" means* and how we verify it. Run **repeatedly**,
 > especially before `scope/* → release/*`. Companion to

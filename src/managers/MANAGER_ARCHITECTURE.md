@@ -12,7 +12,7 @@
 > - `«DOMAIN_PATHS»` — where feature domains live (e.g. `src/domains/<d>/**`); used by the domain-boundary rules + CODEOWNERS.
 > - `.github/CODEOWNERS` — ownership map: one owner per `«DOMAIN_PATHS»` domain + the shared layer; backs the per-domain review requirement.
 >
-> **Pairs with:** `RUNBOOK_DATA_MODEL_GUIDE.md` (data-model detail) and `RUNBOOK_DECISION_LOG.md` (decision records) — boundary: this MANAGER owns *process* (create/verify/audit); the RUNBOOK owns *content shape*.
+> **Pairs with:** `RUNBOOK_DATA_MODEL_GUIDE.md` (data-model detail), `RUNBOOK_DECISION_LOG.md` (decision records), and `RUNBOOK_DOMAIN_ARCHITECTURE.md` (the mechanism — barrels, `/server` split, AST-audit script with the `ALLOWED` map, the ratchet, and the 4-file component convention). Boundary: this MANAGER owns *policy* (create/verify/audit); DOMAIN_ARCHITECTURE owns *mechanism*; DATA_MODEL_GUIDE owns *data-model content shape*.
 >
 > **Owns / defers to:** Owns the repository architecture map (stack, structure, boundaries, system flows). Defers: how code is written → `MANAGER_ENGINEERING_STANDARDS`; decision records → `MANAGER_DECISION_LOG`; deployment policy → `RUNBOOK_RELEASE_MANAGER`.
 
@@ -314,6 +314,8 @@ This is the **canonical** definition of how domains depend on each other. **REQU
 - Enforced by an import-boundary linter (e.g. `eslint-plugin-boundaries` or dependency-cruiser) as a **REQUIRED** CI gate (`boundaries`) — see `github-actions-minutes-workflow.md`.
 
 This is what makes domain-scoped testing (`RELEASE_MANAGER.md` §4.2) sound: if domains only touch each other through public barrels and never cycle, the set of domains affected by a change is computable from the diff, so scoping E2E to those domains cannot miss breakage.
+
+**Implementation** — the layout, the barrel + `/server` split, the AST-based audit script with the `ALLOWED` map + ratchet, the local ESLint rule, the 4-file component convention, and the reference implementations (`empatalk-app` 14 domains, `respect.click` 8 domains) are documented in [`DOMAIN_ARCHITECTURE.md`](./DOMAIN_ARCHITECTURE.md). Read it before writing the audit script — a text `grep` for `@/domains/x` false-flags comments and string literals.
 
 _________
 

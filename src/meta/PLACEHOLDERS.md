@@ -1,5 +1,19 @@
 # Placeholder glossary & conventions
 
+> **🔧 Reuse & local setup**
+>
+> Canonical copy — vendored at `docs/ai-product-builder/PLACEHOLDERS.md` (source of truth). Nothing in this file is filled per repo: it is the glossary the other docs' `«tokens»` are declared against.
+>
+> **Reusability:** template-ready — the token names, the two-kind rule and the deprecated-alias table are portable verbatim; a repo adds rows only when it coins a token no library doc already has.
+>
+> **Pairs with:** `MANAGER_INIT.md` (fills these interactively) and every layer doc's own `Local definitions to provide per repo` list. Boundary: this file says what a token **means**; MANAGER_INIT says how it gets **filled**; each doc says which ones **it** needs.
+>
+> **Owns / defers to:** Owns the canonical token names, the `«SCREAMING_SNAKE»` vs `«lowercase»` rule and the deprecated-alias table. Defers *the interactive fill flow, the answer file and secret handling* → `MANAGER_INIT.md`; *the slash-command surface* → `commands/ai-init.md`; *which tokens a given doc needs* → that doc's Reuse block.
+>
+> **Local definitions to provide per repo:** none.
+
+**Last reviewed:** «DATE»
+
 Canonical token names and fill conventions for **every template in this folder**. When
 you copy a doc into a repo, replace these `«tokens»`. Define the repeated ones **once**
 in the repo's `.claude/CLAUDE.md`, then each doc only needs its extra specifics.
@@ -128,60 +142,12 @@ appear in the deny-list. Keep literal subcommands **outside** the token —
 
 ## Init system (interactive bootstrap)
 
-Every layer doc carries a **"Local definitions to provide per repo"** list in its
-`🔧 Reuse & local setup` block. To fill these interactively instead of by hand:
+Owned by [`MANAGER_INIT.md`](./MANAGER_INIT.md), invoked as `/ai-init <DOC>`.
 
-```bash
-/ai-init RUNBOOK_RELEASE_MANAGER
-```
-
-(or invoke `MANAGER_INIT.md` against any doc — same flow, no slash command needed).
-
-The init tool:
-- **prompts only for `«SCREAMING_SNAKE»`** persistent tokens (skips `«lowercase»` inline-fill
-  and per-invocation tokens like `«DATE»` / `«X.Y.Z»`);
-- **persists answers** to **`.claude/ai-init.local.json`** (committed — repo facts, not
-  secrets);
-- is **diff-aware on re-run** — only prompts for newly-added tokens; never deletes existing
-  answers;
-- offers to **render a filled `docs/ai-product-builder/<NAME>.local.md`** when asked (default: no; co-located with the vendored template);
-- **refuses secrets** (`*_SECRET` / `*_KEY` / `*_PASSWORD` / `*_TOKEN` without `_ENV` suffix)
-  and routes them to `.env.local`.
-
-### Answer-file shape
-
-`.claude/ai-init.local.json`:
-
-```json
-{
-  "_version": 1,
-  "tokens": {
-    "PROJECT": "Acme",
-    "DOMAIN": "acme.app",
-    "NODE_VERSION": "22.15.1",
-    "PKG_MGR": "pnpm",
-    "QUALITY_CMD": "pnpm ci:quality",
-    "DB_CMS": "MongoDB + Payload",
-    "AUTH": "Firebase Auth",
-    "PAYMENTS": "Stripe",
-    "DEPLOY": "Vercel",
-    "LOCALES": "en, pl",
-    "TRUNK": "main",
-    "DOMAIN_PATHS": "src/domains/[^/]+",
-    "SHARED_PATHS": ".github/shared-paths.txt"
-  },
-  "_meta": {
-    "last_init": "2026-05-26",
-    "docs_rendered": []
-  }
-}
-```
-
-Token keys are **bare** (no `«»`). Guillemets only appear in templates.
-
-See **`MANAGER_INIT.md`** for the full spec (token classification, special tokens,
-file-backed bootstrap, anti-patterns).
-
+This file is the **glossary** — what each token means. How tokens get filled, where the
+answers are stored, what the tool refuses to prompt for and how a re-run behaves are all
+one document over there. Restating any of it here is how the init spec ended up in four
+files.
 
 ## Layering tokens (`RUNBOOK_CLAUDE_MD`)
 
@@ -192,3 +158,84 @@ Pairs with the existing `«DOMAIN_PATHS»` (where feature domains live).
 |---|---|---|---|
 | `«SHARED_LIB_PATH»` | repo | Where cross-cutting infrastructure lives — the directory that becomes a junk drawer if the layering rule isn't written down | src/lib |
 | `«DEEP_IMPORT_PATH»` | per-occurrence | One deliberate deep import / rule-break, declared **with its reason** in the exception table | @/lib/x/sub-entrypoint |
+
+## Landing-site + env-tier tokens (`RUNBOOK_LANDING_SITE_TEMPLATE`, `RUNBOOK_ENV_TIERED_ACCESS`, `RUNBOOK_ENV_EXAMPLE_TEMPLATE`)
+
+Used by the landing-site blueprint + the Tier-1/Tier-2 env access pattern + the `.env.example` tutorial pattern. Extracted from a portfolio-wide audit that found 8 sibling sites manually normalizing to an implicit blueprint. `repo` = one value per site.
+
+| Token | Kind | Meaning | Example |
+|---|---|---|---|
+| `«CI_FILE»` | repo | The workflow filename — the blueprint locks this at `.github/workflows/ci.yml` so README badges and audit reports stay portable | .github/workflows/ci.yml |
+| `«CMS»` | repo | CMS choice — one of `storyblok`, `sanity`, `payload`, `none-static` | storyblok |
+| `«CMS_SPACE_ID»` | repo | CMS project / space identifier — always in `.env.example`, never in `package.json` | 286732 |
+| `«CMS_ACCESS_TOKEN_ENV»` | repo | Server-only CMS token env-var name — split from the public bridge token; `import 'server-only'` gates it | STORYBLOK_ACCESS_TOKEN |
+| `«CMS_PUBLIC_TOKEN_ENV»` | repo | Public CMS bridge token env-var name — safe to inline; needed by the visual editor | NEXT_PUBLIC_STORYBLOK_PUBLIC_TOKEN |
+| `«CMS_HOST»` | repo | CMS API hostname for the scheduled probe | api.storyblok.com |
+| `«CMS_HEALTH_QUERY»` | repo | Real read query the scheduled probe hits (must exercise the actual read path, not a liveness ping) | https://api.storyblok.com/v2/cdn/stories/home?token=… |
+| `«PROBE_SCHEDULE»` | repo | Cron expression for `cms-probe.yml` | `0 7 * * *` |
+| `«ENV_EXAMPLE»` | repo | Path to the committed `.env` template that teaches WHY per var | .env.example |
+| `«ENV_TIER1_PATH»` | repo | The sole file allowed to read `process.env` (Tier-1, Zod-validated on boot) | src/constants/env.ts |
+| `«CONFIG_TIER2_PATH»` | repo | The typed config barrel every other file imports from | src/config/index.ts |
+| `«VALIDATOR»` | repo | Runtime schema library used in Tier-1 | zod |
+| `«INSTRUMENTATION_ENTRYPOINT»` | repo | Where the Tier-1 parse executes on process start (throws on missing env) | src/instrumentation.ts |
+| `«AUDIT_ENV_CMD»` | repo | Script that diffs `.env.example` against the Tier-1 schema | pnpm audit:env |
+| `«PAYMENTS_TEST_PREFIX»` / `«PAYMENTS_LIVE_PREFIX»` | repo | Provider-specific key prefixes the Tier-1 schema validates against | sk_test / sk_live |
+| `«PAYMENTS_KEY_PREFIX»` | repo | Either of the above — used when the schema accepts both (validated by `startsWith`) | sk |
+| `«RATE_LIMITER»` | repo | Rate-limit backend (typically Upstash Redis) referenced in `.env.example` traps | Upstash |
+
+## Webhook-ledger + legal-guard tokens (`RUNBOOK_WEBHOOK_IDEMPOTENCY_LEDGER`, `RUNBOOK_COMPILE_TIME_LEGAL_GUARDS`)
+
+Used by the shared webhook-events ledger pattern + the compile-time legal-boundary guard mechanism. `repo` kind unless noted.
+
+| Token | Kind | Meaning | Example |
+|---|---|---|---|
+| `«WEBHOOK_EVENTS_COLLECTION»` | repo | The shared ledger table/collection every inbound webhook claims through | webhook-events |
+| `«PROVIDERS»` | repo | Comma-list of providers routed through the ledger — used in per-provider prefixes | stripe, przelewy24, resend, slack |
+| `«PROVIDER»` | per-occurrence | One provider from `«PROVIDERS»` — the current handler's provider | stripe |
+| `«SLOW_PATH_MS»` | repo | Slow-path warning threshold — set below the provider's retry cliff (5s for Stripe's 10s cliff) | 5000 |
+| `«RECLAIM_INTERVAL_MIN»` | repo | How often the stale-claim reclaim cron runs | 10 |
+| `«STALE_THRESHOLD_MS»` | repo | Age above which a `claimed`/`processing` row is considered orphaned and reclaimable | 300000 |
+| `«GUARD_NAME»` | repo | Semantic name of a compile-time legal guard — one guard per boundary | NO_CUSTODY |
+| `«GUARD_SPEC_PATH»` | repo | The test file that runs the guard in CI | src/lib/server/no-custody/forbidden.static.spec.ts |
+| `«ALLOWLIST_PATH»` | repo | The small file listing intentional exceptions (each requires an ADR) | src/lib/server/no-custody/allowlist.ts |
+| `«JURISDICTION»` | repo | The legal regime a guard enforces — cited in each forbidden-entry rationale | PL / EU under PSD2 |
+
+## Doc-freshness probe tokens (`RUNBOOK_DOC_FRESHNESS_PROBES`)
+
+Used by the `<!-- probe:key -->…<!-- /probe -->` marker mechanism that regenerates numeric doc claims from code. `repo` kind.
+
+| Token | Kind | Meaning | Example |
+|---|---|---|---|
+| `«PROBE_SCRIPT»` | repo | The runner that scans docs, executes probes, and rewrites markers | scripts/tools/docs-audit.ts |
+| `«PROBE_REGISTRY»` | repo | The file mapping probe keys → queries (each query is a pure function of the repo) | scripts/tools/probes.ts |
+
+## Privacy + schema-first tokens (`RUNBOOK_PRIVACY_CONTRACT_TEST`, `RUNBOOK_SCHEMA_FIRST_GDPR_AVOIDANCE`)
+
+`repo` kind.
+
+| Token | Kind | Meaning | Example |
+|---|---|---|---|
+| `«INTEGRATION_TEST_DIR»` | repo | Where integration tests (real DB, no mocks) live | src/__integration__ |
+| `«TEST_DB_HARNESS»` | repo | Fixture that spins up + tears down a real DB per test | testcontainers / ephemeral MongoDB |
+| `«SCHEMA_PATH»` | repo | Where DB schema is defined (Payload collections, Prisma schema, Mongoose models) | src/payload/collections/*.ts |
+
+## Ops runbook tokens (`RUNBOOK_TRIAGE_TREE_RUNBOOK`)
+
+`repo` kind.
+
+| Token | Kind | Meaning | Example |
+|---|---|---|---|
+| `«OPS_RUNBOOK_PATH»` | repo | Where the operational (incident-triage) runbook lives | docs/RUNBOOK.md |
+| `«ESCALATION_ROSTER»` | repo | Where the on-call / escalation contact list lives | docs/ESCALATION.md |
+
+## Portfolio-lessons skill tokens (`SKILL_RATIONALE_COMMENTS`, `SKILL_LAYOUT_NOT_PAGE_SINGLETONS`, `SKILL_EPHEMERAL_CREDENTIALS_ON_STDIN`)
+
+`repo` kind unless noted.
+
+| Token | Kind | Meaning | Example |
+|---|---|---|---|
+| `«DENY_LIST_FILE»` | repo | The file holding a `NEVER_CACHE` / forbidden-tokens / any allow-or-deny list — used in rationale-comment examples | src/domains/shared/never-cache.ts |
+| `«LAYOUT_PATH»` | repo | The route-tree layout file that will hold a singleton whose second construction throws | app/(shell)/layout.tsx |
+| `«SINGLETON_PRIMITIVE»` | repo | The specific primitive that throws on second construction in this codebase | AudioContext.createMediaElementSource |
+| `«CREATE_USER_CMD»` | repo | The CLI command that mints the break-glass / bootstrap account | pnpm create:user --can-push |
+| `«RUNTIME»` | repo | The runtime the CLI executes under (used only to pick a recipe) | Node |

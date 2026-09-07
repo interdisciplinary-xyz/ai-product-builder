@@ -196,6 +196,39 @@ Please identify:
 - tokens used in the doc body but NOT in the Reuse-block list → potential doc drift; report to user; pair with `MANAGER_DOC_FRESHNESS`.
 - secret-shaped tokens being asked → refuse and route to `.env.local`.
 
+### The answer file
+
+`.claude/ai-init.local.json` is committed — it holds repo facts, not secrets.
+
+```json
+{
+  "_version": 1,
+  "tokens": {
+    "PROJECT": "Acme",
+    "NODE_VERSION": "24.9.0",
+    "PKG_MGR": "pnpm",
+    "QUALITY_CMD": "pnpm ci:quality",
+    "DB_CMS": "MongoDB + Payload",
+    "TRUNK": "main",
+    "DOMAIN_PATHS": "src/domains/[^/]+"
+  },
+  "_meta": { "last_init": "«DATE»", "docs_rendered": [] }
+}
+```
+
+Token keys are **bare** — no guillemets. Guillemets appear only in templates.
+
+### Two behaviours that are easy to get wrong
+
+- **Diff-aware on re-run.** A second run prompts only for tokens added since the last
+  one. It never deletes an existing answer and never re-asks a question already
+  answered — otherwise nobody runs it twice, and the answer file rots on the first
+  doc that gains a token.
+- **Refuses secrets.** A token matching `*_SECRET` / `*_KEY` / `*_PASSWORD` / `*_TOKEN`
+  (without an `_ENV` suffix) is never prompted for and never written to the answer
+  file; it is routed to `.env.local`. The answer file is committed, so one prompted
+  secret is a secret in git history.
+
 _________
 
 OUTPUT FORMAT

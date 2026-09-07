@@ -12,9 +12,10 @@ Keep this file short. If a section grows past ~15 lines, either prune it or move
 >
 > **Reusability:** template-ready — every section below is generic; only the `«placeholders»` need per-repo values. Define the **canonical tokens** (e.g. `«PROJECT»`, `«DOMAIN»`, `«NODE_VERSION»`, `«PKG_MGR»`, `«QUALITY_CMD»`, `«DB_CMS»`, `«AUTH»`, `«PAYMENTS»`, `«DEPLOY»`, `«OBSERVABILITY»`, `«AI_PROVIDER»`, `«TRUNK»`) **once here** — every other doc in the `ai-product-builder` library reads them from this file rather than restating them.
 >
-> **Additional local definitions** for the layering + exception tables below:
+> **Local definitions to provide per repo** — for the layering + exception tables below:
 > - `«SHARED_LIB_PATH»` — where cross-cutting infrastructure lives (e.g. `src/lib`) — the directory that becomes a junk drawer if the layering rule isn't written down
 > - `«DEEP_IMPORT_PATH»` — one row per deliberate deep import / rule-break, with its reason
+> - `«ENV_VALIDATION_PATH»` — where env vars are parsed and validated (e.g. `src/lib/env.ts`), so the agent edits the schema rather than reading `process.env` directly
 >
 > **Pairs with:** the rest of the repo's `docs/*` — this file is the index, not the source of truth, for any topic it mentions. Also pairs with [`PERMISSIONS_AND_AUTONOMY.md`](./PERMISSIONS_AND_AUTONOMY.md) + `.claude/settings.json`: this file tells the agent what is **true**; that pair tells it what it may **do**.
 
@@ -153,6 +154,24 @@ Only the commands a contributor or agent runs **daily**. Anything used once per 
 «E2E_CMD»              # e2e tests (Playwright / Cypress / …)
 «BUILD_CMD»            # production build (catches server-only / barrel-leak issues)
 ```
+
+## Branching
+
+Four lines, because this is the file an agent loads before it opens a terminal — and an agent that
+does not know the flow will branch off `«TRUNK»` and open a PR straight at it.
+
+```
+scope/vX.Y.Z  →  release/vX.Y.Z  →  «TRUNK»
+```
+
+- Work happens on `scope/vX.Y.Z`. Post-scope fixes are `fix/<slug>`; production emergencies are `hotfix/<slug>`.
+- PR titles are `«PROJECT» - <branch-name>` — e.g. `«PROJECT» - scope/vX.Y.Z`.
+- Commits are Conventional Commits: `type(scope): description`.
+- Never commit directly to `«TRUNK»`.
+
+Every string shape above is owned by [`NAMING_CONVENTIONS.md`](./NAMING_CONVENTIONS.md) §1; the
+reason the flow has two stages is in [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §1. This section
+is a pointer, not a second copy — if it disagrees with those two, they win.
 
 ## Architecture
 

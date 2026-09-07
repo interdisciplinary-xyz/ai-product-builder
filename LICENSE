@@ -1,0 +1,16 @@
+Copyright (c) 2026 Michał Dopieralski / interdisciplinary-xyz
+
+All rights reserved.
+
+This library is published for reference. No licence to use, copy, modify,
+merge, publish, distribute, sublicense or sell copies of it is granted, and
+no such licence should be inferred from the repository being readable.
+
+This file records the position the project already states in its own footer;
+it grants nothing new and withholds nothing new. Absent a licence, copyright
+law reserves these rights by default — the file exists so a reader does not
+have to infer that.
+
+To open the library up, replace this file with the full text of the chosen
+licence (MIT and Apache-2.0 are the conventional choices for a template
+library) and say so in README.md.

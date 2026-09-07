@@ -11,7 +11,8 @@
 > **Local definitions to provide per repo** (replace the product content; define product facts in the repo's `.claude/CLAUDE.md` or fill them inline):
 > - `«NODE_VERSION»` / `«PKG_MGR»` — Node version (`nvm use`) and package manager (npm/pnpm/yarn)
 > - `«DEV_COMMANDS»` (concept group) — install + dev-server commands; expands to the body token `«LOCAL_URLS»` (the local web/admin URLs and ports, incl. any local-domain wrapper)
-> - `«BRANCH_STRATEGY»` (concept group) — branch model + commit convention; expands to body tokens `«MAIN_BRANCH»`, `«FEATURE_BRANCH_PATTERN»`, `«COMMIT_CONVENTION»`, `«COMMIT_LINT_TOOL»`
+> - `«TRUNK»` — inherited from core tokens. The branch, PR-title and commit shapes are NOT tokens here: they are owned by `NAMING_CONVENTIONS.md` §1 and this doc links to them
+> - `«COMMIT_LINT_TOOL»` — the tool that enforces those shapes (e.g. commitlint)
 > - `«GIT_HOOKS»` (concept group) — pre-commit / pre-push behavior; expands to the body tokens `«GIT_HOOKS_PRECOMMIT»` (lint-staged, commitlint) and `«GIT_HOOKS_PREPUSH»` (test gates)
 > - `«CI_CHECKS»` — what each PR runs (unit, type, E2E, perf)
 > - `«LINT_CONFIG»` (concept group) — linter/formatter setup; expands to body tokens `«LINT_PRESET»`, `«LINT_KEY_RULES»`, `«LINT_STAGED_TOOL»`
@@ -39,12 +40,19 @@
 
 ### Branch Strategy
 
-«BRANCH_STRATEGY»
-(what to write here: the branch model and commit convention, e.g.:)
+**Owned by [`NAMING_CONVENTIONS.md`](./NAMING_CONVENTIONS.md) §1.** Do not restate the branch
+model here. This section names only what is repo-local — where the trunk points and which
+optional prefixes this team allows — and links out for every string shape.
 
-- `«MAIN_BRANCH»` -- production-ready code
-- `«FEATURE_BRANCH_PATTERN»` -- feature branches (merge to main via PR)
-- «COMMIT_CONVENTION» -- e.g. conventional commits `type(scope): description`
+- Trunk: `«TRUNK»`
+- Branch, PR-title, commit, merge-commit and tag shapes: [`NAMING_CONVENTIONS.md`](./NAMING_CONVENTIONS.md) §1 cheatsheet
+- Why work flows `scope/vX.Y.Z → release/vX.Y.Z → «TRUNK»`: [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §1
+
+This section used to carry its own model — a MAIN_BRANCH / FEATURE_BRANCH_PATTERN pair (written
+as placeholders) describing feature branches merged straight to main. That is GitHub Flow, it
+contradicts the scope → release → trunk flow the rest of the library documents, and neither
+placeholder was declared in `PLACEHOLDERS.md`. A repo set up from this playbook and a repo set up
+from RELEASE_MANAGER ended up on two different branch models.
 
 ### Before Committing
 
