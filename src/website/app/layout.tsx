@@ -101,6 +101,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
+        {/* First child on purpose. It seeds the favorites store during render,
+            and SiteNav's count reads that store — so if the hydrator came after
+            the masthead, the first page each static-export worker rendered saw
+            an unseeded store and shipped no count. That was 9 of 171 pages, a
+            different 9 on every build. */}
+        <FavoritesHydrator initial={favorites} />
         <a className="skip" href="#main">
           Skip to content
         </a>
@@ -117,7 +123,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main">{children}</main>
 
         <CommandPalette jumps={defaultJumps()} />
-        <FavoritesHydrator initial={favorites} />
         <DevBar version={version} files={total} />
 
         <footer className="colophon">

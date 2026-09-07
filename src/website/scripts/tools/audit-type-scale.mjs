@@ -55,8 +55,25 @@ const raw_source = fs.readFileSync(STYLESHEET, 'utf8');
  */
 const source = raw_source.replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '));
 
-/** The `:root` block declares the scale; everything after it must use it. */
-const rootEnd = source.indexOf('\n}', source.indexOf(':root {'));
+/**
+ * The `:root` block declares the scale; everything after it must use it.
+ *
+ * Fail loudly if it is not there. `indexOf` returns -1 for a missing `:root {`,
+ * and `slice(0, -1)` / `slice(-1)` are both perfectly valid — so a renamed or
+ * reformatted block would not crash, it would silently check the last character
+ * of the file against an empty scale and report every declaration as a
+ * violation, or none.
+ */
+const rootStart = source.indexOf(':root {');
+if (rootStart === -1) {
+  console.error(`\n${STYLESHEET}: no \`:root {\` block — the type scale is declared there.`);
+  process.exit(2);
+}
+const rootEnd = source.indexOf('\n}', rootStart);
+if (rootEnd === -1) {
+  console.error(`\n${STYLESHEET}: \`:root {\` is never closed by a \`\\n}\` — cannot read the scale.`);
+  process.exit(2);
+}
 const declarations = source.slice(rootEnd);
 
 const scale = new Map();

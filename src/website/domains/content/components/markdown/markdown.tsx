@@ -1,9 +1,17 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
 import { Link } from '@/domains/ui';
-import { remarkTokens, textOf, decodeHref, resolveHref, TOKEN_HREF } from './markdown.constants';
+import {
+  remarkTokens,
+  textOf,
+  decodeHref,
+  resolveHref,
+  TOKEN_HREF,
+  SANITIZE_SCHEMA,
+} from './markdown.constants';
 
 export function Markdown({
   content,
@@ -19,7 +27,7 @@ export function Markdown({
     <div className="prose">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkTokens]}
-        rehypePlugins={[rehypeRaw, rehypeSlug]}
+        rehypePlugins={[rehypeRaw, [rehypeSanitize, SANITIZE_SCHEMA], rehypeSlug]}
         components={{
           a({ href, children, ...props }) {
             if (!href) return <span {...props}>{children}</span>;

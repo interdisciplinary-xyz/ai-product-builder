@@ -1,6 +1,6 @@
 'use client';
 
-import { Link } from '@/domains/ui';
+import { Link, accentStyle } from '@/domains/ui';
 import { FavoriteButton } from '../favorite-button';
 import { useFavorites } from '../../use-favorites';
 import type { FavoriteGroup } from '../../types';
@@ -69,9 +69,14 @@ export function FavoriteList({ groups }: { groups: FavoriteGroup[] }) {
           </h2>
           <ul className="favlist">
             {group.rows.map((row) => (
-              <li key={row.key} data-layer={row.tone} data-topic={row.tone}>
+              <li
+                key={row.key}
+                data-layer={row.tone}
+                data-topic={row.tone}
+                style={accentStyle(row.accent)}
+              >
                 <Link href={row.href} className="favlist__doc">
-                  <span className="favlist__icon">{row.icon}</span>
+                  {row.icon ? <span className="favlist__icon">{row.icon}</span> : null}
                   <span className="favlist__main">
                     <span className="favlist__name mono">{row.name}</span>
                     {row.description ? (

@@ -30,12 +30,13 @@ repo actually gets.
 ```
 src/
 ├── managers/    25  MANAGER_*.md  ──▶  docs/MANAGER_*.md              (prefix kept)
-├── runbooks/    76  RUNBOOK_*.md  ──▶  docs/*.md                      (prefix STRIPPED)
+├── runbooks/    79  RUNBOOK_*.md  ──▶  docs/*.md                      (prefix STRIPPED)
 ├── meta/         1  PLACEHOLDERS  ──▶  docs/PLACEHOLDERS.md
 ├── commands/    11  slash-commands ─▶  .claude/commands/*.md
-├── skills/       8  SKILL_*.md    ──▶  .claude/skills/<name>/SKILL.md  + docs/SKILL_*.md
+├── skills/      12  SKILL_*.md    ──▶  .claude/skills/<name>/SKILL.md  + docs/SKILL_*.md
 ├── agents/       5  AGENT_*.md    ──▶  .claude/agents/<name>.md
-├── scripts/      2  calculators   ──▶  run in place
+├── scripts/      4  2 calculators ──▶  run in place
+│                    + README + example fixture
 └── config/       1  settings      ──▶  .claude/settings.json
 ```
 

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { Accent } from '@/domains/ui';
 
 /**
  * `<group>/<id>` — `runbooks/e2e` for a document, `topics/setup` for a
@@ -21,8 +22,15 @@ export type FavoriteRow = FavoriteItem & {
   /** Right-hand label: the layer for a document, "Scenario" for a topic. */
   tag?: string | null;
   icon?: ReactNode;
-  /** Written out as data-layer, which is what the stylesheet keys on. */
+  /** Written out as data-layer/data-topic, which is what the stylesheet keys on. */
   tone?: string;
+  /**
+   * The light/dark pair `--layer` resolves from. Without it `tone` sets the
+   * attribute, the resolver reads an undefined `--layer-light`, and every row
+   * falls back to the house accent — so the attribute looked like it was
+   * working and did nothing.
+   */
+  accent?: Accent;
 };
 
 /** One heading's worth of rows on /favorites. */

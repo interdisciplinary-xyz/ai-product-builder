@@ -3060,8 +3060,4 @@ main:focus {
   justify-content: space-between;
   gap: 1rem;
 }
-/* A scenario row has no glyph; the cell still holds its width so names line up
-   with the documents below. */
-.favlist__icon:empty {
-  width: 1em;
-}
+

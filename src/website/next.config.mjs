@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { PHASE_PRODUCTION_BUILD } from 'next/constants.js';
 
 /** @type {import('next').NextConfig} */
@@ -6,8 +7,11 @@ const nextConfig = {
   images: { unoptimized: true },
   // This repo carries its own agent conventions; don't scatter generated ones.
   agentRules: false,
-  // The library lives two levels up; Next needs to know files outside the app dir are read.
-  outputFileTracingRoot: process.cwd(),
+  // The library lives two levels up and the site reads it at build time, so
+  // tracing has to root there — process.cwd() is the website package, which
+  // would omit exactly the files this app depends on if a non-export build
+  // ever relied on tracing.
+  outputFileTracingRoot: path.join(process.cwd(), '..', '..'),
   // Portless serves dev over https://ai-product-builder.local — a cross-origin
   // dev host, which Next blocks unless it is named here. See RUNBOOK_DEV_PORTLESS.
   allowedDevOrigins: [

@@ -344,6 +344,7 @@ if offenders:
 import re as _re
 _layers = ("managers", "runbooks", "commands", "skills", "agents", "scripts", "config", "meta")
 _real = {d: len([f for f in (src / d).rglob("*") if f.is_file()]) for d in _layers}
+_contrib_path = (root / "CONTRIBUTING.md")
 _readme = (root / "README.md")
 if _readme.exists():
     _t = _readme.read_text()
@@ -356,6 +357,16 @@ if _readme.exists():
         for _m in _re.finditer(rf'`src/{_d}`[^\n]*?\((\d+) items\)', _t):
             if int(_m.group(1)) != _n:
                 print(f"  README.md: {_d} claims {_m.group(1)} items, tree has {_n}")
+
+# CONTRIBUTING's repo-layout tree, `├── runbooks/    76  RUNBOOK_*.md`. A fourth
+# shape, inside a fenced block, which the three patterns above all missed — found
+# in review, not by this check.
+if _contrib_path.exists():
+    _ct = _contrib_path.read_text()
+    for _d, _n in _real.items():
+        for _m in _re.finditer(rf'[├└]──\s+{_d}/\s+(\d+)\s', _ct):
+            if int(_m.group(1)) != _n:
+                print(f"  CONTRIBUTING.md: layout diagram says {_d}/ {_m.group(1)}, tree has {_n}")
     _total = sum(_real.values())
     for _m in _re.finditer(r'[Aa]ll (\d+) files', _t):
         if int(_m.group(1)) != _total:

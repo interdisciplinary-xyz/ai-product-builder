@@ -27,6 +27,7 @@ export default function FavoritesPage() {
         href: `/topics/${topic.id}/`,
         tag: `${counts[topic.id]} files`,
         tone: topic.id,
+        accent: topic,
       })),
     },
     {
@@ -40,6 +41,7 @@ export default function FavoritesPage() {
           href: docHref(doc),
           tag: LAYER_BY_ID.get(doc.layer)?.label ?? doc.layer,
           tone: doc.layer,
+          accent: LAYER_BY_ID.get(doc.layer),
           icon: <LayerIcon layer={doc.layer} />,
         })),
     },

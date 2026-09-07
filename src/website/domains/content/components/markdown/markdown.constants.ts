@@ -1,4 +1,5 @@
 import type { Root, RootContent } from 'mdast';
+import { defaultSchema } from 'rehype-sanitize';
 
 /* ---------------------------------------------------------------------------
    remark plugin: «PLACEHOLDER» tokens
@@ -78,3 +79,26 @@ export function resolveHref(href: string, map: Record<string, string>): string |
   const route = map[base];
   return route ? `${route}${hash ? `#${hash}` : ''}` : null;
 }
+
+/* --------------------------------------------------------------- sanitize */
+
+/**
+ * `rehypeRaw` turns raw HTML in a document into real elements. The corpus is
+ * repo-controlled and contains nothing script-capable today — verified — but
+ * "the content is ours" is a claim about the past. One merged doc carrying
+ * `<img src=x onerror=…>` would become XSS on every reader's browser, and
+ * nothing in the pipeline would have objected.
+ *
+ * So sanitize after raw and before slug: slug has to see the final headings.
+ * The schema is rehype's default plus the one element this site injects
+ * itself — the «PLACEHOLDER» marker from remarkTokens — and the `id` that
+ * rehype-slug adds to headings.
+ */
+export const SANITIZE_SCHEMA = {
+  ...defaultSchema,
+  attributes: {
+    ...defaultSchema.attributes,
+    span: [...(defaultSchema.attributes?.span ?? []), ['className', 'token'], 'title'],
+    '*': [...(defaultSchema.attributes?.['*'] ?? []), 'id'],
+  },
+};
