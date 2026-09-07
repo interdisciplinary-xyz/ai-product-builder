@@ -42,9 +42,17 @@ Canonical copy — vendored at `docs/ai-product-builder/RUNBOOK_PULL_REQUEST_TEM
   Examples: «PROJECT» - scope/v1.35.0
             «PROJECT» - release/v1.35.0
             «PROJECT» - fix/<slug>
+            «PROJECT» - hotfix/<slug>
 
   «PROJECT» is the repo's human short name (e.g. empatalk, respect.click, savei, onestpromo),
-  not the full GitHub owner/repo path. Rule + rationale: RUNBOOK_RELEASE_MANAGER.md §1 rule 4.
+  not the full GitHub owner/repo path.
+
+  All naming — branches, PR titles, commit messages, merge-commit titles, tags, and the
+  commitlint config that enforces them (including the promotion-squash regex carve-out) — is
+  in ONE place: `NAMING_CONVENTIONS.md` §1 cheatsheet. If any of the below drifts from that
+  runbook, that runbook wins.
+
+  Rule + rationale: `RUNBOOK_RELEASE_MANAGER.md` §1 rule 4.
 -->
 
 ## Summary
