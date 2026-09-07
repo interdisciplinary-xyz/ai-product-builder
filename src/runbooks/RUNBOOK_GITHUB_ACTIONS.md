@@ -289,9 +289,144 @@ After migrating from the old split workflows (`[CI] Quality + Vitest Unit`, `[CI
 - **Rework cost** — skipping CI on scope shifts responsibility to local runs before merge to `release/**`.
 - **`fix/*` into `release/**`** — still runs full CI unless you adopt scope naming or extend skip rules.
 
+## Transient-failure tolerance (network flakes, floating versions, prettier drift)
+
+Three failure modes look identical on the PR check card and are not the same failure:
+a real regression, a transient network flake, and a version drift. Left as-is they train
+the team to "just re-run" every red check — after which a real bug wearing the same colour
+ships. See [`SKILL_CI_TRANSIENT_FAILURE_TOLERANCE.md`](./SKILL_CI_TRANSIENT_FAILURE_TOLERANCE.md)
+for the full doctrine; this section is the CI implementation.
+
+### npm-audit retry loop
+
+`«PKG_MGR» audit` hits the npm registry endpoint (`registry.npmjs.org/-/npm/v1/security/audits`),
+which is not a nine-nines service. A single `ECONNRESET` fails the step, fails the check, and
+re-running is the only path to green.
+
+Wrap every audit step in a bounded (≤5) retry loop with 30-second backoff:
+
+```yaml
+- name: Audit dependencies (retry on transient network failure)
+  run: |
+    for attempt in 1 2 3 4 5; do
+      echo "audit attempt $attempt"
+      if «PKG_MGR» audit --prod --audit-level=high; then
+        exit 0
+      fi
+      echo "attempt $attempt failed; sleeping 30s"
+      sleep 30
+    done
+    echo "audit failed 5 times; treating as real"
+    exit 1
+```
+
+**A real vuln still fails deterministically on every attempt** — the loop still exits 1 and
+the check still goes red. What the loop absorbs is the socket-timeout class, which succeeds
+on attempt 2 or 3.
+
+If you want the retry to be *provably* targeted at network errors, grep the output for the
+transient-error signature before sleeping:
+
+```bash
+if ! echo "$out" | grep -qE 'ECONNRESET|ETIMEDOUT|socket hang up|EAI_AGAIN|network timeout|Failed to fetch'; then
+  echo "non-network failure — real"
+  exit 1
+fi
+```
+
+Apply the same shape to any registry-touching step: `«PKG_MGR» install --frozen-lockfile`,
+`npm publish`, `npm view`.
+
+### `@lhci/cli` pinning
+
+**Never invoke `@lhci/cli` at `@X.Y.x` or naked `npx @lhci/cli`.** `0.13.x` (and similarly
+floating patches) resolved to a version that wedges on dev-server startup — the failure
+was a hang, not a message, which consumed the entire runner timeout before failing.
+
+Pin to a specific `x.y.z`:
+
+```yaml
+- name: Lighthouse
+  run: npx @lhci/cli@«LHCI_VERSION» autorun     # e.g. @lhci/cli@0.13.0
+```
+
+Or install into devDeps: `"@lhci/cli": "«LHCI_VERSION»"` — same effect, one file to bump.
+
+If the underlying wedge is architectural (dev-server startup, Chrome launch), mark the whole
+Lighthouse job **advisory** so it never blocks a merge — but only if the job is advisory by
+design (perf gates ratchet in a separate workflow — see [`MANAGER_PERFORMANCE.md`](./MANAGER_PERFORMANCE.md)):
+
+```yaml
+- name: Lighthouse (advisory — never blocks merge)
+  timeout-minutes: 10
+  continue-on-error: true
+  run: |
+    timeout 600 npx @lhci/cli@«LHCI_VERSION» autorun || {
+      echo "::warning::Lighthouse advisory job did not finish — see run logs"
+      exit 0
+    }
+```
+
+Name the job `Lighthouse (advisory)` so the check-runs UI is honest about what green means.
+Pair `continue-on-error: true` only with names that carry `(advisory)`; a blocking gate with
+`continue-on-error: true` is a lie.
+
+Schedule a monthly renovate/dependabot bump PR for the pinned tool, gated on the same
+Lighthouse run — that is the cheap check that keeps the pin honest.
+
+### Prettier version alignment
+
+Pre-commit's `prettier --write` and CI's `prettier --check` produce **different output** if
+their versions differ. Markdown tables are the classic case: column-alignment rules changed
+between minor versions, and the diff on the failed CI run is columns of spaces nobody typed.
+Every PR carrying a table needs a "fix formatting" commit before green.
+
+Pin `prettier` in `devDependencies` to an exact version:
+
+```json
+{
+  "devDependencies": {
+    "prettier": "«PRETTIER_VERSION»"
+  }
+}
+```
+
+Invoke it via `«PKG_MGR» exec prettier` in both pre-commit AND CI — **never bare `prettier`**,
+which resolves to whatever is on the PATH first (corepack cache, `npm-global`, Homebrew):
+
+```yaml
+# .github/workflows/ci.yml
+- run: «PKG_MGR» install --frozen-lockfile
+- run: «PKG_MGR» exec prettier --check "**/*.md" "**/*.{ts,tsx,json,yml,yaml}"
+```
+
+```bash
+# .husky/pre-commit (or lint-staged config)
+«PKG_MGR» exec prettier --write --list-different "**/*.md"
+```
+
+Verify alignment by running the CI's exact command locally on a fresh install:
+
+```bash
+«PKG_MGR» install --frozen-lockfile
+«PKG_MGR» exec prettier --check "**/*.md"    # zero diffs = versions aligned
+```
+
+### The proof obligation
+
+The full skill (`SKILL_CI_TRANSIENT_FAILURE_TOLERANCE.md`) names three proof obligations:
+
+1. **The retry loop still fails** when the underlying failure is real (add a package with a
+   known high-severity advisory, watch the workflow fail on every attempt and exit 1).
+2. **`@lhci/cli` versions are pinned** — `grep -rE '@lhci/cli@\d+\.\d+\.(x|\d+)' .github/workflows/ package.json`
+   should return zero matches ending in `.x`.
+3. **Prettier is aligned** — `«PKG_MGR» exec prettier --check "**/*.md"` produces zero diffs
+   on a fresh CI-equivalent install.
+
 ## Related docs
 
 - Release policy (POLICY doc this implementation enacts): [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md)
+- Retry / pin / advisory doctrine: [`SKILL_CI_TRANSIENT_FAILURE_TOLERANCE.md`](./SKILL_CI_TRANSIENT_FAILURE_TOLERANCE.md)
 - Current release: «CURRENT_RELEASE_DOC»
 - CI env placeholders: [`.github/ci.env`](../.github/ci.env)
 - Local dev / Portless: [`DEV_PORTLESS.md`](./DEV_PORTLESS.md)

@@ -1,9 +1,9 @@
 # RELEASE_MANAGER.md — Release workflow & CI cost-control policy
 
-> **Canonical / source-of-truth copy** (lives in the `ai-product-builder` library). Unified from the
-> multiple project variants across the codebase. To adopt in a repo,
-> copy to `docs/RELEASE_MANAGER.md` and fill the `«placeholders»`. **Where this
-> template and a repo's *verified* CI config disagree, the verified config wins.**
+> **Canonical / source-of-truth copy** — vendored at `docs/ai-product-builder/RUNBOOK_RELEASE_MANAGER.md`
+> in every deployed repo (source of truth). Unified from the multiple project variants across the
+> codebase. Fill the `«placeholders»` in place via `/ai-init`. **Where this template and a repo's
+> *verified* CI config disagree, the verified config wins.**
 >
 > **Scope:** how work moves from implementation to production, and how we keep
 > GitHub Actions spend low while still gating «TRUNK». Companion to
@@ -46,26 +46,115 @@ only on the release-line PR into «TRUNK» (plus the post-merge safety net).
 ## 1. Staged branch workflow
 
 ```text
-scope/*     → implementation + cheap LOCAL validation (cloud CI skipped on purpose)
-release/*   → staging: cloud CI + E2E + preview; release-readiness gate
-«TRUNK»     → validated, production-ready code only (e.g. main)
+scope/vX.Y.Z    → implementation + cheap LOCAL validation (cloud CI skipped on purpose)
+release/vX.Y.Z  → staging: cloud CI + E2E + preview; release-readiness gate
+«TRUNK»         → validated, production-ready code only (e.g. `main` / `master`)
 ```
 
-Optional middle layer (repos that track one-issue-one-PR, e.g. monorepos):
-
-```text
-feat/<#>-slug | fix/<#>-slug   → one issue → one branch, cut from latest release/*
-```
-
-**Naming convention:** `scope/vX.Y.Z` → `release/X.Y.Z` (or `release/vX.Y.Z`) → «TRUNK» (e.g. main).
-The CI guards key off the `scope/` and `release/**` prefixes, so a `v` asymmetry is
-harmless — but pick one pattern per repo and stay consistent. A legacy `prerelease/*`
-prefix may exist; prefer `scope/*` for new aggregate work.
+**Naming convention:** `scope/vX.Y.Z` → `release/vX.Y.Z` → «TRUNK». **Both branches carry the
+`v` prefix.** The CI guards key off the `scope/` and `release/**` prefixes, so an old repo with
+a `release/X.Y.Z` (no-`v`) history is not broken — but the convention going forward is
+`v` on both. A legacy `prerelease/*` prefix may exist; prefer `scope/*` for new aggregate work.
 
 **Hard rules**
-1. **Never** merge `scope/*` directly into «TRUNK». Scope always targets its `release/*`.
-2. Implementation (`feat/*`/`fix/*`) branches start from the **latest `release/*`**.
-3. The `release/* → «TRUNK»` merge is a **single approved PR**, **merged manually by the maintainer** — automation must not merge to «TRUNK».
+
+1. **Always work on the current `scope/vX.Y.Z` branch.** Commit implementation, review, and
+   AI-assisted iteration directly to scope — do **not** spin up per-change `feat/*`/`fix/*`
+   sub-branches that PR back into scope. The review gate is the `scope → release` PR (and
+   later `release → main`), not a fan-out of intra-cycle PRs. This keeps history linear and
+   avoids the stacked-PR churn intra-scope branches create.
+2. **If the repo runs E2E tests in CI, `scope/vX.Y.Z` MUST target `release/vX.Y.Z`.** Never
+   merge `scope/*` directly into «TRUNK» in such a repo. Cheap checks run locally on scope; E2E
+   and the rest of paid cloud CI run on the release-line PR (see §3–§4). Repos that run **no**
+   cloud E2E on PR MAY promote `scope/*` directly to «TRUNK», but the `release/*` layer is still
+   recommended once any paid CI exists.
+3. **`release/vX.Y.Z` MUST target «TRUNK».** The `release/* → «TRUNK»` merge is a **single
+   approved PR**, **merged manually by the maintainer** — automation must not merge to «TRUNK».
+4. **PR titles MUST be `«PROJECT» - <branch-name>`.** e.g. `«PROJECT» - scope/v1.35.0` for a
+   PR from branch `scope/v1.35.0`; `«PROJECT» - release/v1.35.0` for its release PR; `«PROJECT»
+   - fix/<slug>` for a post-scope fix. The `«PROJECT»` prefix is the **human short name** of the
+   repo (e.g. `empatalk`, `respect.click`, `savei`, `onestpromo`) — NOT the full GitHub repo
+   path (`interdisciplinary-xyz/empatalk-app` → `empatalk`, not the org/repo). The `-` separator
+   is a literal space-dash-space. This format puts the branch name at the visible position of
+   the browser tab title (`«PROJECT» - scope/v1.35.0 · Pull Request #… · …`) so an author with a
+   row of PR tabs open can pick one out at a glance. What changed belongs in the PR body — the
+   changelog is generated from Conventional-Commit messages, so the title carries no changelog
+   burden. **The exact shapes for commit messages, merge-commit titles, tags, and the
+   commitlint config that enforces them (including the load-bearing promotion-squash regex
+   carve-out) all live in [`NAMING_CONVENTIONS.md`](./NAMING_CONVENTIONS.md).**
+
+**Post-scope fixes (the one exception to rule 1).** Once `scope/vX.Y.Z` is merged/closed and
+only `release/vX.Y.Z` (with its open PR) remains for the current cycle, a further isolated fix
+MAY land on a short `fix/*` branch that PRs into `release/vX.Y.Z` — so a release-stage fix
+stays reviewable on its own without reopening scope. This is the only case where a per-change
+branch is allowed during a release cycle. **Hotfixes** applied directly to «TRUNK» (`hotfix/*`)
+must be merged back **down** into the active `release/*` (and `scope/*`, if open) to prevent
+divergence.
+
+---
+
+### 1.1 Docs branches — `docs/readme.md`
+
+**README-only work lives on a stable `docs/readme.md` branch, one per repo, portfolio-wide.**
+This is not a `scope/*` cycle — it is an ambient docs sweep that runs concurrently with active
+scope work. The convention is dotted, lowercase, verbatim: `docs/readme.md`.
+
+**Why a dedicated branch, not a `fix/readme-…` slug per change:**
+
+- README work is high-frequency and low-risk (no code, no CI cost — `paths-ignore` skips it).
+- One branch per repo means one PR per repo, portfolio-wide — the fleet stays trivially navigable.
+- The branch name is the docs "signal" — a `gh pr list` across the org filtered by
+  `head:docs/readme.md` returns exactly the docs-sweep queue.
+- The PR merges, stays open, or re-opens without ambiguity — there is no "which docs branch was that."
+
+**Rules**
+
+1. **Never work on `docs/readme.md` from the user's active scope worktree if it is dirty.**
+   The user's uncommitted work on `scope/vX.Y.Z` MUST NOT be disturbed. Use a **git worktree**
+   from `origin/main`:
+
+   ```bash
+   git fetch origin
+   git worktree add scratchpad/«REPO»-docs -B docs/readme.md origin/main
+   cd scratchpad/«REPO»-docs
+   # …edit README.md, commit…
+   git push --force-with-lease origin docs/readme.md
+   cd -
+   git worktree remove scratchpad/«REPO»-docs
+   ```
+
+   The worktree is disposable; the branch is the artifact. Cleanup only after the PR is opened.
+
+2. **`--force-with-lease`, not `--force`.** The docs branch is shared across sessions — a bare
+   `--force` clobbers a push you did not see. `--force-with-lease` refuses if the remote moved,
+   which is the correct failure mode for a shared branch. If it refuses, `git fetch` and
+   rebase before re-pushing.
+
+3. **Reconciling divergent docs branches.** If a docs branch has drifted from another (e.g.
+   `docs/readme.md` is a stale template push and `docs/readme-template-fixes` carries the real
+   work), realign both to the real work rather than merge-resolving:
+
+   ```bash
+   # Move docs/readme.md forward to whatever branch has the real work.
+   git push --force-with-lease origin origin/docs/readme-template-fixes:docs/readme.md
+   ```
+
+   Then delete the aux branch. **Observed in the portfolio sweep:** craftwave.pl had exactly
+   this shape — `docs/readme.md` stale, `docs/readme-template-fixes` 14 commits ahead.
+
+4. **PR title follows rule 4 above:** `«PROJECT» - docs/readme.md`.
+
+5. **Assign the PR to the owner** — see [`SKILL_PORTFOLIO_ASSIGNMENT_HYGIENE.md`](./SKILL_PORTFOLIO_ASSIGNMENT_HYGIENE.md).
+   `gh pr create --assignee «OWNER_HANDLE»` — a docs PR with no assignee is one that sits open
+   for months across 17 repos.
+
+6. **Docs-only PRs may skip CI entirely** via `paths-ignore` in `ci.yml`. That is by design.
+   If branch protection requires a check that never reports, either merge as admin, or bundle
+   a trivial non-docs change.
+
+7. **README shape** — every `docs/readme.md` PR follows [`RUNBOOK_README_TEMPLATE.md`](./README_TEMPLATE.md).
+   Logo mechanics (private-repo image trap, theme-adaptive SVG, `<p align="center">`) are in
+   [`SKILL_PRIVATE_REPO_README_IMAGES.md`](./SKILL_PRIVATE_REPO_README_IMAGES.md).
 
 ---
 
@@ -73,12 +162,13 @@ prefix may exist; prefer `scope/*` for new aggregate work.
 
 | Branch | Purpose | Allowed work | Cloud CI posture |
 |---|---|---|---|
-| `scope/*` | Implementation, review, AI-assisted iteration (Claude Code / Cursor / Copilot); roadmap & scope docs | Code, fixes, refactors, **local** validation | **Skipped by design** (0 runner minutes) |
-| `feat/*`, `fix/*`, `chore/*` | One issue ↔ one PR (optional layer) | Implementation | **Full** on PR into `release/*` |
-| `release/*` | Staging / release-readiness umbrella | Stabilisation, last fixes; avoid large new scope | **Cloud CI + E2E** on the umbrella PR |
-| «TRUNK» (e.g. main) | Production-ready truth | Only validated release merges; tags + changelog | **Full** on push (safety net); auto-release |
+| `scope/vX.Y.Z` | The **working branch** for the cycle: implementation, review, AI-assisted iteration (Claude Code / Cursor / Copilot); roadmap & scope docs | All code, fixes, refactors — commit **directly**; **local** validation | **Skipped by design** (0 runner minutes) |
+| `release/vX.Y.Z` | Staging / release-readiness umbrella | Stabilisation, last fixes; avoid large new scope | **Cloud CI + E2E** on the umbrella PR |
+| «TRUNK» (`main` / `master`) | Production-ready truth | Only validated release merges; tags + changelog | **Full** on push (safety net); auto-release |
+| `fix/*` (exception) | Post-scope release-stage fix (§1 exception): scope is closed but `release/vX.Y.Z` is still open | One-issue fix targeting `release/vX.Y.Z` | **Full** on PR into `release/*` |
+| `hotfix/*` | Emergency fix cut from «TRUNK», merged back down into `release/*` and `scope/*` to prevent divergence | Urgent isolated fix | **Full** on push |
 
-- On `scope/*`: prefer local validation; do **not** trigger expensive Actions / cloud E2E unless explicitly requested; open the PR as **draft** while WIP.
+- On `scope/*`: prefer local validation; do **not** trigger expensive Actions / cloud E2E unless explicitly requested; open the `scope → release` PR as **draft** while WIP.
 - On `release/*`: cloud CI + Playwright E2E expected; verify the deployment preview; evaluate readiness.
 - On «TRUNK»: accept only validated merges; `release.yml` auto-bumps version + changelog on push (skipping its own `chore(release):` commits).
 
@@ -122,7 +212,7 @@ Local equivalent: `node_modules/.bin/lhci autorun` (call the binary directly —
 `push` → «TRUNK» (e.g. main) only, with a loop guard (`!contains(head_commit.message, 'chore(release):')`).
 Runs the version/changelog tool and pushes tags back to «TRUNK».
 
-### ⚠️ Cost note — one-issue-one-PR vs. minutes
+### Cost note — one-issue-one-PR vs. minutes
 Each `feat/*`/`fix/*` PR into `release/*` costs a full run. For large audit backlogs,
 **batch low-risk, same-area fixes** into one PR (validate locally first) while keeping
 high-risk/structural changes isolated for clean review and revertability.

@@ -28,315 +28,98 @@ The goal is to reduce:
 - AI-generated chaos;
 - repository fragmentation;
 - maintainability degradation.
-
 _________
 
 INITIALIZATION
 
-1. Check whether:
-
-```txt
-docs/ENGINEERING_STANDARDS.md
-```
-
-already exists.
-
-2. If the file does not exist:
-- create it;
-- document engineering conventions;
-- document repository philosophy;
-- document coding standards;
-- document acceptable patterns;
-- document implementation expectations.
-
-3. If the file already exists:
-- review it carefully;
-- verify repository implementation follows documented Engineering Standards policy;
-- identify inconsistent or undocumented engineering patterns.
-
-4. If repository already satisfies Engineering Standards policy:
-- clearly inform that repository satisfies ENGINEERING_STANDARDS policy.
-
-5. If repository does NOT satisfy policy:
-- explain gaps;
-- explain inconsistencies;
-- recommend minimal corrective actions.
+Check for `docs/ENGINEERING_STANDARDS.md`. If it does not exist, create it and document the
+conventions, philosophy, coding standards, acceptable patterns and implementation
+expectations. If it does, verify the repository follows it and name the inconsistent or
+undocumented patterns. Say plainly whether the repo satisfies the policy; if it does not,
+give the gaps and the smallest corrective action.
 
 _________
 
 PURPOSE
 
-This workflow exists to ensure:
-- predictable engineering decisions;
-- maintainable implementations;
-- repository consistency;
-- scalable AI-assisted development;
-- shared engineering language;
-- reduced implementation drift.
+This document is the repository's coding constitution. QA validates implementation quality;
+Engineering Standards define how code should be written. They are complementary, not
+duplicates. The goal is less architecture drift, fewer inconsistent patterns, less
+AI-generated chaos, less fragmentation and slower maintainability decay.
 
-Engineering Standards should act as:
-- repository implementation constitution;
-- architectural guardrails;
-- engineering decision baseline.
+Filled, it becomes the repository's architectural guardrails, its shared engineering
+language, and the baseline every engineering decision is measured against.
 
 _________
 
-ENGINEERING PHILOSOPHY
+WHAT TO DOCUMENT AND VERIFY
 
-Please document and preserve:
+Each heading is one section of `docs/ENGINEERING_STANDARDS.md`. Document it, check it against
+the code, and report where they disagree.
 
-- simplicity over cleverness;
-- maintainability over short-term hacks;
-- readability over abstraction for abstraction’s sake;
-- consistency over personal preference;
-- explicitness over hidden magic;
-- reuse over duplication where reasonable.
+**Philosophy.** Simplicity over cleverness, maintainability over short-term hacks, readability
+over abstraction for its own sake, consistency over personal preference, explicitness over
+hidden magic, reuse over duplication where reasonable. Enforce DRY, KISS, predictable patterns
+and low operational complexity. Avoid speculative abstraction, overengineering, unnecessary
+indirection, framework gymnastics and mixed implementation styles.
 
-Please enforce:
-- DRY;
-- KISS;
-- predictable patterns;
-- low operational complexity.
-
-Avoid:
-- speculative abstractions;
-- overengineering;
-- unnecessary indirection;
-- framework gymnastics;
-- inconsistent implementation styles.
-
-_________
-
-ARCHITECTURE CONVENTIONS
-
-Please document repository structure philosophy.
-
-Examples:
-- feature-first;
-- layer-first;
-- modular boundaries;
-- shared libraries;
-- monorepo conventions;
-- frontend/backend separation;
-- API boundaries.
-
-Please ensure:
-- structure remains predictable;
-- boundaries remain understandable;
-- repository organization scales reasonably.
+**Architecture conventions.** The structure philosophy: feature-first or layer-first, modular
+boundaries, shared libraries, monorepo conventions, frontend/backend separation, API
+boundaries. Structure stays predictable and organisation scales.
 
 **REQUIRED:** domain-boundary lint (no cross-domain deep imports; dependency direction `domain → shared` only; no cycles; no `server-only` in client-reachable barrels) is enforced as a CI gate — see `ARCHITECTURE.md` (boundaries) and `github-actions-minutes-workflow.md` (the `boundaries` gate).
 
-_________
+**Components and modules.** Component structure, reusable-component philosophy, the
+hooks/services/utils separation, shared logic, UI versus business logic, file organisation.
+Flag duplicated logic, unclear boundaries, oversized modules and tight coupling.
 
-COMPONENT & MODULE RULES
+**Naming.** Conventions for files, folders, components, hooks, services, utilities, APIs,
+types and interfaces, tests, and environment variables. Naming reflects responsibility and
+reduces ambiguity.
 
-Please document:
+**Typing.** Type-safety expectations, TypeScript standards, interface and type organisation,
+API, schema and validation typing. Enforce strong typing where practical; avoid unsafe
+implicit behaviour and casual `any`. Avoid type gymnastics too: an unreadable type is a
+comment nobody can fix.
 
-- component structure expectations;
-- reusable component philosophy;
-- hooks/services/utils separation;
-- shared logic expectations;
-- UI/business logic separation;
-- file organization rules.
+**Error handling.** Philosophy, async errors, API error conventions, frontend error states,
+logging and reporting. Failures stay predictable and errors stay actionable, without leaking
+anything sensitive. No silent failures, swallowed exceptions or inconsistent error shapes.
 
-Please identify:
-- duplicated logic;
-- unclear boundaries;
-- oversized components/modules;
-- tightly coupled code.
+**Async and data flow.** Async standards, loading states, retry behaviour, request and data
+flow, concurrency. State transitions stay predictable; loading and error states are handled
+the same way everywhere.
 
-_________
+**Validation and API contracts.** Validation philosophy, schema validation, request and
+response expectations, input sanitisation, the frontend/backend contract. Validation happens
+consistently and API behaviour is explicit.
 
-NAMING CONVENTIONS
+**Logging and observability.** Logging, debugging, monitoring and production-safe standards.
+Logs stay actionable and leak nothing. No noisy logs, no inconsistent formats.
 
-Please document conventions for:
-
-- files;
-- folders;
-- components;
-- hooks;
-- services;
-- utilities;
-- APIs;
-- types/interfaces;
-- tests;
-- environment variables.
-
-Please ensure:
-- naming is predictable;
-- naming reflects responsibility;
-- naming reduces ambiguity.
-
-_________
-
-TYPING STANDARDS
-
-Please document:
-
-- type safety expectations;
-- TypeScript usage standards;
-- interface/type organization;
-- API typing expectations;
-- schema typing expectations;
-- validation typing expectations.
-
-Please enforce:
-- strong typing where practical;
-- avoidance of unsafe implicit behavior;
-- avoidance of excessive `any` usage.
-
-Avoid:
-- overcomplicated type gymnastics;
-- unnecessary type abstractions.
-
-_________
-
-ERROR HANDLING
-
-Please document:
-
-- error handling philosophy;
-- async error handling;
-- API error conventions;
-- frontend error states;
-- logging/reporting expectations.
-
-Please ensure:
-- failures are predictable;
-- errors are actionable;
-- sensitive information is not exposed unintentionally.
-
-Avoid:
-- silent failures;
-- swallowed exceptions;
-- inconsistent error formats.
-
-_________
-
-ASYNC & DATA FLOW
-
-Please document:
-
-- async handling standards;
-- loading state expectations;
-- retry behavior if relevant;
-- request/data flow expectations;
-- concurrency expectations if relevant.
-
-Please ensure:
-- async flows remain understandable;
-- state transitions remain predictable;
-- loading/error states are handled consistently.
-
-_________
-
-VALIDATION & API CONTRACTS
-
-Please document:
-
-- validation philosophy;
-- schema validation standards;
-- API request/response expectations;
-- input sanitization expectations;
-- frontend/backend contract expectations.
-
-Please ensure:
-- validation happens consistently;
-- contracts remain predictable;
-- API behavior is explicit.
-
-_________
-
-LOGGING & OBSERVABILITY
-
-Please document:
-
-- logging expectations;
-- debugging expectations;
-- monitoring/reporting expectations;
-- production-safe logging standards.
-
-Please ensure:
-- logs remain actionable;
-- sensitive information is not leaked;
-- debugging remains practical.
-
-Avoid:
-- noisy meaningless logs;
-- inconsistent logging formats.
-
-_________
-
-TESTING PHILOSOPHY
-
-Please document:
-
-- unit vs integration vs E2E expectations;
-- testing priorities;
-- local vs CI testing philosophy;
-- critical path philosophy;
-- regression testing expectations.
-
-Please align with:
-
-```txt
-docs/TESTING_STRATEGY.md
-```
-
-Testing should:
-- protect important behavior;
-- remain maintainable;
-- avoid brittle over-testing.
+**Testing philosophy.** Unit versus integration versus E2E, testing priorities, local versus
+CI, critical paths, regression expectations. Align with `docs/TESTING_STRATEGY.md` rather than
+restating it. Tests protect important behaviour, stay maintainable, and do not calcify into
+brittle over-testing.
 
 _________
 
 AI-ASSISTED DEVELOPMENT RULES
 
-AI systems should:
-- follow repository conventions;
-- preserve architecture consistency;
-- reuse existing patterns first;
-- avoid introducing speculative abstractions;
-- avoid repository fragmentation.
-
-Before generating code:
-- inspect existing patterns;
-- follow established conventions;
-- align with documented standards.
-
-AI-generated code should feel:
-- native to repository;
-not:
-- obviously AI-generated.
+Follow the repository's conventions, preserve its architecture, and reuse an existing pattern
+before inventing one. Inspect what is there before generating code. AI-written code should
+read as native to the repository, not as obviously AI-written.
 
 _________
 
 RESPONSIBILITIES
 
-Please:
-- inspect repository conventions;
-- inspect architecture consistency;
-- inspect implementation patterns;
-- inspect maintainability;
-- inspect engineering quality consistency.
+Inspect the repository's conventions, architectural consistency, implementation patterns,
+maintainability and quality consistency. Identify inconsistent patterns, drift,
+fragmentation, duplicated logic, overengineering, weak abstractions and unclear boundaries.
+Recommend simpler implementations, genuinely reusable abstractions, and improvements to
+standardisation, consistency and maintainability.
 
-Please identify:
-- inconsistent patterns;
-- architecture drift;
-- repository fragmentation;
-- duplicated logic;
-- overengineering;
-- weak abstractions;
-- unclear boundaries.
-
-Please recommend:
-- simpler implementations;
-- reusable abstractions;
-- standardization improvements;
-- consistency improvements;
-- maintainability improvements.
- 
 _________
 
 OUTPUT FORMAT

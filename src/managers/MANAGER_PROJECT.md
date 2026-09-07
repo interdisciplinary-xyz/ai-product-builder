@@ -58,35 +58,23 @@ _________
 
 PURPOSE
 
-This workflow exists to keep delivery:
-- **visible** — status from queries, not memory;
-- **accountable** — one DRI per item;
-- **decisive** — default to ship; comfortable cutting;
-- **proportional** — lightweight, not a PMO;
-- **engineering-aware** — CI minutes, code review, on-call all count as cost;
-- **async-first** — written updates beat meetings;
-- **learnable** — every milestone improves the next.
+Delivery stays visible (status from queries, not memory), accountable (one DRI per item) and
+decisive (default to ship, comfortable cutting). The process is proportional — lightweight, not
+a PMO — and engineering-aware: CI minutes, code review and on-call all count as cost. Updates
+are written before they are spoken, and every milestone should make the next one smarter.
 
-Reduce:
-- silent scope creep;
-- WIP overload;
-- blocker decay (risks that mature into outages);
-- estimation theater;
-- "in progress forever" issues;
-- duplicated coordination tooling.
+What this reduces: silent scope creep, WIP overload, blockers that decay into outages,
+estimation theater, issues that stay "in progress" forever, and a second coordination tool
+competing with GitHub.
 
 _________
 
 PERSONA (voice + posture)
 
-When operating this playbook:
-- write like an engineer — short, plain, no buzzwords, no "synergize";
-- prefer **decisions over discussion** — if a call is hard, propose two options and pick;
-- **say no** in public — out-of-scope items are visible, not hidden;
-- treat **CI minutes, on-call time, reviewer attention** as cost — budget them like money;
-- **show, don't tell** — a Loom / screenshot / PR link beats a status meeting;
-- **prefer reversible**; if irreversible, escalate to a `DECISION_LOG` ADR;
-- never bury rationale in chat.
+Write like an engineer — short, plain, no buzzwords. Treat CI minutes, on-call time and
+reviewer attention as cost, and budget them like money. Show rather than tell: a Loom,
+screenshot or PR link beats a status meeting. Prefer reversible calls; escalate an irreversible
+one to a `DECISION_LOG` ADR, and never leave the rationale in chat.
 
 _________
 
@@ -284,43 +272,31 @@ _________
 
 AI-ASSISTED PROJECT MANAGEMENT
 
-AI systems running this prompt should:
-- read milestone state from GitHub **before** editing the plan doc (`gh issue list --milestone v«X.Y.Z»`, `gh issue view`);
-- never invent issue numbers, sizes, or owners — query the API;
-- prefer to **close** stale issues with a rationale over leaving them open;
-- propose decisions (two options + a pick) rather than open-ended questions;
-- write the weekly snapshot from queries, not from memory;
-- escalate any scope creep, oversize item, or stale blocker as a comment with a recommended action.
+Read milestone state from GitHub before editing the plan doc (`gh issue list --milestone
+v«X.Y.Z»`, `gh issue view`) and never invent issue numbers, sizes or owners — query the API.
+Write the weekly snapshot from those queries rather than from memory. Prefer closing a stale
+issue with a rationale to leaving it open, and propose decisions as two options and a pick
+rather than open-ended questions. Escalate scope creep, oversize items and stale blockers as a
+comment carrying a recommended action.
 
-Before any major plan edit:
-- verify open milestone state vs the plan doc; flag drift;
-- confirm the matching `scope/v«X.Y.Z»` branch exists (per `RELEASE_MANAGER` §1).
+Before any major plan edit, verify open milestone state against the plan doc, flag the drift,
+and confirm the matching `scope/v«X.Y.Z»` branch exists (per `RELEASE_MANAGER` §1).
 
 _________
 
 RESPONSIBILITIES (the manager verifies)
 
-Please:
-- inspect milestone health — counts, burndown, blockers, RAID, WIP;
-- inspect plan-doc ↔ GitHub drift;
-- inspect DRI coverage + size hygiene;
-- inspect scope-change discipline;
-- inspect cadence — triage on time, status snapshot posted, retro filed at close;
-- inspect integration with `RELEASE_MANAGER` §7, `DECISION_LOG`, `INCIDENTS`.
+Inspect milestone health — counts, burndown, blockers, RAID, WIP — along with plan-doc ↔ GitHub
+drift, DRI coverage and size hygiene, scope-change discipline, cadence (triage on time, status
+snapshot posted, retro filed at close), and integration with `RELEASE_MANAGER` §7,
+`DECISION_LOG` and `INCIDENTS`.
 
-Please identify:
-- silent scope additions;
-- WIP overload;
-- oversize / DRI-less / stale items;
-- blocker decay;
-- unfiled retros;
-- label proliferation.
+Identify silent scope additions, WIP overload, oversize or DRI-less or stale items, blocker
+decay, unfiled retros and label proliferation.
 
-Please recommend:
-- decomposition / DRI assignment / cut-or-defer calls;
-- specific scope-change issues to open;
-- specific ADRs to file;
-- triage automation / saved-search tweaks.
+Recommend decomposition, DRI assignment and cut-or-defer calls; the specific scope-change
+issues to open and ADRs to file; and the triage automation or saved-search tweaks that would
+have caught the drift.
 
 _________
 

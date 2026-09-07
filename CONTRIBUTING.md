@@ -30,12 +30,13 @@ repo actually gets.
 ```
 src/
 ├── managers/    25  MANAGER_*.md  ──▶  docs/MANAGER_*.md              (prefix kept)
-├── runbooks/    64  RUNBOOK_*.md  ──▶  docs/*.md                      (prefix STRIPPED)
+├── runbooks/    79  RUNBOOK_*.md  ──▶  docs/*.md                      (prefix STRIPPED)
 ├── meta/         1  PLACEHOLDERS  ──▶  docs/PLACEHOLDERS.md
 ├── commands/    11  slash-commands ─▶  .claude/commands/*.md
-├── skills/       5  SKILL_*.md    ──▶  .claude/skills/<name>/SKILL.md  + docs/SKILL_*.md
+├── skills/      12  SKILL_*.md    ──▶  .claude/skills/<name>/SKILL.md  + docs/SKILL_*.md
 ├── agents/       5  AGENT_*.md    ──▶  .claude/agents/<name>.md
-├── scripts/      2  calculators   ──▶  run in place
+├── scripts/      4  2 calculators ──▶  run in place
+│                    + README + example fixture
 └── config/       1  settings      ──▶  .claude/settings.json
 ```
 
@@ -102,6 +103,20 @@ Other rules:
   cross-linked corpus this is a silent, compounding failure.
 - **Relative links only.** The tree gets relocated into other repos; an absolute
   `github.com/...` URL will point at *this* repo, not theirs.
+- **Cross-reference by the name the target has once deployed.** `bin/build` flattens `src/` into
+  the shape a consumer vendors, and the naming is asymmetric: a **runbook loses its prefix**
+  because it is the doc your team lives with, while a **manager or skill keeps it** because it is
+  library tooling.
+
+  ```
+  src/runbooks/RUNBOOK_E2E.md          →  E2E.md                    link as ./E2E.md
+  src/managers/MANAGER_PERFORMANCE.md  →  MANAGER_PERFORMANCE.md    link as ./MANAGER_PERFORMANCE.md
+  src/skills/SKILL_RATIONALE_...md     →  SKILL_RATIONALE_...md     link as ./SKILL_RATIONALE_...md
+  ```
+
+  A link written against the library filename (`./RUNBOOK_E2E.md`) resolves nowhere once deployed.
+  `npm run lint` fails the build on it — including on the example above, which is why it is a code
+  block and not a live link.
 - If you add a MANAGER, add its paired RUNBOOK (and vice versa) unless the boundary explicitly
   says no pair.
 - Run **`npm run check`** before opening a PR.
@@ -125,13 +140,17 @@ Verified on every build. `npm run check` enforces the first row; the rest are st
 | Cross-links resolve in the built tree | 0 broken |
 | Reuse-block coverage on every layer doc | 100% |
 | MANAGER has Layer + Pairs-with + Owns/defers + OUTPUT FORMAT | 25/25 |
-| RUNBOOK marked `Reusability: template-ready` | 64/64 |
-| Every `SKILL_*` carries an installable frontmatter block | 4/4 |
+| RUNBOOK marked `Reusability: template-ready` | 79/79 |
+| Every `SKILL_*` carries an installable frontmatter block | 12/12 |
 | Zero product-name leaks | pass |
 | Both calculators run clean with no args | 2/2 |
-| Every `«TOKEN»` registered in `PLACEHOLDERS.md` | **41 unregistered in `src/commands/`** |
+| Every `«TOKEN»` registered in `PLACEHOLDERS.md` | verified by `bin/build --check` (see `bin/build`) |
+| `.nvmrc` == `package.json.engines.node` across the repo | verified by `bin/build --check` |
+| `.env.example` matches Tier-1 schema in consumer repos | delegated to `«AUDIT_ENV_CMD»` per `RUNBOOK_ENV_EXAMPLE_TEMPLATE.md` |
+| Every `SKILL_*` carries `**Last reviewed:** «DATE»` | verified by `bin/build --check` |
 
-That last row is the current debt: the slash-commands use 41 tokens
-(`«API_ROUTES_DIR»`, `«BRAND_TOKENS_PATH»`, …) that appear in no glossary, so `/ai-init` can't
-prompt for them. It was marked "pass" for months before anyone checked. Fixing it is the next
-obvious job.
+Previously that last row was the standing debt — the slash-commands used 41 tokens
+(`«API_ROUTES_DIR»`, `«BRAND_TOKENS_PATH»`, …) that appeared in no glossary, so `/ai-init`
+couldn't prompt for them. The portfolio-lessons pass (v0.3.0) added the missing sections to
+[`PLACEHOLDERS.md`](src/meta/PLACEHOLDERS.md) and wired an unregistered-token check into
+`bin/build --check`, so the row is now enforced instead of hand-asserted.

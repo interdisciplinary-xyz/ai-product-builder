@@ -22,232 +22,87 @@ This workflow exists because AI-generated code can look correct while silently i
 - inconsistent assumptions;
 - untested critical paths;
 - duplicated or fragile behavior.
-
 _________
 
 INITIALIZATION
 
-1. Check whether:
-
-```txt
-docs/TESTING_STRATEGY.md
-```
-
-already exists.
-
-2. If the file does not exist:
-- create it;
-- document repository testing strategy;
-- document what should be tested;
-- document what should not be tested;
-- document unit/integration/E2E responsibilities;
-- document local vs CI validation strategy;
-- document critical user paths.
-
-3. If the file already exists:
-- review it carefully;
-- verify repository testing approach matches documented testing policy;
-- identify missing, stale or unrealistic testing expectations.
-
-4. If repository already satisfies Testing Strategy policy:
-- clearly inform that repository satisfies TESTING_STRATEGY policy.
-
-5. If repository does NOT satisfy policy:
-- explain gaps;
-- explain risks;
-- recommend minimal corrective actions.
+Check for `docs/TESTING_STRATEGY.md`. If it does not exist, create it and document the test
+layers, critical paths, what is deliberately not tested, and the local-versus-CI split. If it
+does, verify the suite matches it and name the gaps. Say plainly whether the repo satisfies
+the policy, and give the smallest corrective action if not.
 
 _________
 
 PURPOSE
 
-This workflow exists to ensure that testing remains:
-
-- practical;
-- focused;
-- cost-aware;
-- maintainable;
-- aligned with real product risk;
-- resistant to AI-generated regressions.
-
-The goal is not to maximize test count.
-
-The goal is to protect:
-- core user flows;
-- business-critical behavior;
-- security-sensitive paths;
-- integration boundaries;
-- release confidence.
+Testing here stays practical, focused, cost-aware, maintainable, aligned with real product
+risk, and resistant to AI-generated regressions. The goal is not to maximise test count. It is
+to protect core user flows, business-critical behaviour, security-sensitive paths, integration
+boundaries, and release confidence.
 
 _________
 
-TESTING PRINCIPLES
+PRINCIPLES
 
-Please prioritize:
+Prioritise critical paths over cosmetic coverage, behaviour over implementation detail,
+regression protection over vanity metrics, stable tests over fragile ones, local validation
+before expensive CI, and realistic confidence over exhaustive automation.
 
-- critical paths over cosmetic coverage;
-- behavior over implementation details;
-- regression protection over vanity metrics;
-- stable tests over fragile tests;
-- local validation before expensive CI;
-- realistic confidence over excessive automation.
-
-Avoid:
-- testing trivial framework behavior;
-- brittle implementation-specific tests;
-- excessive snapshot testing;
-- expensive E2E for every minor change;
-- duplicating the same assertion across test layers;
-- chasing 100% coverage without product value.
+Avoid testing framework behaviour, brittle implementation-specific assertions, excessive
+snapshots, E2E for every minor change, the same assertion duplicated across layers, and 100%
+coverage chased without product value.
 
 _________
 
-WHAT WE TEST
+WHAT WE TEST, AND WHAT WE DO NOT
 
-Please identify and document tests for:
+**Test:** core user journeys, authentication flows, authorization boundaries, API contracts,
+data validation, error, loading and empty states, critical UI interactions, security-sensitive
+paths, release-critical regressions, and payment, AI-integration and file-upload flows where
+they exist.
 
-- core user journeys;
-- authentication flows;
-- authorization boundaries;
-- API contracts;
-- data validation;
-- error states;
-- loading states;
-- empty states;
-- critical UI interactions;
-- payment/subscription flows if relevant;
-- AI integration behavior if relevant;
-- upload/file handling if relevant;
-- security-sensitive paths;
-- release-critical regressions.
+**Do not test:** framework internals, static rendering with no logic, third-party library
+behaviour, decorative UI, coverage already handled elsewhere, and unstable tests with low
+confidence value.
 
-_________
-
-WHAT WE DO NOT TEST
-
-Avoid spending time on:
-
-- framework internals;
-- simple static rendering with no logic;
-- third-party library behavior;
-- purely decorative UI;
-- duplicated coverage already handled elsewhere;
-- unstable tests with low confidence value.
-
-If something is not tested, document why.
+If something is not tested, document why. An untested path with a stated reason is a
+decision; one without is an oversight nobody can tell from a decision.
 
 _________
 
 TEST TYPES
 
-## Unit Tests
+**Unit.** Pure functions, helpers, validators, mappers, reducers, formatting and parsing,
+isolated business rules, small deterministic modules. Fast, deterministic, local-first, cheap
+to run constantly.
 
-Use unit tests for:
-- pure functions;
-- helpers;
-- validators;
-- mappers;
-- reducers;
-- formatting/parsing logic;
-- isolated business rules;
-- small deterministic modules.
+**Integration.** API routes, service boundaries, database interactions, auth plus data access,
+form submission, client/server contracts, critical module cooperation. Prove the pieces work
+together without paying for a browser.
 
-Unit tests should be:
-- fast;
-- deterministic;
-- local-first;
-- cheap to run frequently.
-
-_________
-
-## Integration Tests
-
-Use integration tests for:
-- API routes;
-- service boundaries;
-- database interactions;
-- auth + data access;
-- form submission flows;
-- client/server contracts;
-- critical module cooperation.
-
-Integration tests should verify that important pieces work together without requiring full browser E2E when unnecessary.
-
-_________
-
-## E2E Tests
-
-Use E2E tests for:
-- critical user paths;
-- release-blocking flows;
-- onboarding/login/signup;
-- core product workflows;
-- payment/subscription flows if relevant;
-- important regression-prone flows;
-- flows that cannot be trusted through unit/integration tests alone.
-
-E2E tests should be limited, valuable and stable.
-
-Avoid using E2E tests as the default validation layer for every change.
+**E2E.** Critical user paths, release-blocking flows, onboarding, login and signup, core
+workflows, regression-prone flows, and anything unit and integration cannot be trusted to
+cover. Limited, valuable and stable. Never the default validation layer for every change.
 
 **REQUIRED — domain-scoped E2E at release.** Domain-scoped E2E is **required** at the `release/* → «TRUNK»` merge: run only the E2E of the domains whose files changed (union when several), and fall back to the **full** E2E suite when a `«SHARED_PATHS»` file or a cross-domain contract/shared fixture changes. This requires E2E specs to be **domain-mapped** — by path (`e2e/<domain>/**`) or tag (`@<domain>`). Mechanism: `RELEASE_MANAGER.md` §4.2. CI implementation: `github-actions-minutes-workflow.md`.
 
 _________
 
-LOCAL VS CI STRATEGY
+LOCAL VS CI
 
-## Local Validation
+Prefer local validation on `scope/*` work: lint, typecheck, unit, integration, local build,
+and local E2E where it helps. It is cheaper, faster to iterate against, and does not spend
+GitHub Actions minutes.
 
-Prefer local validation during:
-
-```txt
-scope/*
-```
-
-branch work.
-
-Use locally:
-- lint;
-- typecheck;
-- unit tests;
-- integration tests;
-- local build;
-- local E2E when relevant.
-
-Local validation is preferred because:
-- it is cheaper;
-- it is faster during iteration;
-- it avoids unnecessary GitHub Actions usage.
-
-_________
-
-## CI Validation
-
-Use CI validation mainly on:
-
-```txt
-release/*
-main
-```
-
-branches.
-
-Cloud CI is appropriate for:
-- release verification;
-- staging validation;
-- deployment preview verification;
-- final merge confidence;
-- production readiness checks.
-
-Avoid expensive CI execution on unstable `scope/*` branches unless explicitly requested.
+Use cloud CI mainly on `release/*` and «TRUNK»: release verification, staging validation,
+deployment previews, final merge confidence, production readiness. Avoid expensive CI on an
+unstable `scope/*` branch unless it is asked for.
 
 _________
 
 CRITICAL PATHS
 
-Please maintain a list of critical paths for the repository.
-
-Each critical path should include:
+Maintain a list of the repository's critical paths, each in this shape:
 
 ```md
 ## Critical Path: <name>
@@ -270,49 +125,27 @@ Relevant test files.
 Gaps to address.
 ```
 
-Critical paths should be reviewed before:
-- merging `scope/*` into `release/*`;
-- major releases;
-- risky refactors;
-- auth/API/security changes.
+
+Review them before merging `scope/*` into `release/*`, before major releases, before risky
+refactors, and before any auth, API or security change.
 
 _________
 
 AI-GENERATED CODE TESTING RULES
 
-When code is generated or heavily modified by AI:
-
-Please verify:
-- edge cases;
-- assumptions;
-- error handling;
-- type safety;
-- integration boundaries;
-- regression risks;
-- consistency with existing test patterns.
-
-AI-generated code should not be trusted only because it compiles.
-
-Prefer small, meaningful tests that prove behavior.
+When code is generated or heavily modified by AI, verify the edge cases, the assumptions, the
+error handling, type safety, integration boundaries, regression risk, and consistency with
+existing test patterns. AI-generated code should not be trusted because it compiles. Prefer
+small, meaningful tests that prove behaviour.
 
 _________
 
 TEST REVIEW RESPONSIBILITIES
 
-Please:
-- inspect existing test coverage;
-- identify missing critical paths;
-- compare expected behavior vs tested behavior;
-- detect duplicated or low-value tests;
-- detect flaky or fragile tests;
-- recommend minimal high-impact tests.
- 
-Please identify:
-- untested business logic;
-- missing regression coverage;
-- auth/API gaps;
-- fragile E2E flows;
-- over-testing or under-testing.
+Inspect existing coverage, find missing critical paths, compare expected behaviour against
+tested behaviour, and detect duplicated, low-value, flaky or fragile tests. Identify untested
+business logic, missing regression coverage, auth and API gaps, fragile E2E flows, and both
+over- and under-testing. Recommend the smallest set of high-impact tests.
 
 Please also **verify** (REQUIRED) that the repo:
 - (a) maps E2E specs to domains by path (`e2e/<domain>/**`) or tag (`@<domain>`);

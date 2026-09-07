@@ -2,14 +2,21 @@
 #
 # Flatten the src/ tree into the layout consumer repos vendor.
 #
-#   src/managers/MANAGER_X.md  ─┐
-#   src/runbooks/RUNBOOK_X.md  ─┼─▶  <out>/MANAGER_X.md, <out>/RUNBOOK_X.md   (flat)
-#   src/meta/PLACEHOLDERS.md   ─┤
-#   README.md                  ─┘
+#   src/managers/MANAGER_X.md  ───▶  <out>/MANAGER_X.md      (prefix kept)
+#   src/skills/SKILL_X.md      ───▶  <out>/SKILL_X.md        (prefix kept)
+#   src/runbooks/RUNBOOK_X.md  ───▶  <out>/X.md              (prefix STRIPPED)
+#   src/meta/PLACEHOLDERS.md   ───▶  <out>/PLACEHOLDERS.md
+#   README.md                  ───▶  <out>/README.md
 #   src/commands/foo.md        ───▶  <out>/commands/foo.md
 #
-# The flat output is the contract: every doc cross-references its siblings by
-# bare filename (`RUNBOOK_E2E.md`), which only resolves once flattened.
+# The flat output is the contract, and the naming is asymmetric on purpose: a
+# runbook is the doc your team lives with, so it deploys under the name it will
+# be called by (`E2E.md`); a manager and a skill are library tooling and keep
+# the prefix that says so.
+#
+# THEREFORE: cross-reference a runbook by its DEPLOYED name (`./E2E.md`) and a
+# manager or skill by its LIBRARY name (`./MANAGER_PERFORMANCE.md`). That is the
+# single link convention, and `--check` fails the build on anything else.
 #
 # Usage:
 #   bin/build                       # build into dist/
@@ -152,7 +159,15 @@ echo
 echo "checking cross-links…"
 
 report="$(mktemp)"
-trap 'rm -f "$report"' EXIT
+manifest="$(mktemp)"
+trap 'rm -f "$report" "$manifest"' EXIT
+
+# Every file in the built tree, by its LITERAL name. `[[ -e ]]` asks the
+# filesystem, and macOS answers case-insensitively while the Linux CI runner
+# does not — so `](./e2e.md)` pointing at a file named `E2E.md` passed on a
+# laptop for as long as it existed and failed on the first CI run. Comparing
+# against the listing gives the same answer on both.
+( cd "$out" && find . -type f | sed 's|^\./||' | sort ) > "$manifest"
 
 while IFS= read -r file; do
   rel="${file#"$out"/}"
@@ -165,9 +180,15 @@ while IFS= read -r file; do
   while IFS= read -r target; do
     [[ -z "$target" ]] && continue
     # Links resolve relative to the doc's own directory in the built tree.
-    base="$out"
-    [[ "$dir" != "." ]] && base="$out/$dir"
-    [[ -e "$base/$target" ]] && continue
+    cand="$target"
+    [[ "$dir" != "." ]] && cand="$dir/$target"
+    # Collapse `segment/../` before comparing — scripts/README.md links to
+    # ../METRICS.md, which is a real file at the root of the built tree.
+    while [[ "$cand" == */../* ]]; do
+      cand="$(printf '%s' "$cand" | sed -E 's|[^/]+/\.\./||')"
+    done
+    cand="${cand#./}"
+    grep -Fxq "$cand" "$manifest" && continue
     printf '  %-38s → %s\n' "$rel" "$target" >> "$report"
   done <<< "$(printf '%s\n' "$targets" | sed -E 's/^\]\(//; s/\)$//; s/#.*$//; s|^\./||')"
 done < <(find "$out" -name '*.md')
@@ -207,11 +228,254 @@ for name in ("README.md", "CATALOG.md", "CONTRIBUTING.md"):
                 print(f"  {name:<38} → {path or dest.name}#{frag}  (no such anchor)")
 PY
 
+# --- portfolio-lessons v0.3.0 checks --------------------------------------
+# Three lints added from the portfolio audit of 24 repos:
+#   A) every «TOKEN» in src/ is declared in src/meta/PLACEHOLDERS.md
+#      (was the 41-unregistered-in-commands debt row in CONTRIBUTING's quality bar)
+#   B) every SKILL_*.md carries `**Last reviewed:** «…»` (skill sprawl guard —
+#      when a repo has 30+ skills without dates, half of them are dead — see
+#      SKILL_TEMPLATE.md §5 "the skill that rots")
+#   C) no emoji in any heading (the GitHub slugger strips the emoji but keeps
+#      the space after it, so `## 🚀 Setup` → `#-setup` and every hand-written
+#      link to it 404s — see CONTRIBUTING.md §Conventions)
+#
+# Consumer-repo checks (Node version consistency across .nvmrc / package.json
+# engines / CI, `.env.example` vs code drift) are the consumer's `bin/lint`
+# job — the LIBRARY has no .nvmrc or .env.example. Those live in the runbooks
+# they codify (RUNBOOK_ENV_EXAMPLE_TEMPLATE, RUNBOOK_LANDING_SITE_TEMPLATE).
+warn_report="$(mktemp)"
+trap 'rm -f "$report" "$warn_report"' EXIT
+
+python3 - "$root" "$warn_report" >> "$report" <<'PY'
+import pathlib, re, sys
+
+root = pathlib.Path(sys.argv[1])
+warn_path = pathlib.Path(sys.argv[2])
+warn_lines = []
+src = root / "src"
+# The LIBRARY is src/{managers,runbooks,commands,skills,agents,scripts,config,meta}.
+# src/website is an application that happens to live here — it carries its own
+# gates (pnpm ci:quality) and, more to the point, a node_modules of several
+# thousand third-party READMEs and CHANGELOGs. Walking those made this linter
+# report emoji-in-heading violations from typescript-eslint's release notes.
+LIBRARY_LAYERS = ("managers", "runbooks", "commands", "skills", "agents", "scripts", "config", "meta")
+
+def library_docs(src):
+    for layer in LIBRARY_LAYERS:
+        yield from sorted((src / layer).rglob("*.md"))
+
+
+# Kebab-case / lowercase tokens are inline-fill; only SCREAMING_SNAKE persists.
+# But we also allow SCREAMING_SNAKE:kebab-case sub-keys.
+TOKEN_RE = re.compile(r'«([A-Z][A-Z0-9_]*)(:[A-Za-z0-9_\-]+)?»')
+
+# --- A) unregistered tokens ---
+# Two-tier: PLACEHOLDERS.md declares CORE (repo-wide, canonical) tokens; each
+# layer doc's own Reuse-block "Local definitions to provide per repo" list
+# declares PER-DOC tokens (fine for that doc, not required to be canonical).
+placeholders = (src / "meta" / "PLACEHOLDERS.md").read_text()
+core = set()
+for m in TOKEN_RE.finditer(placeholders):
+    core.add(m.group(1))
+# Sub-keys via the `«QUALITY_CMD:format|lint|…»` alternation shapes
+for m in re.finditer(r'«([A-Z][A-Z0-9_]*):([a-zA-Z0-9_|\-]+)»', placeholders):
+    for sub in m.group(2).split('|'):
+        core.add(f'{m.group(1)}:{sub.strip()}')
+
+def local_declarations(text):
+    # Extract tokens declared in the doc's own Reuse-block "Local definitions"
+    # section. The section runs from the "Local definitions" line to the first
+    # non-blockquote line (i.e. the end of the Reuse block).
+    m = re.search(
+        r'(?:Local definitions to provide per (?:repo|milestone|invocation)|Local definitions)[^\n]*\n'
+        r'((?:>\s*.*\n)+)',
+        text)
+    if not m:
+        return set()
+    declared = set()
+    for m2 in TOKEN_RE.finditer(m.group(1)):
+        declared.add(m2.group(1))
+        if m2.group(2):
+            declared.add(f'{m2.group(1)}{m2.group(2)}')
+    return declared
+
+def is_ok(root_token, sub, local):
+    if root_token in core or root_token in local:
+        return True
+    if sub and (f'{root_token}{sub}' in core or f'{root_token}{sub}' in local):
+        return True
+    if root_token == 'QUALITY_CMD':   # any sub-key is OK; the root is canonical
+        return True
+    return False
+
+offenders = {}   # {token: [file:line, ...]}
+for f in library_docs(src):
+    if f.name == "PLACEHOLDERS.md":
+        continue
+    text = f.read_text()
+    local = local_declarations(text)
+    # Strip fenced code blocks so grep patterns inside `«PATTERN»` bash
+    # snippets don't get flagged as unregistered token uses.
+    stripped = re.sub(r'```.*?```', '', text, flags=re.S)
+    for lineno, line in enumerate(stripped.splitlines(), 1):
+        for m in TOKEN_RE.finditer(line):
+            rt, sub = m.group(1), m.group(2) or ''
+            key = f'{rt}{sub}'
+            if is_ok(rt, sub, local):
+                continue
+            offenders.setdefault(key, []).append(f"{f.relative_to(root)}:{lineno}")
+
+if offenders:
+    # Unregistered tokens are WARN, not FAIL: 390 pre-existing per-doc tokens
+    # (declared inline in each doc's own Reuse block by convention that predates
+    # the check) would otherwise break every PR. The list surfaces the debt.
+    warn_lines.append(f"  unregistered tokens ({len(offenders)} distinct):")
+    for tok, hits in sorted(offenders.items()):
+        preview = ', '.join(hits[:3])
+        more = f' (+{len(hits)-3} more)' if len(hits) > 3 else ''
+        warn_lines.append(f"    «{tok}»  {preview}{more}")
+
+# --- G) counted claims match the tree --- (FAIL)
+# Brand rule 1: a number that can be wrong is derived, not typed. README's layer
+# table drifted to runbooks 64 (real 78), skills 5 (real 9), scripts 2 (real 4)
+# and "all 114 files" (real 134) — every one of them typed once and never
+# revisited. Both README shapes are checked: the pipe table `| N |` and the
+# prose form `(N items)`, plus the catalog total.
+import re as _re
+_layers = ("managers", "runbooks", "commands", "skills", "agents", "scripts", "config", "meta")
+_real = {d: len([f for f in (src / d).rglob("*") if f.is_file()]) for d in _layers}
+_contrib_path = (root / "CONTRIBUTING.md")
+_readme = (root / "README.md")
+if _readme.exists():
+    _t = _readme.read_text()
+    for _d, _n in _real.items():
+        # `| [Managers](CATALOG.md#managers) | 25 |`
+        for _m in _re.finditer(rf'\[[A-Za-z]+\]\(CATALOG\.md#{_d}\)\s*\|\s*(\d+)\s*\|', _t):
+            if int(_m.group(1)) != _n:
+                print(f"  README.md: {_d} claims {_m.group(1)}, tree has {_n}")
+        # `src/runbooks` … (64 items)
+        for _m in _re.finditer(rf'`src/{_d}`[^\n]*?\((\d+) items\)', _t):
+            if int(_m.group(1)) != _n:
+                print(f"  README.md: {_d} claims {_m.group(1)} items, tree has {_n}")
+
+# CONTRIBUTING's repo-layout tree, `├── runbooks/    76  RUNBOOK_*.md`. A fourth
+# shape, inside a fenced block, which the three patterns above all missed — found
+# in review, not by this check.
+if _contrib_path.exists():
+    _ct = _contrib_path.read_text()
+    for _d, _n in _real.items():
+        for _m in _re.finditer(rf'[├└]──\s+{_d}/\s+(\d+)\s', _ct):
+            if int(_m.group(1)) != _n:
+                print(f"  CONTRIBUTING.md: layout diagram says {_d}/ {_m.group(1)}, tree has {_n}")
+    _total = sum(_real.values())
+    for _m in _re.finditer(r'[Aa]ll (\d+) files', _t):
+        if int(_m.group(1)) != _total:
+            print(f"  README.md: claims 'all {_m.group(1)} files', tree has {_total}")
+# CONTRIBUTING's quality bar states ratios (76/76 runbooks, 7/7 skills) that were
+# typed when those were the counts. Both were still true in substance and wrong in
+# arithmetic — the kind of claim that erodes trust in the rows beside it.
+_contrib = (root / "CONTRIBUTING.md")
+if _contrib.exists():
+    _c = _contrib.read_text()
+    for _label, _dir, _glob in (("RUNBOOK marked", "runbooks", "*.md"),
+                                ("installable frontmatter block", "skills", "SKILL_*.md"),
+                                ("MANAGER has Layer", "managers", "*.md")):
+        _n = len(list((src / _dir).glob(_glob)))
+        for _m in _re.finditer(rf'{_re.escape(_label)}[^|]*\|\s*(\d+)/(\d+)\s*\|', _c):
+            if int(_m.group(2)) != _n:
+                print(f"  CONTRIBUTING.md: '{_label}…' claims x/{_m.group(2)}, tree has {_n} {_dir}")
+
+_cat = (root / "CATALOG.md")
+if _cat.exists():
+    _rows = len(_re.findall(r'^\|\s*\[`', _cat.read_text(), _re.M))
+    if _rows != sum(_real.values()):
+        print(f"  CATALOG.md: {_rows} rows, tree has {sum(_real.values())} files")
+
+# --- D) one branch model, library-wide --- (FAIL)
+# The library documents scope/vX.Y.Z → release/vX.Y.Z → «TRUNK». RUNBOOK_TEAM_PLAYBOOK
+# used to ship a rival model — a MAIN_BRANCH / FEATURE_BRANCH_PATTERN pair describing
+# feature branches merged straight to main, i.e. GitHub Flow — declared in neither
+# PLACEHOLDERS.md nor NAMING_CONVENTIONS.md. A repo set up from that playbook and one
+# set up from RELEASE_MANAGER ended up on two different models. Nothing caught it,
+# because a contradiction between two documents is invisible to a per-document check.
+RIVAL_BRANCH = re.compile(
+    r'«(MAIN_BRANCH|FEATURE_BRANCH_PATTERN|DEVELOP_BRANCH)»'
+    r'|feature branches \(merge to (?:main|trunk)'
+    r'|git.?flow',
+    re.I)
+for f in library_docs(src):
+    stripped = re.sub(r'```.*?```', '', f.read_text(), flags=re.S)
+    for lineno, line in enumerate(stripped.splitlines(), 1):
+        m = RIVAL_BRANCH.search(line)
+        if m:
+            print(f"  {f.relative_to(root)}:{lineno}: describes a branch model other than "
+                  f"scope/ → release/ → trunk ({m.group(0)!r}) — defer to NAMING_CONVENTIONS.md §1")
+
+# --- E) every layer doc carries a Reuse block --- (FAIL)
+# CONTRIBUTING §Conventions: "Every layer doc carries a 🔧 Reuse & local setup block."
+for f in library_docs(src):
+    if 'TEMPLATE' in f.name.upper() or f.name == 'README.md':
+        continue
+    # The BLOCK, not the phrase. PLACEHOLDERS.md passed this check for as long as
+    # it existed while having no block at all, because a paragraph elsewhere in it
+    # mentioned the words. A check satisfied by a document talking about the
+    # convention is not checking the convention.
+    if not _re.search(r'^>\s*\*\*🔧 Reuse & local setup\*\*', f.read_text(), _re.M):
+        print(f"  {f.relative_to(root)}: no `🔧 Reuse & local setup` block (CONTRIBUTING §Conventions)")
+
+# --- F) boundary discipline --- (WARN — a ratchet, not a gate)
+# CONTRIBUTING requires every layer doc to declare what it owns and defers to. All 25
+# MANAGERs do; at the time this check landed, 0 of 77 RUNBOOKs did. Making it blocking
+# would fail every PR, so it reports a count that must only go down.
+_no_owns = [f for f in library_docs(src)
+            if 'Owns / defers to' not in f.read_text() and 'TEMPLATE' not in f.name.upper()]
+if _no_owns:
+    warn_lines.append(f"  no `Owns / defers to` boundary ({len(_no_owns)} docs — ratchet down, never up):")
+    from collections import Counter as _C
+    for _layer, _n in sorted(_C(f.relative_to(src).parts[0] for f in _no_owns).items()):
+        warn_lines.append(f"    {_layer}: {_n}")
+
+# --- B) SKILL `**Last reviewed:**` presence --- (FAIL — small number, easy to fix)
+for f in sorted((src / "skills").glob("SKILL_*.md")):
+    if f.name == "SKILL_TEMPLATE.md":
+        continue   # the template itself
+    if "**Last reviewed:**" not in f.read_text():
+        print(f"  {f.relative_to(root)}: missing `**Last reviewed:**` line (see SKILL_TEMPLATE.md §5 sibling anti-pattern)")
+
+# --- C) no emoji in headings --- (WARN — pre-existing occurrences exist)
+# Ignore fenced code blocks — `# ❌ Runbook line` inside a ```bash fence is
+# a comment, not a heading. Emoji ranges cover what the GitHub slugger drops.
+EMOJI_RE = re.compile(
+    r'['
+    r'\U0001F300-\U0001F9FF'   # symbols & pictographs, emoticons, transport, misc
+    r'\U0001FA00-\U0001FAFF'   # extended symbols
+    r'☀-➿'           # misc symbols + dingbats (☀ ✓ ✅ ❌ etc.)
+    r'⌀-⏿'           # misc technical (⌘ ⏰ etc.)
+    r']'
+)
+for f in library_docs(src):
+    text = f.read_text()
+    stripped = re.sub(r'```.*?```', '', text, flags=re.S)
+    for lineno, line in enumerate(stripped.splitlines(), 1):
+        if re.match(r'^#{1,6}\s', line) and EMOJI_RE.search(line):
+            warn_lines.append(f"  {f.relative_to(root)}:{lineno}: emoji in heading breaks anchor slugger ({line.strip()[:60]})")
+
+if warn_lines:
+    warn_path.write_text('\n'.join(warn_lines) + '\n')
+PY
+
 echo
+
+if [[ -s "$warn_report" ]]; then
+  echo "warnings (pre-existing debt — not blocking):"
+  sort -u "$warn_report"
+  echo
+fi
+
 if [[ -s "$report" ]]; then
   sort -u "$report"
   echo
-  echo "$(sort -u "$report" | wc -l | tr -d ' ') broken cross-link(s)"
+  echo "$(sort -u "$report" | wc -l | tr -d ' ') blocking issue(s) — broken cross-links, missing SKILL review dates, or hard structural problems"
   exit 1
 fi
-echo "all cross-links resolve"
+echo "all cross-links resolve · all SKILL reviewed dates present"

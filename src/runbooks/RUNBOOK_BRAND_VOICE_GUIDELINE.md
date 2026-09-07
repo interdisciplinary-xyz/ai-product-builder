@@ -191,6 +191,8 @@ Good:
 
 ## 7. Visual Tone Alignment
 
+> **Typography is not covered here.** The type scale, the faces and how they load are owned by [`TYPOGRAPHY.md`](./TYPOGRAPHY.md) — this section says what the design must *signal*, that runbook says what it is *made of*. A voice pillar like "precise, never chatty" has a typographic consequence, and the two documents should be filled in the same sitting.
+
 Design language must signal:
 
 - «VISUAL_SIGNALS»
