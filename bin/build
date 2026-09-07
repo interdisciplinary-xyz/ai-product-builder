@@ -391,7 +391,11 @@ for f in library_docs(src):
 for f in library_docs(src):
     if 'TEMPLATE' in f.name.upper() or f.name == 'README.md':
         continue
-    if 'Reuse & local setup' not in f.read_text():
+    # The BLOCK, not the phrase. PLACEHOLDERS.md passed this check for as long as
+    # it existed while having no block at all, because a paragraph elsewhere in it
+    # mentioned the words. A check satisfied by a document talking about the
+    # convention is not checking the convention.
+    if not _re.search(r'^>\s*\*\*🔧 Reuse & local setup\*\*', f.read_text(), _re.M):
         print(f"  {f.relative_to(root)}: no `🔧 Reuse & local setup` block (CONTRIBUTING §Conventions)")
 
 # --- F) boundary discipline --- (WARN — a ratchet, not a gate)

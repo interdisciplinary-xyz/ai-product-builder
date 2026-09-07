@@ -98,6 +98,7 @@ The content is good; the adoption is unproven. Weigh accordingly.
 - **388 unregistered tokens** library-wide — `/ai-init` can't prompt for what no glossary declares. `npm run check` counts them on every run; the number may only go down.
 - **No sync.** Re-running `deploy` overwrites; your copy drifts until you re-copy.
 - **A dozen unexercised docs.** Some playbooks describe a process nobody has ever run.
+- **One filled example, not five.** [`examples/`](examples/) shows a filled `CLAUDE.md` for a Next + Payload repo. Every other template you fill from the placeholders alone.
 
 ## License
 

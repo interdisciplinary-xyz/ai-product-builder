@@ -1,5 +1,19 @@
 # Placeholder glossary & conventions
 
+> **🔧 Reuse & local setup**
+>
+> Canonical copy — vendored at `docs/ai-product-builder/PLACEHOLDERS.md` (source of truth). Nothing in this file is filled per repo: it is the glossary the other docs' `«tokens»` are declared against.
+>
+> **Reusability:** template-ready — the token names, the two-kind rule and the deprecated-alias table are portable verbatim; a repo adds rows only when it coins a token no library doc already has.
+>
+> **Pairs with:** `MANAGER_INIT.md` (fills these interactively) and every layer doc's own `Local definitions to provide per repo` list. Boundary: this file says what a token **means**; MANAGER_INIT says how it gets **filled**; each doc says which ones **it** needs.
+>
+> **Owns / defers to:** Owns the canonical token names, the `«SCREAMING_SNAKE»` vs `«lowercase»` rule and the deprecated-alias table. Defers *the interactive fill flow, the answer file and secret handling* → `MANAGER_INIT.md`; *the slash-command surface* → `commands/ai-init.md`; *which tokens a given doc needs* → that doc's Reuse block.
+>
+> **Local definitions to provide per repo:** none.
+
+**Last reviewed:** «DATE»
+
 Canonical token names and fill conventions for **every template in this folder**. When
 you copy a doc into a repo, replace these `«tokens»`. Define the repeated ones **once**
 in the repo's `.claude/CLAUDE.md`, then each doc only needs its extra specifics.
@@ -128,60 +142,12 @@ appear in the deny-list. Keep literal subcommands **outside** the token —
 
 ## Init system (interactive bootstrap)
 
-Every layer doc carries a **"Local definitions to provide per repo"** list in its
-`🔧 Reuse & local setup` block. To fill these interactively instead of by hand:
+Owned by [`MANAGER_INIT.md`](./MANAGER_INIT.md), invoked as `/ai-init <DOC>`.
 
-```bash
-/ai-init RUNBOOK_RELEASE_MANAGER
-```
-
-(or invoke `MANAGER_INIT.md` against any doc — same flow, no slash command needed).
-
-The init tool:
-- **prompts only for `«SCREAMING_SNAKE»`** persistent tokens (skips `«lowercase»` inline-fill
-  and per-invocation tokens like `«DATE»` / `«X.Y.Z»`);
-- **persists answers** to **`.claude/ai-init.local.json`** (committed — repo facts, not
-  secrets);
-- is **diff-aware on re-run** — only prompts for newly-added tokens; never deletes existing
-  answers;
-- offers to **render a filled `docs/ai-product-builder/<NAME>.local.md`** when asked (default: no; co-located with the vendored template);
-- **refuses secrets** (`*_SECRET` / `*_KEY` / `*_PASSWORD` / `*_TOKEN` without `_ENV` suffix)
-  and routes them to `.env.local`.
-
-### Answer-file shape
-
-`.claude/ai-init.local.json`:
-
-```json
-{
-  "_version": 1,
-  "tokens": {
-    "PROJECT": "Acme",
-    "DOMAIN": "acme.app",
-    "NODE_VERSION": "22.15.1",
-    "PKG_MGR": "pnpm",
-    "QUALITY_CMD": "pnpm ci:quality",
-    "DB_CMS": "MongoDB + Payload",
-    "AUTH": "Firebase Auth",
-    "PAYMENTS": "Stripe",
-    "DEPLOY": "Vercel",
-    "LOCALES": "en, pl",
-    "TRUNK": "main",
-    "DOMAIN_PATHS": "src/domains/[^/]+",
-    "SHARED_PATHS": ".github/shared-paths.txt"
-  },
-  "_meta": {
-    "last_init": "2026-05-26",
-    "docs_rendered": []
-  }
-}
-```
-
-Token keys are **bare** (no `«»`). Guillemets only appear in templates.
-
-See **`MANAGER_INIT.md`** for the full spec (token classification, special tokens,
-file-backed bootstrap, anti-patterns).
-
+This file is the **glossary** — what each token means. How tokens get filled, where the
+answers are stored, what the tool refuses to prompt for and how a re-run behaves are all
+one document over there. Restating any of it here is how the init spec ended up in four
+files.
 
 ## Layering tokens (`RUNBOOK_CLAUDE_MD`)
 
