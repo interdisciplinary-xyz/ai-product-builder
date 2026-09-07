@@ -267,7 +267,7 @@ List critical paths with zero coverage (e.g. API routes, payment/webhook flows).
 
 ### 6.3 E2E Test Gaps
 
-List the journeys covered and the critical ones missing (see [`e2e.md`](./e2e.md)).
+List the journeys covered and the critical ones missing (see [`E2E.md`](./E2E.md)).
 
 ### 6.4 Test Quality
 

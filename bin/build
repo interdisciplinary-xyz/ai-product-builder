@@ -159,7 +159,15 @@ echo
 echo "checking cross-links…"
 
 report="$(mktemp)"
-trap 'rm -f "$report"' EXIT
+manifest="$(mktemp)"
+trap 'rm -f "$report" "$manifest"' EXIT
+
+# Every file in the built tree, by its LITERAL name. `[[ -e ]]` asks the
+# filesystem, and macOS answers case-insensitively while the Linux CI runner
+# does not — so `](./e2e.md)` pointing at a file named `E2E.md` passed on a
+# laptop for as long as it existed and failed on the first CI run. Comparing
+# against the listing gives the same answer on both.
+( cd "$out" && find . -type f | sed 's|^\./||' | sort ) > "$manifest"
 
 while IFS= read -r file; do
   rel="${file#"$out"/}"
@@ -172,9 +180,15 @@ while IFS= read -r file; do
   while IFS= read -r target; do
     [[ -z "$target" ]] && continue
     # Links resolve relative to the doc's own directory in the built tree.
-    base="$out"
-    [[ "$dir" != "." ]] && base="$out/$dir"
-    [[ -e "$base/$target" ]] && continue
+    cand="$target"
+    [[ "$dir" != "." ]] && cand="$dir/$target"
+    # Collapse `segment/../` before comparing — scripts/README.md links to
+    # ../METRICS.md, which is a real file at the root of the built tree.
+    while [[ "$cand" == */../* ]]; do
+      cand="$(printf '%s' "$cand" | sed -E 's|[^/]+/\.\./||')"
+    done
+    cand="${cand#./}"
+    grep -Fxq "$cand" "$manifest" && continue
     printf '  %-38s → %s\n' "$rel" "$target" >> "$report"
   done <<< "$(printf '%s\n' "$targets" | sed -E 's/^\]\(//; s/\)$//; s/#.*$//; s|^\./||')"
 done < <(find "$out" -name '*.md')
