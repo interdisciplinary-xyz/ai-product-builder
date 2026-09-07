@@ -11,7 +11,7 @@ is the name it takes in your repo after `npm run deploy` (the `RUNBOOK_` prefix 
 | 🔒 [Config](#config) | 1 | `.claude/settings.json` |
 | 🎛️ [Managers](#managers) | 25 | `docs/` |
 | 🏷️ [Meta](#meta) | 1 | `docs/` |
-| 📘 [Runbooks](#runbooks) | 74 | `docs/` |
+| 📘 [Runbooks](#runbooks) | 76 | `docs/` |
 | 🧮 [Scripts](#scripts) | 2 | run in place |
 | ⚡ [Skills](#skills) | 8 | `.claude/skills/` |
 
@@ -125,6 +125,7 @@ name.
 | [`RUNBOOK_DECISION_THRESHOLDS.md`](src/runbooks/RUNBOOK_DECISION_THRESHOLDS.md) | `DECISION_THRESHOLDS.md` | Kill / iterate / expand bands, pre-committed **before** the first user arrives. |
 | [`RUNBOOK_DEV_PORTLESS.md`](src/runbooks/RUNBOOK_DEV_PORTLESS.md) | `DEV_PORTLESS.md` | Portless local dev — HTTPS `.local` hostnames, no ports, webhook-ready. |
 | [`RUNBOOK_DOC_FRESHNESS_PROBES.md`](src/runbooks/RUNBOOK_DOC_FRESHNESS_PROBES.md) | `DOC_FRESHNESS_PROBES.md` | The `<!-- probe:key --><!-- /probe -->` marker mechanism that regenerates numeric doc claims from code — the implementation half of `MANAGER_DOC_FRESHNESS`. |
+| [`RUNBOOK_DOMAIN_ARCHITECTURE.md`](src/runbooks/RUNBOOK_DOMAIN_ARCHITECTURE.md) | `DOMAIN_ARCHITECTURE.md` | The mechanism behind `MANAGER_ARCHITECTURE` §DOMAIN BOUNDARIES — barrel + `/server` split, AST-based audit with the `ALLOWED` map + ratchet, local ESLint rule, 4-file component convention. |
 | [`RUNBOOK_E2E.md`](src/runbooks/RUNBOOK_E2E.md) | `E2E.md` | E2E inventory — critical-path coverage, spec catalogue, how to add tests, what's out of scope. |
 | [`RUNBOOK_EMAILS_WORKFLOW.md`](src/runbooks/RUNBOOK_EMAILS_WORKFLOW.md) | `EMAILS_WORKFLOW.md` | Transactional email inventory — trigger, timing, recipient, test entry-point per template. |
 | [`RUNBOOK_EMAIL_DELIVERABILITY.md`](src/runbooks/RUNBOOK_EMAIL_DELIVERABILITY.md) | `EMAIL_DELIVERABILITY.md` | SPF/DKIM/DMARC DNS setup, inbox-placement matrix, remediation steps. |
@@ -145,6 +146,7 @@ name.
 | [`RUNBOOK_LANDING_SITE_TEMPLATE.md`](src/runbooks/RUNBOOK_LANDING_SITE_TEMPLATE.md) | `LANDING_SITE_TEMPLATE.md` | The marketing/landing-site blueprint — the shared shape 8+ sibling landing sites already follow by hand, now codified so drift stops accumulating. |
 | [`RUNBOOK_LEGAL_RISK.md`](src/runbooks/RUNBOOK_LEGAL_RISK.md) | `LEGAL_RISK.md` | Data/AI processing, regime matrix, liability, IP, recommendations. |
 | [`RUNBOOK_MAINTENANCE.md`](src/runbooks/RUNBOOK_MAINTENANCE.md) | `MAINTENANCE.md` | Running costs — service cost table, free-tier cliffs, cost-per-action, monitoring checklist. |
+| [`RUNBOOK_NAMING_CONVENTIONS.md`](src/runbooks/RUNBOOK_NAMING_CONVENTIONS.md) | `NAMING_CONVENTIONS.md` | The one-page cheatsheet + `commitlint.config.js` template for every naming shape — branches, PR titles, commits, merge-commit titles, tags. Includes the load-bearing promotion-squash regex carve-out. |
 | [`RUNBOOK_METRICS.md`](src/runbooks/RUNBOOK_METRICS.md) | `METRICS.md` | Canonical KPI definitions — NSM, activation, retention, expansion, cost — with targets. |
 | [`RUNBOOK_NORTH_STAR.md`](src/runbooks/RUNBOOK_NORTH_STAR.md) | `NORTH_STAR.md` | Mission thesis, the one north-star metric, rejected alternatives, targets, failure signals. |
 | [`RUNBOOK_OBSERVABILITY.md`](src/runbooks/RUNBOOK_OBSERVABILITY.md) | `OBSERVABILITY.md` | Event taxonomy, dual-emit flow, consent gate, error tags, source-map upload. |
@@ -176,6 +178,7 @@ name.
 | [`RUNBOOK_TEAM_PLAYBOOK.md`](src/runbooks/RUNBOOK_TEAM_PLAYBOOK.md) | `TEAM_PLAYBOOK.md` | Team conventions — workflow, branching, code standards, testing, env setup, deployment. |
 | [`RUNBOOK_THIRD_PARTY.md`](src/runbooks/RUNBOOK_THIRD_PARTY.md) | `THIRD_PARTY.md` | Vendor inventory by cost model — purpose, pricing, env vars, cost-risk summary. |
 | [`RUNBOOK_TRANSLATION_WORKFLOW.md`](src/runbooks/RUNBOOK_TRANSLATION_WORKFLOW.md) | `TRANSLATION_WORKFLOW.md` | Locale matrix, key-naming convention, missing-key audit, new-locale checklist, i18n gotchas. |
+| [`RUNBOOK_TYPOGRAPHY.md`](src/runbooks/RUNBOOK_TYPOGRAPHY.md) | `TYPOGRAPHY.md` | The type scale as tokens, three faces and their jobs, metric-matched font loading, and the audit that fails the build on a size that is not a step. |
 | [`RUNBOOK_TRIAGE_TREE_RUNBOOK.md`](src/runbooks/RUNBOOK_TRIAGE_TREE_RUNBOOK.md) | `TRIAGE_TREE_RUNBOOK.md` | Write the ops runbook as a decision tree ("can you reach `/`? if yes ..."), not section-per-subsystem. |
 | [`RUNBOOK_USER_OBSERVATION.md`](src/runbooks/RUNBOOK_USER_OBSERVATION.md) | `USER_OBSERVATION.md` | Usability observation script plus the Sean Ellis PMF interview, with scoring bands. |
 | [`RUNBOOK_UX_PRINCIPLES.md`](src/runbooks/RUNBOOK_UX_PRINCIPLES.md) | `UX_PRINCIPLES.md` | Design system, visual identity, copy rules, notifications, accessibility target. |
@@ -212,4 +215,5 @@ need it* — it ambushes the diff at the moment you're about to make the mistake
 | [`SKILL_RATIONALE_COMMENTS.md`](src/skills/SKILL_RATIONALE_COMMENTS.md) | `rationale-comments/` | A comment that RESTATES the code is noise the next session will delete. A comment that STATES WHY is the load-bearing prose that stops the guard from being deleted. |
 | [`SKILL_LAYOUT_NOT_PAGE_SINGLETONS.md`](src/skills/SKILL_LAYOUT_NOT_PAGE_SINGLETONS.md) | `layout-not-page-singletons/` | Host singletons (`AudioContext`, `SharedWorker`, a page-level `<audio>` fed into an analyser) throw on the second navigation. Hoist them into a layout, not a page. |
 | [`SKILL_EPHEMERAL_CREDENTIALS_ON_STDIN.md`](src/skills/SKILL_EPHEMERAL_CREDENTIALS_ON_STDIN.md) | `ephemeral-credentials-on-stdin/` | A password on argv is world-readable via `ps auxww` / `/proc/<pid>/cmdline`. The bootstrap-admin credential reads from stdin, never argv. |
+| [`SKILL_FONT_FALLBACK_SHIFT.md`](src/skills/SKILL_FONT_FALLBACK_SHIFT.md) | `font-fallback-shift/` | A webfont without a metric-matched fallback reflows every cold visit, and the author's cache means they can never see it. |
 | [`SKILL_TEMPLATE.md`](src/skills/SKILL_TEMPLATE.md) | — | The anatomy for writing your own. The frontmatter **is** the skill; a body that lists current facts rots and then argues with the diff. |
