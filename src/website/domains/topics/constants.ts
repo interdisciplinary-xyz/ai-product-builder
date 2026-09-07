@@ -138,6 +138,7 @@ export const ASSIGNED: Record<TopicId, string[]> = {
     'managers/product-context',
     'runbooks/claude-md',
     'runbooks/domain-architecture',
+    'runbooks/payload-app-template',
     'runbooks/onboarding-pack',
     'runbooks/team-playbook',
     'runbooks/dev-portless',

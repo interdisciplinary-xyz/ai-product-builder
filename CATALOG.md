@@ -152,6 +152,7 @@ name.
 | [`RUNBOOK_OBSERVABILITY.md`](src/runbooks/RUNBOOK_OBSERVABILITY.md) | `OBSERVABILITY.md` | Event taxonomy, dual-emit flow, consent gate, error tags, source-map upload. |
 | [`RUNBOOK_ONBOARDING_PACK.md`](src/runbooks/RUNBOOK_ONBOARDING_PACK.md) | `ONBOARDING_PACK.md` | Day-one guide — prereqs, first green build, reading order, 30-minute smoke. |
 | [`RUNBOOK_OUTREACH_TEMPLATES.md`](src/runbooks/RUNBOOK_OUTREACH_TEMPLATES.md) | `OUTREACH_TEMPLATES.md` | Founder-voice DM/email templates and the cadence for recruiting the first cohort. |
+| [`RUNBOOK_PAYLOAD_APP_TEMPLATE.md`](src/runbooks/RUNBOOK_PAYLOAD_APP_TEMPLATE.md) | `PAYLOAD_APP_TEMPLATE.md` | Standing up a Next + React + TypeScript + Payload repo — the layout, the `(payload)` route group, the shared script set, and the four places the five sibling repos disagree. |
 | [`RUNBOOK_PAYMENTS_COMPLIANCE.md`](src/runbooks/RUNBOOK_PAYMENTS_COMPLIANCE.md) | `PAYMENTS_COMPLIANCE.md` | The platform-vs-payment-institution boundary — custody rules, provider split, forbidden-token CI gate. |
 | [`RUNBOOK_PAYMENTS_LIFECYCLE.md`](src/runbooks/RUNBOOK_PAYMENTS_LIFECYCLE.md) | `PAYMENTS_LIFECYCLE.md` | Processor setup, test-mode verification, the live flip, and the founder's own $-test. |
 | [`RUNBOOK_PERMISSIONS_AND_AUTONOMY.md`](src/runbooks/RUNBOOK_PERMISSIONS_AND_AUTONOMY.md) | `PERMISSIONS_AND_AUTONOMY.md` | The *why* behind `settings.json` — autonomy table, deny-list rationale, the prune ritual. |
