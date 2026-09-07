@@ -30,7 +30,7 @@ repo actually gets.
 ```
 src/
 ├── managers/    25  MANAGER_*.md  ──▶  docs/MANAGER_*.md              (prefix kept)
-├── runbooks/    74  RUNBOOK_*.md  ──▶  docs/*.md                      (prefix STRIPPED)
+├── runbooks/    76  RUNBOOK_*.md  ──▶  docs/*.md                      (prefix STRIPPED)
 ├── meta/         1  PLACEHOLDERS  ──▶  docs/PLACEHOLDERS.md
 ├── commands/    11  slash-commands ─▶  .claude/commands/*.md
 ├── skills/       8  SKILL_*.md    ──▶  .claude/skills/<name>/SKILL.md  + docs/SKILL_*.md
@@ -102,6 +102,20 @@ Other rules:
   cross-linked corpus this is a silent, compounding failure.
 - **Relative links only.** The tree gets relocated into other repos; an absolute
   `github.com/...` URL will point at *this* repo, not theirs.
+- **Cross-reference by the name the target has once deployed.** `bin/build` flattens `src/` into
+  the shape a consumer vendors, and the naming is asymmetric: a **runbook loses its prefix**
+  because it is the doc your team lives with, while a **manager or skill keeps it** because it is
+  library tooling.
+
+  ```
+  src/runbooks/RUNBOOK_E2E.md          →  E2E.md                    link as ./E2E.md
+  src/managers/MANAGER_PERFORMANCE.md  →  MANAGER_PERFORMANCE.md    link as ./MANAGER_PERFORMANCE.md
+  src/skills/SKILL_RATIONALE_...md     →  SKILL_RATIONALE_...md     link as ./SKILL_RATIONALE_...md
+  ```
+
+  A link written against the library filename (`./RUNBOOK_E2E.md`) resolves nowhere once deployed.
+  `npm run lint` fails the build on it — including on the example above, which is why it is a code
+  block and not a live link.
 - If you add a MANAGER, add its paired RUNBOOK (and vice versa) unless the boundary explicitly
   says no pair.
 - Run **`npm run check`** before opening a PR.
@@ -125,7 +139,7 @@ Verified on every build. `npm run check` enforces the first row; the rest are st
 | Cross-links resolve in the built tree | 0 broken |
 | Reuse-block coverage on every layer doc | 100% |
 | MANAGER has Layer + Pairs-with + Owns/defers + OUTPUT FORMAT | 25/25 |
-| RUNBOOK marked `Reusability: template-ready` | 74/74 |
+| RUNBOOK marked `Reusability: template-ready` | 76/76 |
 | Every `SKILL_*` carries an installable frontmatter block | 7/7 |
 | Zero product-name leaks | pass |
 | Both calculators run clean with no args | 2/2 |

@@ -12,9 +12,10 @@ Keep this file short. If a section grows past ~15 lines, either prune it or move
 >
 > **Reusability:** template-ready — every section below is generic; only the `«placeholders»` need per-repo values. Define the **canonical tokens** (e.g. `«PROJECT»`, `«DOMAIN»`, `«NODE_VERSION»`, `«PKG_MGR»`, `«QUALITY_CMD»`, `«DB_CMS»`, `«AUTH»`, `«PAYMENTS»`, `«DEPLOY»`, `«OBSERVABILITY»`, `«AI_PROVIDER»`, `«TRUNK»`) **once here** — every other doc in the `ai-product-builder` library reads them from this file rather than restating them.
 >
-> **Additional local definitions** for the layering + exception tables below:
+> **Local definitions to provide per repo** — for the layering + exception tables below:
 > - `«SHARED_LIB_PATH»` — where cross-cutting infrastructure lives (e.g. `src/lib`) — the directory that becomes a junk drawer if the layering rule isn't written down
 > - `«DEEP_IMPORT_PATH»` — one row per deliberate deep import / rule-break, with its reason
+> - `«ENV_VALIDATION_PATH»` — where env vars are parsed and validated (e.g. `src/lib/env.ts`), so the agent edits the schema rather than reading `process.env` directly
 >
 > **Pairs with:** the rest of the repo's `docs/*` — this file is the index, not the source of truth, for any topic it mentions. Also pairs with [`PERMISSIONS_AND_AUTONOMY.md`](./PERMISSIONS_AND_AUTONOMY.md) + `.claude/settings.json`: this file tells the agent what is **true**; that pair tells it what it may **do**.
 

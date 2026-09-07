@@ -1,9 +1,9 @@
 # RELEASE_MANAGER.md — Release workflow & CI cost-control policy
 
-> **Canonical / source-of-truth copy** (lives in the `ai-product-builder` library). Unified from the
-> multiple project variants across the codebase. To adopt in a repo,
-> copy to `docs/RELEASE_MANAGER.md` and fill the `«placeholders»`. **Where this
-> template and a repo's *verified* CI config disagree, the verified config wins.**
+> **Canonical / source-of-truth copy** — vendored at `docs/ai-product-builder/RUNBOOK_RELEASE_MANAGER.md`
+> in every deployed repo (source of truth). Unified from the multiple project variants across the
+> codebase. Fill the `«placeholders»` in place via `/ai-init`. **Where this template and a repo's
+> *verified* CI config disagree, the verified config wins.**
 >
 > **Scope:** how work moves from implementation to production, and how we keep
 > GitHub Actions spend low while still gating «TRUNK». Companion to
@@ -79,7 +79,9 @@ a `release/X.Y.Z` (no-`v`) history is not broken — but the convention going fo
    the browser tab title (`«PROJECT» - scope/v1.35.0 · Pull Request #… · …`) so an author with a
    row of PR tabs open can pick one out at a glance. What changed belongs in the PR body — the
    changelog is generated from Conventional-Commit messages, so the title carries no changelog
-   burden.
+   burden. **The exact shapes for commit messages, merge-commit titles, tags, and the
+   commitlint config that enforces them (including the load-bearing promotion-squash regex
+   carve-out) all live in [`NAMING_CONVENTIONS.md`](./NAMING_CONVENTIONS.md).**
 
 **Post-scope fixes (the one exception to rule 1).** Once `scope/vX.Y.Z` is merged/closed and
 only `release/vX.Y.Z` (with its open PR) remains for the current cycle, a further isolated fix
@@ -145,7 +147,7 @@ Local equivalent: `node_modules/.bin/lhci autorun` (call the binary directly —
 `push` → «TRUNK» (e.g. main) only, with a loop guard (`!contains(head_commit.message, 'chore(release):')`).
 Runs the version/changelog tool and pushes tags back to «TRUNK».
 
-### ⚠️ Cost note — one-issue-one-PR vs. minutes
+### Cost note — one-issue-one-PR vs. minutes
 Each `feat/*`/`fix/*` PR into `release/*` costs a full run. For large audit backlogs,
 **batch low-risk, same-area fixes** into one PR (validate locally first) while keeping
 high-risk/structural changes isolated for clean review and revertability.

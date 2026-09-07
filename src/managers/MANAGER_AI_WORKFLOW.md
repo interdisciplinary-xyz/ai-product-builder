@@ -11,6 +11,9 @@
 > **Pairs with:** `RUNBOOK_RELEASE_MANAGER.md`, `RUNBOOK_SESSION_MIGRATION.md`, `RUNBOOK_QUALITY_ASSURANCE.md` (it orchestrates them) — boundary: this MANAGER owns *process* (create/verify/audit); the RUNBOOKs own *content shape*.
 >
 > **Owns / defers to:** Owns AI-TOOL responsibilities (Claude Code / Cursor / Copilot) + the cost-aware local-vs-cloud validation strategy. Defers the human contributor entry-point → `MANAGER_CONTRIBUTING`; release policy → `RUNBOOK_RELEASE_MANAGER`; session handoff → `RUNBOOK_SESSION_MIGRATION`; QA gate → `RUNBOOK_QUALITY_ASSURANCE`. Boundary vs `MANAGER_CONTRIBUTING`: AI_WORKFLOW = AI tooling + validation specifics; CONTRIBUTING = the human "how to contribute" entry point.
+>
+> **Local definitions to provide per repo:**
+> - `«EMAIL_PROVIDER»` — the transactional email vendor whose SDK the agent may call (e.g. Resend, Postmark), named here so a prompt cannot invent a second one
 
 Please act as an AI Workflow Manager for this repository.
 

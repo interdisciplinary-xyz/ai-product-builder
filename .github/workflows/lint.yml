@@ -1,0 +1,35 @@
+# The library's own quality gate.
+#
+# ai-product-builder publishes runbooks about CI gates, required checks and
+# cost control, and until now enforced none of them on itself: every ✅ in the
+# README was hand-asserted. `bin/build --check` flattens src/ the way a
+# consumer repo vendors it and then verifies the result — cross-links resolve,
+# every SKILL carries a review date, no emoji in a heading (the slugger drops
+# it and keeps the space, so every anchor link to that heading 404s).
+#
+# Cost control, per RUNBOOK_RELEASE_MANAGER: one job, no matrix, no scheduled
+# runs. This repo is markdown; a build farm would be theatre.
+name: lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: bin/build --check
+        run: bin/build --check

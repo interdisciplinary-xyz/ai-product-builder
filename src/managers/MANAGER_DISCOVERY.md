@@ -156,15 +156,9 @@ DECISION RULES
 
 **Ulysses-pact scoring rule.** The bands above are committed in `docs/PMF_VERDICT.md` *before* the survey responses are read. Once responses land, the band's pre-committed action executes regardless of which result the team was hoping for. This prevents post-hoc rationalization ("yes 23% is technically weak, but the *quality* of the responses was so high we should...").
 
-**Qualitative quote scoring** (each interview, by the moderator, within 1h):
+**Qualitative quote scoring** (each interview, by the moderator, within 1h) — the `★★★` / `★★` / `★` rubric is defined once in [`USER_OBSERVATION.md`](./USER_OBSERVATION.md) §Qualitative quote scoring, which is the doc the moderator has open during the session. Do not restate it here: a rubric maintained in two places is a rubric that will disagree with itself.
 
-| Score | Meaning |
-| ----- | ------- |
-| `★★★` | Verbatim, specific, surprising, unprompted. Goes on homepage candidate list. |
-| `★★`  | Verbatim, specific, expected. Goes in ICP doc. |
-| `★`   | Polite affirmation, vague, or paraphrased by moderator. Discard from quote bank; useful only as friction signal. |
-
-A `★` quote is **not** evidence of PMF. If the quote bank is 90% `★`, the cohort is being too polite — change the recruiter, change the interviewer, or change the questions.
+What this manager checks is the **distribution**, not the definitions. A `★` quote is not evidence of PMF; if the quote bank is 90% `★`, the cohort is being too polite — change the recruiter, change the interviewer, or change the questions.
 
 _________
 

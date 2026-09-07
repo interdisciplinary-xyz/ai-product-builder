@@ -2,14 +2,21 @@
 #
 # Flatten the src/ tree into the layout consumer repos vendor.
 #
-#   src/managers/MANAGER_X.md  ─┐
-#   src/runbooks/RUNBOOK_X.md  ─┼─▶  <out>/MANAGER_X.md, <out>/RUNBOOK_X.md   (flat)
-#   src/meta/PLACEHOLDERS.md   ─┤
-#   README.md                  ─┘
+#   src/managers/MANAGER_X.md  ───▶  <out>/MANAGER_X.md      (prefix kept)
+#   src/skills/SKILL_X.md      ───▶  <out>/SKILL_X.md        (prefix kept)
+#   src/runbooks/RUNBOOK_X.md  ───▶  <out>/X.md              (prefix STRIPPED)
+#   src/meta/PLACEHOLDERS.md   ───▶  <out>/PLACEHOLDERS.md
+#   README.md                  ───▶  <out>/README.md
 #   src/commands/foo.md        ───▶  <out>/commands/foo.md
 #
-# The flat output is the contract: every doc cross-references its siblings by
-# bare filename (`RUNBOOK_E2E.md`), which only resolves once flattened.
+# The flat output is the contract, and the naming is asymmetric on purpose: a
+# runbook is the doc your team lives with, so it deploys under the name it will
+# be called by (`E2E.md`); a manager and a skill are library tooling and keep
+# the prefix that says so.
+#
+# THEREFORE: cross-reference a runbook by its DEPLOYED name (`./E2E.md`) and a
+# manager or skill by its LIBRARY name (`./MANAGER_PERFORMANCE.md`). That is the
+# single link convention, and `--check` fails the build on anything else.
 #
 # Usage:
 #   bin/build                       # build into dist/
@@ -232,6 +239,17 @@ root = pathlib.Path(sys.argv[1])
 warn_path = pathlib.Path(sys.argv[2])
 warn_lines = []
 src = root / "src"
+# The LIBRARY is src/{managers,runbooks,commands,skills,agents,scripts,config,meta}.
+# src/website is an application that happens to live here — it carries its own
+# gates (pnpm ci:quality) and, more to the point, a node_modules of several
+# thousand third-party READMEs and CHANGELOGs. Walking those made this linter
+# report emoji-in-heading violations from typescript-eslint's release notes.
+LIBRARY_LAYERS = ("managers", "runbooks", "commands", "skills", "agents", "scripts", "config", "meta")
+
+def library_docs(src):
+    for layer in LIBRARY_LAYERS:
+        yield from sorted((src / layer).rglob("*.md"))
+
 
 # Kebab-case / lowercase tokens are inline-fill; only SCREAMING_SNAKE persists.
 # But we also allow SCREAMING_SNAKE:kebab-case sub-keys.
@@ -277,7 +295,7 @@ def is_ok(root_token, sub, local):
     return False
 
 offenders = {}   # {token: [file:line, ...]}
-for f in src.rglob("*.md"):
+for f in library_docs(src):
     if f.name == "PLACEHOLDERS.md":
         continue
     text = f.read_text()
@@ -321,7 +339,7 @@ EMOJI_RE = re.compile(
     r'⌀-⏿'           # misc technical (⌘ ⏰ etc.)
     r']'
 )
-for f in src.rglob("*.md"):
+for f in library_docs(src):
     text = f.read_text()
     stripped = re.sub(r'```.*?```', '', text, flags=re.S)
     for lineno, line in enumerate(stripped.splitlines(), 1):
