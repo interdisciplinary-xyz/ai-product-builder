@@ -321,6 +321,51 @@ if offenders:
         more = f' (+{len(hits)-3} more)' if len(hits) > 3 else ''
         warn_lines.append(f"    «{tok}»  {preview}{more}")
 
+# --- G) counted claims match the tree --- (FAIL)
+# Brand rule 1: a number that can be wrong is derived, not typed. README's layer
+# table drifted to runbooks 64 (real 78), skills 5 (real 9), scripts 2 (real 4)
+# and "all 114 files" (real 134) — every one of them typed once and never
+# revisited. Both README shapes are checked: the pipe table `| N |` and the
+# prose form `(N items)`, plus the catalog total.
+import re as _re
+_layers = ("managers", "runbooks", "commands", "skills", "agents", "scripts", "config", "meta")
+_real = {d: len([f for f in (src / d).rglob("*") if f.is_file()]) for d in _layers}
+_readme = (root / "README.md")
+if _readme.exists():
+    _t = _readme.read_text()
+    for _d, _n in _real.items():
+        # `| [Managers](CATALOG.md#managers) | 25 |`
+        for _m in _re.finditer(rf'\[[A-Za-z]+\]\(CATALOG\.md#{_d}\)\s*\|\s*(\d+)\s*\|', _t):
+            if int(_m.group(1)) != _n:
+                print(f"  README.md: {_d} claims {_m.group(1)}, tree has {_n}")
+        # `src/runbooks` … (64 items)
+        for _m in _re.finditer(rf'`src/{_d}`[^\n]*?\((\d+) items\)', _t):
+            if int(_m.group(1)) != _n:
+                print(f"  README.md: {_d} claims {_m.group(1)} items, tree has {_n}")
+    _total = sum(_real.values())
+    for _m in _re.finditer(r'[Aa]ll (\d+) files', _t):
+        if int(_m.group(1)) != _total:
+            print(f"  README.md: claims 'all {_m.group(1)} files', tree has {_total}")
+# CONTRIBUTING's quality bar states ratios (76/76 runbooks, 7/7 skills) that were
+# typed when those were the counts. Both were still true in substance and wrong in
+# arithmetic — the kind of claim that erodes trust in the rows beside it.
+_contrib = (root / "CONTRIBUTING.md")
+if _contrib.exists():
+    _c = _contrib.read_text()
+    for _label, _dir, _glob in (("RUNBOOK marked", "runbooks", "*.md"),
+                                ("installable frontmatter block", "skills", "SKILL_*.md"),
+                                ("MANAGER has Layer", "managers", "*.md")):
+        _n = len(list((src / _dir).glob(_glob)))
+        for _m in _re.finditer(rf'{_re.escape(_label)}[^|]*\|\s*(\d+)/(\d+)\s*\|', _c):
+            if int(_m.group(2)) != _n:
+                print(f"  CONTRIBUTING.md: '{_label}…' claims x/{_m.group(2)}, tree has {_n} {_dir}")
+
+_cat = (root / "CATALOG.md")
+if _cat.exists():
+    _rows = len(_re.findall(r'^\|\s*\[`', _cat.read_text(), _re.M))
+    if _rows != sum(_real.values()):
+        print(f"  CATALOG.md: {_rows} rows, tree has {sum(_real.values())} files")
+
 # --- D) one branch model, library-wide --- (FAIL)
 # The library documents scope/vX.Y.Z → release/vX.Y.Z → «TRUNK». RUNBOOK_TEAM_PLAYBOOK
 # used to ship a rival model — a MAIN_BRANCH / FEATURE_BRANCH_PATTERN pair describing

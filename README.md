@@ -18,15 +18,15 @@ Playbooks, templates and agent skills for solo founders shipping products with C
 | | Layer | Files | What it is |
 |---|---|:--:|---|
 | 🎛️ | [Managers](CATALOG.md#managers) | 25 | Playbooks you **run** against a repo. They create, verify, or audit a doc. |
-| 📘 | [Runbooks](CATALOG.md#runbooks) | 64 | Docs you **fill**. This is what your team lives with. |
+| 📘 | [Runbooks](CATALOG.md#runbooks) | 78 | Docs you **fill**. This is what your team lives with. |
 | ⌨️ | [Commands](CATALOG.md#commands) | 11 | Slash-commands. The 4 audits open an issue **only on regression**. |
-| ⚡ | [Skills](CATALOG.md#skills) | 5 | Ambient rules that fire **without being asked**. |
+| ⚡ | [Skills](CATALOG.md#skills) | 9 | Ambient rules that fire **without being asked**. |
 | 🎩 | [Agents](CATALOG.md#agents) | 5 | Read-only exec lenses; `/board` reports their **disagreement**. |
-| 🧮 | [Scripts](CATALOG.md#scripts) | 2 | Calculators. A playbook ending in a number ships the one that produces it. |
+| 🧮 | [Scripts](CATALOG.md#scripts) | 4 | Calculators. A playbook ending in a number ships the one that produces it. |
 | 🔒 | [Config](CATALOG.md#config) | 1 | The deny-list. The human merges, deploys, touches secrets. |
 | 🏷️ | [Meta](CATALOG.md#meta) | 1 | The `«token»` glossary. |
 
-**[→ CATALOG.md](CATALOG.md)** — all 114 files, each with a one-line description.
+**[→ CATALOG.md](CATALOG.md)** — all 134 files, each with a one-line description.
 
 ## Quick start
 
@@ -95,7 +95,7 @@ The content is good; the adoption is unproven. Weigh accordingly.
 ## Weak points
 
 - **Never deployed end to end.** You'd be first.
-- **41 unregistered tokens** in the audit commands — `/ai-init` can't prompt for them.
+- **388 unregistered tokens** library-wide — `/ai-init` can't prompt for what no glossary declares. `npm run check` counts them on every run; the number may only go down.
 - **No sync.** Re-running `deploy` overwrites; your copy drifts until you re-copy.
 - **A dozen unexercised docs.** Some playbooks describe a process nobody has ever run.
 

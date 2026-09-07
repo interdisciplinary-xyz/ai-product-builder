@@ -139,8 +139,8 @@ Verified on every build. `npm run check` enforces the first row; the rest are st
 | Cross-links resolve in the built tree | 0 broken |
 | Reuse-block coverage on every layer doc | 100% |
 | MANAGER has Layer + Pairs-with + Owns/defers + OUTPUT FORMAT | 25/25 |
-| RUNBOOK marked `Reusability: template-ready` | 76/76 |
-| Every `SKILL_*` carries an installable frontmatter block | 7/7 |
+| RUNBOOK marked `Reusability: template-ready` | 78/78 |
+| Every `SKILL_*` carries an installable frontmatter block | 9/9 |
 | Zero product-name leaks | pass |
 | Both calculators run clean with no args | 2/2 |
 | Every `«TOKEN»` registered in `PLACEHOLDERS.md` | verified by `bin/build --check` (see `bin/build`) |

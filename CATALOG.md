@@ -196,6 +196,8 @@ the calculator that produces it.*
 |---|---|---|
 | [`sensitivity-table.py`](src/scripts/sensitivity-table.py) | `python3 sensitivity-table.py` | **Which variable, off by 50%, kills the model?** Moves each one the wrong way, ranks the damage, and exposes the monthly-vs-annual fee physics. Prints trip-wires, not a forecast. |
 | [`score-sean-ellis.py`](src/scripts/score-sean-ellis.py) | `python3 score-sean-ellis.py responses.json` | **What's the PMF read after discounting polite signal?** Prints a raw verdict and a discounted one. The bundled example scores **raw 40% PASS / discounted 20% FAIL**. |
+| [`README.md`](src/scripts/README.md) | — | **How to run the calculators**, and the rule they exist to serve. |
+| [`pmf-responses.example.json`](src/scripts/examples/pmf-responses.example.json) | input to `score-sean-ellis.py` | Fifteen survey responses engineered so the raw verdict passes and the honest one does not. |
 
 Also here: [`README.md`](src/scripts/README.md) (how to run them, and the rule they exist to
 serve) and [`examples/pmf-responses.example.json`](src/scripts/examples/pmf-responses.example.json)
