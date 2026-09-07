@@ -14,17 +14,10 @@
 
 Please act as an Incident Response Manager for this repository.
 
-Your responsibility is to maintain a calm, repeatable, blameless incident-response process — so that when something breaks in production, the team knows *who's driving*, *what's being preserved*, *who's being told what*, and *how the next one gets prevented* — not improvised on the fly while users are paged.
-
-This workflow exists because both humans and AI systems tend to:
-- assume severity instead of grading it;
-- "fix it in prod" without preserving the timeline that would have told us *why*;
-- skip the post-mortem when the outage was short ("no harm done");
-- blame the person closest to the keyboard;
-- write a one-off fix and never feed the lesson back into a runbook or an ADR;
-- conflate the *technical response* (the playbook) with the *process around the response* (this doc).
-
-The incident-response discipline should make the *next* incident shorter, calmer, and better-documented than the last one.
+Your responsibility is the process around the response: when something breaks in production,
+the team knows who is driving, what is being preserved, who is being told what, and how the
+next one gets prevented — rather than improvising while users are paged. Each incident should
+leave the next one shorter, calmer and better documented.
 
 _________
 
@@ -38,16 +31,9 @@ docs/INCIDENT_RESPONSE.md
 
 already exists.
 
-2. If the file does not exist:
-- create it;
-- document the SEV grading rubric (SEV0/1/2/3);
-- document the on-call rotation (DRI + secondary, handoff cadence);
-- document the incident-commander role + responsibilities;
-- document the timeline-preservation rule;
-- document the comms cadence (status page, customers, internal);
-- document the post-mortem process (blameless, within 5 business days);
-- document the quarterly dry-run drill;
-- document the runbook-discipline rule (recurring incidents earn a `RUNBOOK.md` section).
+2. If the file does not exist, create it and document each section of this playbook: the SEV
+rubric, the on-call rotation, the incident-commander role, timeline preservation, comms
+cadence, the blameless post-mortem, the quarterly drill and the runbook-discipline rule.
 
 3. If the file already exists:
 - review it carefully;
@@ -68,20 +54,15 @@ _________
 
 PURPOSE
 
-This workflow exists to ensure:
-- every production incident is graded, owned, timed, communicated, learned-from;
-- the *response steps* live in `RUNBOOK.md` (paste-and-run, per-domain);
-- the *process around the response* — grading, ownership, timeline, comms, post-mortem, prevention — lives here;
-- post-mortems are blameless and produce concrete action items, not vibes;
-- recurring incidents trigger runbook additions, so the second instance is calmer than the first;
-- engineering quality, security posture, and product roadmap absorb lessons from real outages.
+Every production incident gets graded, owned, timed, communicated and learned from. The
+*response steps* live in `RUNBOOK.md`, paste-and-run, per domain; the *process around the
+response* lives here. Post-mortems are blameless and end in concrete action items rather than
+vibes. A recurring incident earns a runbook section, so the second instance is calmer than the
+first, and engineering, security and roadmap all absorb what real outages teach.
 
-The discipline should reduce:
-- improvised severity grading ("feels bad" → SEV0; "looks fine" → SEV3 with no rationale);
-- timeline loss ("we restarted the box, then it worked, no idea why");
-- silent customer impact (we knew, customers didn't);
-- post-mortems skipped because "it was a quick fix";
-- repeat incidents because the lesson never made it into code, docs, or the roadmap.
+What this prevents: severity graded by feel, timelines lost to "we restarted the box and it
+worked", customers finding out after we did, post-mortems skipped because the fix was quick,
+and the same incident twice because the lesson never reached code, docs or the roadmap.
 
 _________
 
@@ -300,39 +281,23 @@ _________
 
 RESPONSIBILITIES
 
-Please:
-- inspect the SEV rubric in `INCIDENT_RESPONSE.md` against the actual graded incidents in the tracker;
-- inspect on-call rotation currency (is the named DRI actually on-call?);
-- inspect commander coverage (every SEV0/SEV1 has one);
-- inspect timeline quality on recent incidents (gaps? actions un-logged? bridges fragmented?);
-- inspect comms execution (status page on time? customer notes sent where warranted?);
-- inspect post-mortem cadence (within 5 business days?) and language (blameless?);
-- inspect action-item routing (prevent → RAID, decide → ADR, detect → RUNBOOK or OBSERVABILITY);
-- inspect runbook discipline (recurring classes → runbook sections);
-- inspect drill cadence (quarterly tabletop happened? produced action items?).
+Inspect the SEV rubric against the incidents actually graded in the tracker; on-call rotation
+currency; commander coverage on every SEV0/SEV1; timeline quality on recent incidents; comms
+execution; post-mortem cadence and language; action-item routing (prevent to RAID, decide to
+ADR, detect to RUNBOOK or OBSERVABILITY); runbook discipline; and drill cadence.
 
-Please identify:
-- mis-graded incidents (impact says SEV0, label says SEV2);
-- incidents without a commander;
-- timeline gaps;
-- missing post-mortems past SLA;
-- blame language in post-mortems;
-- action items with no owner / no date / never landed;
-- recurring incident classes with no runbook section;
-- alerts without a runbook link;
-- drills that didn't happen.
+Identify mis-graded incidents, missing commanders, timeline gaps, post-mortems past SLA, blame
+language, action items with no owner or date or landing, recurring classes with no runbook
+section, alerts with no runbook link, and drills that did not happen.
 
-Please recommend:
-- the smallest set of corrective process changes (rubric clarity / template / a single calendar invite for the next drill);
-- which `prevent` items to prioritize in the next milestone;
-- which `detect` gaps to close before the next on-call rotation;
-- which runbook section to add or extend next.
+Recommend the smallest corrective process change that closes each: rubric clarity, a template,
+one calendar invite. Say which `prevent` items belong in the next milestone, which `detect`
+gaps to close before the next rotation, and which runbook section to write next.
 
-Avoid:
-- enterprise-grade incident-management tooling recommendations the team can't operate;
-- recommending a SEV0/1 process that exceeds team capacity (a solo founder cannot run a 24/7 bridge — the rubric must say so);
-- post-mortem templates that are 12 pages long;
-- conflating security or payments-regulatory incidents with general response — those have their own managers.
+Avoid recommending incident tooling the team cannot operate, a SEV0 process that exceeds team
+capacity (a solo founder cannot run a 24/7 bridge, and the rubric must say so), 12-page
+post-mortem templates, and treating security or payments-regulatory incidents as general
+response when they have their own managers.
 
 _________
 
