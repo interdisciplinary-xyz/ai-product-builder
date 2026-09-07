@@ -30,277 +30,76 @@ Without a reliable Architecture document, AI systems and developers tend to:
 - generate conflicting implementations.
 
 Architecture documentation should reflect REAL repository structure — not theoretical intentions.
-
 _________
 
 INITIALIZATION
 
-1. Check whether:
-
-```txt
-docs/ARCHITECTURE.md
-```
-
-already exists.
-
-2. If the file does not exist:
-- create it;
-- document repository architecture;
-- document stack and infrastructure;
-- document repository structure;
-- document conventions and boundaries;
-- document system flows and responsibilities.
-
-3. If the file already exists:
-- review it carefully;
-- verify repository implementation matches documented architecture;
-- identify stale or inaccurate architectural assumptions;
-- identify undocumented architecture decisions.
-
-4. If repository already satisfies Architecture policy:
-- clearly inform that repository satisfies ARCHITECTURE policy.
-
-5. If repository does NOT satisfy policy:
-- explain gaps;
-- explain architecture drift;
-- recommend minimal corrective actions.
+Check for `docs/ARCHITECTURE.md`. If it does not exist, create it and document the stack,
+infrastructure, repository structure, conventions, boundaries, system flows and
+responsibilities. If it does, verify the implementation matches it, and name stale
+assumptions and undocumented decisions. Say plainly whether the repo satisfies the policy;
+if it does not, give the gaps, the drift, and the smallest corrective action.
 
 _________
 
 PURPOSE
 
-This workflow exists to:
-- preserve architecture consistency;
-- reduce implementation drift;
-- reduce AI hallucination risk;
-- reduce onboarding cost;
-- preserve repository boundaries;
-- preserve predictable development patterns.
-
-Architecture documentation should act as:
-- repository source of truth;
-- implementation map;
-- system boundary definition;
-- architecture memory layer.
+Architecture documentation is the repository's source of truth, implementation map, boundary
+definition and memory layer. Without it, both people and AI systems guess, drift, invent
+inconsistent patterns, misread boundaries and pay the onboarding cost twice. Document what the repository REALLY is, never
+what it was meant to be.
 
 _________
 
-TECH STACK
+WHAT TO DOCUMENT AND VERIFY
 
-Please document and verify:
+Each heading below is one section of `docs/ARCHITECTURE.md`. For every one: document it,
+check it against the implementation, and report where the two disagree.
 
-- frontend stack;
-- backend stack;
-- framework choices;
-- runtime choices;
-- language choices;
-- database technologies;
-- authentication providers;
-- infrastructure/services;
-- deployment platforms;
-- testing stack;
-- build tooling;
-- package manager/runtime expectations.
+**Tech stack.** Frontend, backend, framework, runtime and language choices; databases; auth
+providers; infrastructure and services; deployment platforms; testing stack; build tooling;
+package manager and runtime expectations. Mark deprecated technologies as deprecated.
 
-Please ensure:
-- stack documentation reflects actual implementation;
-- deprecated technologies are marked clearly.
+**Repository structure.** Monorepo organisation, applications, packages and services, shared
+libraries, module boundaries, folder ownership. Say why the structure exists and where a new
+feature is supposed to go — an architecture doc that cannot place the next module is not
+being used. Flag unclear structure, drift and duplicated shared logic.
 
-_________
+**Frontend.** Architecture approach, component and design-system structure, state management,
+routing, async data fetching, boundaries, and what counts as shared UI versus shared logic.
+Prefer a reusable pattern to a one-off.
 
-MONOREPO / REPOSITORY STRUCTURE
+**Backend.** Structure, API architecture, service and auth boundaries, validation flow,
+business-logic organisation, database access patterns, background processing. API boundaries
+stay explicit.
 
-Please document:
+**API conventions.** Endpoint, validation and error-response shapes; request/response and
+authentication expectations; versioning if it exists. Contracts stay predictable so frontend
+and backend do not drift apart.
 
-- repository structure;
-- monorepo organization;
-- applications/packages/services;
-- shared libraries;
-- boundaries between modules;
-- ownership/responsibility of folders.
+**State.** Global approach, local philosophy, server/client separation, caching and
+synchronisation. Avoid global state nothing global reads, duplicated state logic, and flows
+nobody can predict.
 
-Please explain:
-- why structure exists;
-- how code should be organized;
-- how new modules/features should fit into architecture.
+**Auth.** Flow, authorization boundaries, session and token handling, protected routes, roles
+and permissions. This one drifts silently. Check it against the code, not the intent.
 
-Please identify:
-- unclear structure;
-- architecture drift;
-- duplicated/shared logic problems.
+**Database.** Architecture, ORM or query approach, schema philosophy and evolution,
+migrations, data ownership, indexing and performance assumptions.
 
-_________
+**Environment and infrastructure.** Local setup, required runtimes and tools, environment
+variables, deployment environments, CI/CD structure, cloud services, staging versus
+production. Flag inconsistencies, undocumented setup steps and unstated assumptions.
 
-FRONTEND ARCHITECTURE
+**Conventions.** Folder, naming, shared-module, import and file-organisation conventions,
+so the structure stays scalable and predictable.
 
-Please document:
+**Deployment flow.** Strategy, release, staging, production, CI/CD, rollback and recovery.
+Align with `docs/RELEASE_MANAGER.md` rather than restating it.
 
-- frontend architecture approach;
-- component structure;
-- Design System structure;
-- state management approach;
-- routing approach;
-- async/data fetching approach;
-- frontend boundaries;
-- shared UI/shared logic expectations.
-
-Please ensure:
-- frontend architecture remains predictable;
-- reusable patterns are preferred over one-off implementations.
-
-_________
-
-BACKEND ARCHITECTURE
-
-Please document:
-
-- backend structure;
-- API architecture;
-- service boundaries;
-- auth boundaries;
-- validation flow;
-- business logic organization;
-- database access patterns;
-- async/background processing if relevant.
-
-Please ensure:
-- backend responsibilities remain understandable;
-- API boundaries remain explicit.
-
-_________
-
-API CONVENTIONS
-
-Please document:
-
-- API structure;
-- endpoint conventions;
-- validation conventions;
-- error response conventions;
-- request/response expectations;
-- authentication expectations;
-- versioning approach if relevant.
-
-Please ensure:
-- contracts remain predictable;
-- frontend/backend communication remains consistent.
-
-_________
-
-STATE MANAGEMENT
-
-Please document:
-
-- global state approach;
-- local state philosophy;
-- server/client state separation;
-- caching/data synchronization philosophy.
-
-Please avoid:
-- unnecessary global state;
-- duplicated state logic;
-- unpredictable state flows.
-
-_________
-
-AUTH FLOW
-
-Please document:
-
-- authentication flow;
-- authorization boundaries;
-- session/token handling;
-- protected route strategy;
-- role/permission approach if relevant.
-
-Please ensure:
-- auth architecture matches implementation reality.
-
-_________
-
-DATABASE APPROACH
-
-Please document:
-
-- database architecture;
-- ORM/query approach;
-- schema philosophy;
-- migration approach;
-- data ownership boundaries;
-- indexing/performance assumptions if relevant.
-
-Please ensure:
-- database access remains predictable;
-- schema evolution remains maintainable.
-
-_________
-
-ENVIRONMENT & INFRASTRUCTURE
-
-Please document:
-
-- local development setup;
-- required runtimes/tools;
-- environment variables;
-- deployment environments;
-- CI/CD structure;
-- cloud providers/services;
-- staging/production expectations.
-
-Please identify:
-- environment inconsistencies;
-- undocumented setup requirements;
-- infrastructure assumptions.
-
-_________
-
-NAMING & STRUCTURE CONVENTIONS
-
-Please document:
-
-- folder conventions;
-- naming conventions;
-- shared module conventions;
-- import conventions;
-- file organization expectations.
-
-Please ensure:
-- repository structure remains scalable and predictable.
-
-_________
-
-DEPLOYMENT FLOW
-
-Please document:
-
-- deployment strategy;
-- release flow;
-- staging flow;
-- production flow;
-- CI/CD expectations;
-- rollback/recovery expectations if relevant.
-
-Please align with:
-
-```txt
-docs/RELEASE_MANAGER.md
-```
-
-_________
-
-SHARED LIBRARIES & DESIGN SYSTEM
-
-Please document:
-
-- shared package philosophy;
-- reusable library expectations;
-- Design System boundaries;
-- UI/shared logic ownership;
-- cross-package dependency expectations.
-
-Please ensure:
-- duplication is minimized;
-- package boundaries remain understandable.
+**Shared libraries and design system.** Shared-package philosophy, reusable-library
+expectations, design-system boundaries, UI versus shared-logic ownership, cross-package
+dependencies. Minimise duplication; keep package boundaries legible.
 
 _________
 
@@ -329,21 +128,14 @@ CODEOWNERS PER DOMAIN (REQUIRED)
 
 _________
 
+_________
+
 AI-ASSISTED DEVELOPMENT RULES
 
-AI systems should:
-- verify architecture before implementing;
-- follow repository boundaries;
-- reuse existing patterns;
-- avoid speculative architecture;
-- avoid introducing inconsistent structure.
-
-Before major changes:
-- inspect existing architecture;
-- align with documented repository structure;
-- preserve boundaries and conventions.
-
-Architecture documentation should always take priority over assumptions.
+Verify the architecture before implementing. Follow the repository's boundaries, reuse its
+existing patterns, and do not invent speculative structure. Before a major change, inspect
+what is there and align with it. Where documentation and assumption disagree, the
+documentation wins. That is what it is for.
 
 _________
 
@@ -369,32 +161,14 @@ _________
 
 RESPONSIBILITIES
 
-Please:
-- inspect repository architecture;
-- inspect implementation boundaries;
-- inspect structure consistency;
-- inspect architecture drift;
-- inspect repository conventions.
+Inspect the repository's architecture, implementation boundaries, structural consistency,
+drift and conventions. Identify what is undocumented, stale, inconsistent, duplicated,
+fragmented or unowned. Recommend the smallest change that fixes it: clearer boundaries,
+more consistent structure, better maintainability, fewer moving parts.
 
-Please identify:
-- undocumented architecture;
-- stale documentation;
-- inconsistent boundaries;
-- duplicated responsibilities;
-- architecture fragmentation;
-- unclear ownership.
+Avoid enterprise overengineering, speculative abstraction, and complexity with no business
+value behind it.
 
-Please recommend:
-- minimal architecture improvements;
-- clearer boundaries;
-- better structure consistency;
-- maintainability improvements;
-- architecture simplifications.
-
-Avoid:
-- unnecessary enterprise overengineering;
-- speculative abstractions;
-- architecture complexity without business value.
 _________
 
 OUTPUT FORMAT
