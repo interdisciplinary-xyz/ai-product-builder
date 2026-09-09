@@ -1,5 +1,6 @@
 import type { Root, RootContent } from 'mdast';
 import { defaultSchema } from 'rehype-sanitize';
+import { SECTION_LABEL } from '../../constants';
 
 /* ---------------------------------------------------------------------------
    remark plugin: «PLACEHOLDER» tokens
@@ -46,6 +47,36 @@ export function remarkTokens() {
       (node as Root).children = next;
     };
     walk(tree);
+  };
+}
+
+/**
+ * A MANAGER marks its sections with a bare uppercase line — `INITIALIZATION`,
+ * `WCAG TARGET & SCOPE` — rather than with `##`. That is the library's house
+ * style and worth keeping; the cost was that all 25 managers parsed to zero
+ * headings, so they had no contents rail, no reading position, and no section
+ * rows in the search palette. They are the longest documents here, which made
+ * them exactly the ones that needed it.
+ *
+ * This promotes such a paragraph to a depth-2 heading, after which rehype-slug
+ * gives it an id like any other. 247 blocks across the corpus match, all of
+ * them in managers, and none of them longer than six words.
+ *
+ * The rule is deliberately narrow: a paragraph at the ROOT of the document
+ * whose single child is a text node that is entirely uppercase. Anything
+ * nested — a list item, a table cell, a blockquote — is left alone, and a
+ * paragraph with two children (a token span, a link, emphasis) is not a
+ * section label. `corpus.ts` mirrors this rule line by line to build the
+ * contents; the two must agree or the rail links to anchors that do not exist.
+ */
+export function remarkSectionLabels() {
+  return (tree: Root) => {
+    tree.children = tree.children.map((node) => {
+      if (node.type !== 'paragraph' || node.children.length !== 1) return node;
+      const [only] = node.children;
+      if (only.type !== 'text' || !SECTION_LABEL.test(only.value.trim())) return node;
+      return { type: 'heading', depth: 2, children: [{ type: 'text', value: only.value.trim() }] };
+    });
   };
 }
 

@@ -41,8 +41,13 @@ other than `../..`.
   all 129 files placed on exactly one. `/topics`, and the grouping inside any layer index past a
   dozen files.
 - **Search from anywhere.** <kbd>⌘K</kbd> (or `/`) opens a palette over documents, the library's
-  1,223 **section headings**, and its tokens. A section is the unit that actually answers a
+  1,607 **section headings**, and its tokens. A section is the unit that actually answers a
   question, and it was previously unreachable except by scrolling.
+- **MANAGER sections are headings.** A manager marks its sections with a bare uppercase line
+  rather than `##`, so all 25 of them parsed to zero headings — no contents rail, no reading
+  position, no section rows in the palette, on the longest documents in the library. The
+  renderer promotes those lines and the corpus counts them: 110 pages had a contents rail
+  before, 265 do now.
 - **The `«token»` index** at `/tokens`: one token, and every document that wants it, joined to
   its glossary meaning. It also states the uncomfortable number — how many tokens have no row in
   `PLACEHOLDERS.md`, and so cannot be prompted for by `/ai-init`.
@@ -70,7 +75,7 @@ app/                      the routes — the composition root, and nothing else
 ├── review/               the triage pass — /review, then /review/<layer>/<slug>
 ├── [layer]/page.tsx      one layer's ledger, grouped by topic past a dozen files
 ├── [layer]/[slug]/       one document
-├── search-index.json/    a static route handler — the palette's index, ~195 kB
+├── search-index.json/    a static route handler — the palette's index, ~234 kB
 └── globals.css           the whole design system, no framework
 domains/                  one directory per feature, one barrel each — see domains/README.md
 ├── ui/                   the base leaf: Link, Entry, Ledger, PageHead, the icon spec
@@ -166,7 +171,7 @@ show a size the stylesheet does not have.
 
 ### The search index
 
-The palette searches section headings, which is 150 kB of index — far too much to inline into
+The palette searches section headings, which is 234 kB of index — far too much to inline into
 each of 159 pages. `app/search-index.json/route.ts` is a `force-static` route handler, the only
 way to emit a plain JSON file under `output: 'export'`; the palette fetches it on first open and
 the browser caches it from there. Adding a document to the library regenerates it; nothing needs

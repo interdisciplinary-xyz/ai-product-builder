@@ -57,6 +57,38 @@ export function ReviewConsole({
    * rather than stranded. Computed here, from the live store — a server-side
    * answer would be stale after the session's very first verdict.
    */
+  /**
+   * How far through the document you are, drawn along the top edge of the
+   * console.
+   *
+   * The contents rail carries this on the document page, but only 79 of the
+   * 138 files here can have one: MANAGER files mark their sections with bare
+   * uppercase lines rather than `##`, so they parse to no headings at all.
+   * This works for every document because it asks the scroll position, not the
+   * markup. Same rAF-throttled shape as DocToc — reading scroll height on
+   * every tick of a 14,000px page is the thrash that shows up as jank.
+   */
+  const [read, setRead] = useState(0);
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setRead(max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 1);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [item.key]);
+
   const onward = useCallback(
     (justDecided: ReviewKey) => {
       const from = queueKeys.indexOf(justDecided);
@@ -71,11 +103,11 @@ export function ReviewConsole({
   const cast = useCallback(
     (verdict: Verdict) => {
       if (!writable) return;
-      if (note.trim() !== (record?.note ?? '')) annotate(item.key, note);
-      decide(item.key, verdict);
+      // One call, so a reason typed before the verdict lands with it.
+      decide(item.key, verdict, note);
       onward(item.key);
     },
-    [writable, note, record?.note, annotate, decide, item.key, onward],
+    [writable, note, decide, item.key, onward],
   );
 
   useEffect(() => {
@@ -107,6 +139,10 @@ export function ReviewConsole({
 
   return (
     <aside className="revconsole" aria-label="Review this document">
+      <span className="revconsole__read" aria-hidden="true">
+        <span style={{ transform: `scaleX(${read})` }} />
+      </span>
+
       <div className="revconsole__row">
         <span className="revconsole__where mono">
           {position} / {total}
@@ -161,22 +197,26 @@ export function ReviewConsole({
         </nav>
       </div>
 
+      {/* Always present, and enabled before a verdict exists: the reason is
+          usually what you work out while reading, and the verdict follows from
+          it. `cast` carries whatever is in here into the same write.
+
+          Deliberately not autofocused — the keydown handler ignores k/r/c
+          while a field has focus, so a focused note would disable the very
+          shortcuts this console is built around. */}
       <textarea
         className="revconsole__note"
         rows={1}
         maxLength={MAX_NOTE}
         value={note}
-        disabled={!writable || !record}
+        disabled={!writable}
         aria-label="Why — the reason for this verdict"
-        placeholder={
-          record
-            ? 'Why — merge into RELEASE_MANAGER; the SEV table is the only unique part.'
-            : 'Record a verdict, then say why.'
-        }
+        placeholder="Why — merge into RELEASE_MANAGER; the SEV table is the only unique part."
         onChange={(e) => setNote(e.target.value)}
         // Saved on blur rather than per keystroke: a PUT per character would
-        // rewrite the committed file dozens of times a sentence.
-        onBlur={() => annotate(item.key, note)}
+        // rewrite the committed file dozens of times a sentence. Only once the
+        // document has a verdict to hang it on; otherwise `cast` carries it.
+        onBlur={() => (record ? annotate(item.key, note) : undefined)}
       />
 
       {!writable ? (

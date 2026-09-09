@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Link } from '@/domains/ui';
 import { LAYER_BY_ID, Markdown, CodeBlock, LayerIcon, layerStyle, type LayerId } from '@/domains/content';
 import { findDoc, linkMap } from '@/domains/content/server';
+import { DocToc } from '@/domains/navigation';
 import { ReviewConsole } from '@/domains/review';
 import { reviewQueue } from '@/domains/review/server';
 
@@ -45,6 +46,7 @@ export default async function ReviewDocPage({
   const layer = doc ? LAYER_BY_ID.get(doc.layer as LayerId) : undefined;
   if (!doc || !layer) notFound();
 
+  const toc = doc.headings.filter((h) => h.depth === 2);
   const queue = reviewQueue();
   const at = queue.findIndex((item) => item.key === `${doc.layer}/${doc.slug}`);
   if (at < 0) notFound();
@@ -62,40 +64,42 @@ export default async function ReviewDocPage({
         <span aria-current="page">{doc.slug}</span>
       </nav>
 
-      <header className="doc__head rise">
+      {/* Compact on purpose. The document page can afford a full masthead of
+          metadata; this one is read 138 times in a row, and every row of chrome
+          is a row of the document you cannot see. Source and length stay —
+          length is part of the judgment — and the rest goes. */}
+      <header className="doc__head doc__head--review rise">
         <h1 className="doc__title mono">{doc.name}</h1>
         {doc.description ?? doc.heading ? (
           <p className="doc__desc">{doc.description ?? doc.heading}</p>
         ) : null}
-        <dl className="doc__meta mono">
-          <div>
-            <dt>Source</dt>
-            <dd>{doc.repoPath}</dd>
-          </div>
-          <div>
-            <dt>You</dt>
-            <dd>{layer.verb} it</dd>
-          </div>
-          <div>
-            <dt>Length</dt>
-            <dd>
-              {doc.words.toLocaleString('en-US')} words · {(doc.bytes / 1024).toFixed(1)} kB
-            </dd>
-          </div>
-        </dl>
+        <p className="doc__meta--review mono">
+          <span>{doc.repoPath}</span>
+          <span>{layer.verb} it</span>
+          <span>
+            {doc.words.toLocaleString('en-US')} words · {(doc.bytes / 1024).toFixed(1)} kB
+          </span>
+        </p>
       </header>
 
-      {/* The document itself, so the judgment is made against the text rather
-          than against a description of it. Same renderer as the document page;
-          the rail, the token index and the relations panel are left off — they
-          are for navigating the library, and this page is for leaving it. */}
-      <article className="doc__body doc__body--review">
-        {doc.language ? (
-          <CodeBlock code={doc.body} language={doc.language} />
-        ) : (
-          <Markdown content={doc.body} links={linkMap()} self={`/${doc.layer}/${doc.slug}/`} />
-        )}
-      </article>
+      <div className="doc__body doc__body--review">
+        {/* The document itself, so the judgment is made against the text rather
+            than against a description of it. Same renderer as the document
+            page; the sibling rail and the relations panel are left off — they
+            are for navigating the library, and this page is for leaving it. */}
+        <article>
+          {doc.language ? (
+            <CodeBlock code={doc.body} language={doc.language} />
+          ) : (
+            <Markdown content={doc.body} links={linkMap()} self={`/${doc.layer}/${doc.slug}/`} />
+          )}
+        </article>
+
+        {/* The contents rail earns its place here more than anywhere: it is the
+            only map of a 2,500-word manager, and it carries the reading
+            progress that says how much of the judgment is still ahead. */}
+        {toc.length > 2 ? <DocToc headings={toc.map(({ id, text }) => ({ id, text }))} /> : null}
+      </div>
 
       <ReviewConsole
         item={item}

@@ -132,19 +132,28 @@ async function persist(next: ReviewState) {
   notify();
 }
 
-/** Record or change a verdict, preserving any note already written. */
-export function decide(key: ReviewKey, verdict: Verdict): void {
+/**
+ * Record or change a verdict, with the reason written in the same call.
+ *
+ * `note` is passed in rather than merged from the store afterwards, and that
+ * is the fix for a bug worth naming: the console used to call `annotate` and
+ * then `decide`, and `annotate` bails when the document has no record yet — so
+ * a reason typed BEFORE pressing Keep was dropped on the floor, which is
+ * exactly the order a person does it in.
+ */
+export function decide(key: ReviewKey, verdict: Verdict, note?: string): void {
   if (!KEY_SHAPE.test(key)) return;
   const existing = snapshot[key];
+  const text = (note ?? existing?.note ?? '').slice(0, MAX_NOTE).trim();
   void persist(
     Object.freeze({
       ...snapshot,
-      [key]: { ...(existing?.note ? { note: existing.note } : {}), verdict, at: new Date().toISOString() },
+      [key]: { ...(text ? { note: text } : {}), verdict, at: new Date().toISOString() },
     }),
   );
 }
 
-/** Attach a reason. A note without a verdict is not a decision, so it is ignored. */
+/** Edit the reason on a document that already has a verdict. */
 export function annotate(key: ReviewKey, note: string): void {
   const existing = snapshot[key];
   if (!existing) return;

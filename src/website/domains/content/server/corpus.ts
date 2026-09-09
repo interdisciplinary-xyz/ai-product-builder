@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import GithubSlugger from 'github-slugger';
-import { LAYERS } from '../constants';
+import { LAYERS, SECTION_LABEL } from '../constants';
 import { slugify } from '../taxonomy';
 import type { Doc, LayerId, SearchEntry } from '../types';
 
@@ -98,12 +98,18 @@ function frontmatterValue(frontmatter: string | null, key: string): string | nul
  * is fed through in document order so the duplicate counter stays in step,
  * then the list is narrowed to the levels the contents shows.
  */
-function extractHeadings(body: string) {
+function extractHeadings(body: string, markdown: boolean) {
   const headings: { depth: number; text: string; id: string }[] = [];
   const slugger = new GithubSlugger();
   let fenced = false;
   let commented = false;
-  for (const line of body.split('\n')) {
+  const lines = body.split('\n');
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i];
+    // Read off the array rather than tracked in a variable: the loop `continue`s
+    // in four places, and every one of them would have to remember to update it.
+    const previous = lines[i - 1] ?? '';
+    const next = lines[i + 1] ?? '';
     if (/^\s*(```|~~~)/.test(line)) fenced = !fenced;
     if (fenced) continue;
     // Sections are commented out in place ("uncomment if this is a payments
@@ -114,12 +120,37 @@ function extractHeadings(body: string) {
       continue;
     }
     if (commented) continue;
+    // A MANAGER's sections are bare uppercase lines, not `##`. The renderer
+    // promotes those to depth-2 headings (remarkSectionLabels), so the contents
+    // has to see them too — the rule is mirrored here rather than shared,
+    // because that plugin works on an mdast tree and this walks lines, and the
+    // two must agree or the rail links to anchors that were never emitted.
+    //
+    // "Standalone paragraph" is a blank line either side, which is what makes
+    // it its own paragraph for remark. Markdown only: a `.py` script renders
+    // as a code block, and its comment banners are not sections.
+    if (markdown && SECTION_LABEL.test(line.trim()) && !previous.trim() && !next.trim()) {
+      const text = line.trim();
+      headings.push({ depth: 2, text, id: slugger.slug(text) });
+      continue;
+    }
+
     const match = line.match(/^(#{1,6})\s+(.+?)\s*#*$/);
     if (!match) continue;
-    // Strip only what the renderer consumes: emphasis asterisks and code
-    // backticks. NOT underscores — «TARGET_PRICE_POINT» is an identifier here,
-    // and removing them produced ids no heading ever had.
-    const text = match[2].replace(/[*`]/g, '').trim();
+    // Strip what the renderer consumes and nothing else.
+    //
+    // A link renders as its text, so the URL must go: `## 2. Branch names —
+    // see [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §1` slugged with the
+    // target still in it, and the contents rail pointed at an anchor no
+    // heading ever carried. One dead link, and the only one in the library.
+    //
+    // Emphasis asterisks and code backticks go the same way. NOT underscores —
+    // «TARGET_PRICE_POINT» is an identifier here, and removing them produced
+    // ids no heading ever had.
+    const text = match[2]
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+      .replace(/[*`]/g, '')
+      .trim();
     headings.push({ depth: match[1].length, text, id: slugger.slug(text) });
   }
   return headings;
@@ -201,7 +232,7 @@ export function allDocs(): Doc[] {
         heading,
         body: content,
         language: languageFor(file),
-        headings: extractHeadings(content),
+        headings: extractHeadings(content, languageFor(file) === null),
         words: content.split(/\s+/).filter(Boolean).length,
         bytes: Buffer.byteLength(raw),
       });

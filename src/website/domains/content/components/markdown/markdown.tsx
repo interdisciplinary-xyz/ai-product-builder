@@ -6,6 +6,7 @@ import rehypeSlug from 'rehype-slug';
 import { Link } from '@/domains/ui';
 import {
   remarkTokens,
+  remarkSectionLabels,
   textOf,
   decodeHref,
   resolveHref,
@@ -26,7 +27,7 @@ export function Markdown({
   return (
     <div className="prose">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkTokens]}
+        remarkPlugins={[remarkGfm, remarkSectionLabels, remarkTokens]}
         rehypePlugins={[rehypeRaw, [rehypeSanitize, SANITIZE_SCHEMA], rehypeSlug]}
         components={{
           a({ href, children, ...props }) {
