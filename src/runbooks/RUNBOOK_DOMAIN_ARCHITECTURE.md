@@ -12,7 +12,7 @@
 >
 > **Reusability:** template-ready — the barrel convention, the AST-audit shape, the `ui` base-leaf idea, the `/server` sub-entrypoint, and the ratchet mechanism are portable verbatim; only the specific domain names and paths differ per repo.
 >
-> **Pairs with:** `MANAGER_ARCHITECTURE.md` (the policy this runbook implements), `RUNBOOK_RELEASE_MANAGER.md` §domain-scoped E2E (which only works if this DAG is real), `commands/audit-structure.md` (invokes the audit script). Boundary: this runbook owns the **mechanism** (files, scripts, rules); the ARCHITECTURE MANAGER owns the **policy** (which domains exist, who owns what).
+> **Pairs with:** `MANAGER_ARCHITECTURE.md` (the policy this runbook implements), `RUNBOOK_RELEASE_MANAGER.md` §domain-scoped E2E (which only works if this DAG is real), `commands/audit-structure.md` (invokes the audit script), `RUNBOOK_NAMING_CONVENTIONS.md` §8 (the same kebab-case rule, as a cheatsheet row). Boundary: this runbook owns the **mechanism** (files, scripts, rules) and is where the casing rule is enforced; the ARCHITECTURE MANAGER owns the **policy** (which domains exist, who owns what); NAMING_CONVENTIONS indexes the shape and defers here.
 >
 > **Local definitions to provide per repo:**
 > - `«DOMAIN_PATHS»` — inherited from core tokens (e.g. `src/domains/<d>/**`)
@@ -133,7 +133,7 @@ button/
 
 Rules:
 
-- **Every directory is kebab-case.** `button/`, `layer-icon/`, `command-palette/`. One casing rule for the whole tree — routes, domains and component folders alike — because a tree with two rules is a tree you have to guess at. Exported identifiers stay PascalCase (`export function Button`): that is a JavaScript convention, not a filesystem one.
+- **Every directory is kebab-case** — and so is every file. `button/`, `layer-icon/`, `command-palette/`. One casing rule for the whole tree — routes, domains and component folders alike — because a tree with two rules is a tree you have to guess at, and the wrong guess resolves on macOS and 404s on Linux. Exported identifiers stay PascalCase (`export function Button`): that is a JavaScript convention, not a filesystem one. Same rule, stated as a cheatsheet row, in `RUNBOOK_NAMING_CONVENTIONS.md` §8.
 - **Filename == directory name.** `button/button.tsx`, not `button/index.tsx` (the latter breaks stack traces — every frame reads `index.tsx` and you cannot tell the components apart).
 - **`index.ts` is a barrel, not code.** No component logic. Just re-exports.
 - **Constants live in `.constants.ts`.** If they're used outside the component, they're not "constants for this component" — hoist to the domain constants file.

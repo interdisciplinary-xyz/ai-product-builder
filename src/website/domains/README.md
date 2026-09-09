@@ -99,7 +99,11 @@ client-safe barrel must **not** re-export, for the reason above.
 7. The re-export chain: `components/index.ts` exists, carries every folder beside
    it, and the domain barrel re-exports `./components` rather than reaching past it.
 8. A domain directory with no row in `ALLOWED` — its edges would go unaudited.
-9. Cycles, by DFS over `ALLOWED`. `ACCEPTED_CYCLES` is empty and should stay so.
+9. Every **file** name under a domain, kebab in every segment (`layer-icon.constants.ts`).
+   Folders were checked from the start and a component's main file had to match its folder, so
+   it was kebab by construction — but `dataModel.ts` beside it passed. The docs said every file;
+   this is what makes that true.
+10. Cycles, by DFS over `ALLOWED`. `ACCEPTED_CYCLES` is empty and should stay so.
 
 `--strict` exits non-zero on any violation, and `ci:quality` runs it that way.
 
@@ -115,16 +119,17 @@ entry/
 ```
 
 **Every directory in this tree is kebab-case, and the file matches its folder.**
-The runbook's §4 writes the folder as `Button/Button.tsx`; this repo writes
-`button/button.tsx` instead, because the routes under `app/` were already
-kebab (`design-system/`, `search-index.json/`) and one tree with two casing
-rules is a tree you have to guess at. The rule the runbook actually cares about
-— filename equals directory name, so a stack trace names the component rather
-than a wall of `index.tsx` — is unchanged. Exported identifiers stay
-PascalCase: that is a JavaScript convention, not a filesystem one.
+That is the library's rule, not a local one: `RUNBOOK_DOMAIN_ARCHITECTURE` §4
+states it and `RUNBOOK_NAMING_CONVENTIONS` §8 carries it in the cheatsheet.
+This app is where it was first enforced — the routes under `app/` were already
+kebab (`design-system/`, `search-index.json/`), and one tree with two casing
+rules is a tree you have to guess at before every import. The second half,
+filename equals directory name, is what makes a stack trace name the component
+rather than a wall of `index.tsx`. Exported identifiers stay PascalCase: that
+is a JavaScript convention, not a filesystem one.
 
-The audit enforces both halves: a folder that is not kebab-case is a violation,
-and so is a folder whose main file does not match its name.
+The audit enforces all of it: a folder that is not kebab-case is a violation, so is a
+file that is not, and so is a folder whose main file does not match its name.
 
 `name.spec.tsx` is the fourth file in the runbook's convention and there are
 none here yet: this app has no test runner. The audit reports spec coverage on

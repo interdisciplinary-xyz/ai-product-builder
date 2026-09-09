@@ -280,14 +280,46 @@ function auditBarrels() {
 const shape = { folders: 0, withConstants: 0, withSpec: 0 };
 
 /**
- * Every directory in the tree is kebab-case, and a component's file matches its
- * folder. The runbook's §4 writes that pair as `Button/Button.tsx`; here it is
- * `button/button.tsx`, because `app/` was already kebab (`design-system/`,
- * `search-index.json/`) and one tree with two casing rules is a tree you have
- * to guess at. Exported identifiers are still PascalCase — that is a JavaScript
+ * Every directory AND every file in the tree is kebab-case, and a component's
+ * file matches its folder — RUNBOOK_DOMAIN_ARCHITECTURE §4, indexed as a
+ * cheatsheet row in RUNBOOK_NAMING_CONVENTIONS §8.
+ *
+ * One casing rule for the whole tree, because the wrong guess resolves on macOS
+ * and 404s on Linux — a class of bug that only ever surfaces in CI, after
+ * review. Exported identifiers are still PascalCase: that is a JavaScript
  * convention, not a filesystem one.
+ *
+ * Files were checked only indirectly until now — a component's main file had to
+ * match its folder, so it was kebab by construction, but `dataModel.ts` beside
+ * it passed. The docs claimed every file; this makes that true.
  */
 const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/** `layer-icon.constants.ts`, `layer-icon.spec.tsx` — kebab in every segment. */
+const KEBAB_FILE = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.[a-z0-9]+(?:-[a-z0-9]+)*)*\.[a-z]+$/;
+
+/** Every file under a domain, so the casing rule can cover all of them. */
+function* filesUnder(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) yield* filesUnder(full);
+    else yield { dir, name: entry.name, full };
+  }
+}
+
+function auditFileNames() {
+  for (const domain of Object.keys(ALLOWED)) {
+    const domainDir = path.join(DOMAINS_DIR, domain);
+    if (!fs.existsSync(domainDir)) continue;
+    for (const file of filesUnder(domainDir)) {
+      if (!KEBAB_FILE.test(file.name)) {
+        violations.push(
+          `${rel(file.full)}: file names are kebab-case (§4) — ${file.name}`,
+        );
+      }
+    }
+  }
+}
 
 function auditComponentShape() {
   for (const domain of Object.keys(ALLOWED)) {
@@ -348,6 +380,7 @@ function auditCycles() {
 auditImports();
 auditBarrels();
 auditComponentShape();
+auditFileNames();
 auditCycles();
 
 const strict = process.argv.includes('--strict');
