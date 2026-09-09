@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Link } from '@/domains/ui';
 import { useReview } from '../../use-review';
@@ -42,12 +42,26 @@ export function ReviewConsole({
   const record = recordFor(item.key);
   const [note, setNote] = useState(record?.note ?? '');
 
-  // The console stays mounted across a client-side route change, so the note
-  // has to follow the key rather than only the first record it saw. Without
-  // this the second document in a session shows the first one's reason.
-  const shownFor = useRef(item.key);
-  if (shownFor.current !== item.key) {
-    shownFor.current = item.key;
+  /**
+   * The console stays mounted across a client-side route change, so the note
+   * has to follow the key rather than only the first record it saw. Without
+   * this the second document in a session shows the first one's reason.
+   *
+   * This is React's "adjusting state when a prop changes": setting state during
+   * the render of the SAME component is supported, does not warn, and does not
+   * loop — React re-runs the component immediately and never commits the first
+   * pass. An effect would be worse here, because the previous document's reason
+   * would paint for a frame before being replaced.
+   *
+   * The previous key is held in STATE rather than a ref, which is the part that
+   * matters under concurrent rendering: a ref mutated during render survives a
+   * render that gets discarded and replayed, so it would already hold the new
+   * key on the replay, the reset would be skipped, and the stale note would
+   * stick — the exact bug this block exists to prevent.
+   */
+  const [shownFor, setShownFor] = useState(item.key);
+  if (shownFor !== item.key) {
+    setShownFor(item.key);
     setNote(record?.note ?? '');
   }
 
@@ -117,6 +131,10 @@ export function ReviewConsole({
       const el = event.target as HTMLElement | null;
       if (el && (el.isContentEditable || /^(input|textarea|select)$/i.test(el.tagName))) return;
       if (event.metaKey || event.ctrlKey || event.altKey) return;
+      // Auto-repeat, from a held key. Every verdict writes the file and jumps to
+      // the next document, so holding `k` would rattle through the queue at the
+      // keyboard's repeat rate, stamping a verdict on documents nobody read.
+      if (event.repeat) return;
 
       const verdict = VERDICTS.find((v) => v.key === event.key.toLowerCase());
       if (verdict) {

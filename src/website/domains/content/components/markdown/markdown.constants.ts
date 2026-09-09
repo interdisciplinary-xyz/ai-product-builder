@@ -130,6 +130,45 @@ export const SANITIZE_SCHEMA = {
   attributes: {
     ...defaultSchema.attributes,
     span: [...(defaultSchema.attributes?.span ?? []), ['className', 'token'], 'title'],
+    // `remarkLinkedCode` marks a code span that is already inside a link, and
+    // the sanitizer runs between that plugin and the renderer — an attribute
+    // it does not know about is dropped without a word, which is exactly how
+    // the first version of this failed silently.
+    code: [...(defaultSchema.attributes?.code ?? []), 'dataInLink'],
     '*': [...(defaultSchema.attributes?.['*'] ?? []), 'id'],
   },
 };
+
+/**
+ * Marks every code span that already sits inside a link.
+ *
+ * The `code` renderer turns a code span naming a library file into a link,
+ * which is right for "Pairs with: `RELEASE_MANAGER.md`" and wrong the moment
+ * the document already wrote it as one: ``[`RELEASE_MANAGER.md`](./FILE.md)``
+ * produced `<a><a>`. Nested anchors are invalid HTML and React reports them as
+ * a hydration error — 635 of them across the built site.
+ *
+ * Done on the mdast tree rather than with a React context, because `Markdown`
+ * renders inside server components and `createContext` is client-only. The
+ * ancestor relationship is a fact about the tree anyway, so this is the more
+ * honest place to read it.
+ */
+export function remarkLinkedCode() {
+  return (tree: Root) => {
+    const mark = (node: RootContent) => {
+      if (node.type === 'inlineCode') {
+        const data = (node.data ??= {});
+        data.hProperties = { ...(data.hProperties ?? {}), 'data-in-link': '' };
+      }
+      if ('children' in node && node.children) (node.children as RootContent[]).forEach(mark);
+    };
+    const walk = (node: Root | RootContent) => {
+      if (!('children' in node) || !node.children) return;
+      for (const child of node.children as RootContent[]) {
+        if (child.type === 'link' || child.type === 'linkReference') child.children.forEach(mark);
+        else walk(child);
+      }
+    };
+    walk(tree);
+  };
+}

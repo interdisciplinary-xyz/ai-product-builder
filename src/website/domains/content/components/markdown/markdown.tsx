@@ -7,6 +7,7 @@ import { Link } from '@/domains/ui';
 import {
   remarkTokens,
   remarkSectionLabels,
+  remarkLinkedCode,
   textOf,
   decodeHref,
   resolveHref,
@@ -27,10 +28,10 @@ export function Markdown({
   return (
     <div className="prose">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkSectionLabels, remarkTokens]}
+        remarkPlugins={[remarkGfm, remarkSectionLabels, remarkLinkedCode, remarkTokens]}
         rehypePlugins={[rehypeRaw, [rehypeSanitize, SANITIZE_SCHEMA], rehypeSlug]}
         components={{
-          a({ href, children, ...props }) {
+          a({ href, children, node: _node, ...props }) {
             if (!href) return <span {...props}>{children}</span>;
             if (/^https?:/.test(href)) {
               return (
@@ -70,10 +71,19 @@ export function Markdown({
           // 25 managers do). Rendered literally that is an inert pill, which
           // hides the single most central relationship in the library. So a
           // code span that names a file we have becomes a link to it.
-          code({ children, className, ...props }) {
+          code({ children, className, node: _node, ...props }) {
+            // Set by remarkLinkedCode on any code span already inside a link.
+            // Read off the spread rather than destructured, because the JSX
+            // prop types do not carry arbitrary data-* attributes — then
+            // removed, because it is a marker for this branch and not
+            // something the reader's DOM should carry 1,374 times.
+            const insideLink = 'data-in-link' in props;
+            delete (props as Record<string, unknown>)['data-in-link'];
             const text = String(children);
             const isBlock = text.includes('\n') || /^language-/.test(className ?? '');
-            if (!isBlock) {
+            // Already inside an anchor: linking again would nest one <a> in
+            // another, which is invalid HTML and a hydration error on the page.
+            if (!isBlock && !insideLink) {
               const route = links[text.trim().toLowerCase()];
               if (route && route !== self) {
                 return (
@@ -108,14 +118,14 @@ export function Markdown({
             }
             return <blockquote {...props}>{children}</blockquote>;
           },
-          table({ children, ...props }) {
+          table({ children, node: _node, ...props }) {
             return (
               <div className="table-wrap">
                 <table {...props}>{children}</table>
               </div>
             );
           },
-          h2({ children, id, ...props }) {
+          h2({ children, id, node: _node, ...props }) {
             return (
               <h2 id={id} {...props}>
                 {children}
@@ -127,7 +137,7 @@ export function Markdown({
               </h2>
             );
           },
-          h3({ children, id, ...props }) {
+          h3({ children, id, node: _node, ...props }) {
             return (
               <h3 id={id} {...props}>
                 {children}
