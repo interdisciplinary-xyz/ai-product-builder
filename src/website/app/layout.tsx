@@ -95,6 +95,9 @@ function defaultJumps(): Jump[] {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const version = libraryVersion();
   const total = allDocs().filter((d) => d.layer !== 'guides').length;
+  // Everything a star can go on: every document, plus every scenario on the
+  // front page. The masthead count is read against this.
+  const markable = total + TOPICS.length;
   // Read once, above every page, so a star anywhere starts from the file.
   const favorites = readFavorites().favorites;
 
@@ -116,7 +119,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/" className="wordmark">
               ai<span>·</span>product<span>·</span>builder
             </Link>
-            <SiteNav />
+            <SiteNav markable={markable} />
           </div>
         </header>
 
