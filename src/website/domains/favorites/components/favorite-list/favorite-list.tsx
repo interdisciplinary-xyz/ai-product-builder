@@ -1,6 +1,7 @@
 'use client';
 
-import { Link, accentStyle } from '@/domains/ui';
+import { useId, useState } from 'react';
+import { Icon, Link, accentStyle } from '@/domains/ui';
 import { FavoriteButton } from '../favorite-button';
 import { useFavorites } from '../../use-favorites';
 import type { FavoriteGroup } from '../../types';
@@ -17,6 +18,10 @@ import type { FavoriteGroup } from '../../types';
  */
 export function FavoriteList({ groups }: { groups: FavoriteGroup[] }) {
   const { keys, count, clear, writable, error } = useFavorites();
+  // Which scenarios are open. Nothing is open on arrival: the list is a list of
+  // what you marked, and expanding one by default would bury the rest.
+  const [open, setOpen] = useState<readonly string[]>([]);
+  const listId = useId();
 
   const shown = groups
     .map((group) => ({ ...group, rows: group.rows.filter((row) => keys.includes(row.key)) }))
@@ -68,26 +73,81 @@ export function FavoriteList({ groups }: { groups: FavoriteGroup[] }) {
             <span className="mono">{group.rows.length}</span>
           </h2>
           <ul className="favlist">
-            {group.rows.map((row) => (
-              <li
-                key={row.key}
-                data-layer={row.tone}
-                data-topic={row.tone}
-                style={accentStyle(row.accent)}
-              >
-                <Link href={row.href} className="favlist__doc">
-                  {row.icon ? <span className="favlist__icon">{row.icon}</span> : null}
-                  <span className="favlist__main">
-                    <span className="favlist__name mono">{row.name}</span>
-                    {row.description ? (
-                      <span className="favlist__desc">{row.description}</span>
+            {group.rows.map((row) => {
+              const expanded = open.includes(row.key);
+              const kids = row.children ?? [];
+              return (
+                <li
+                  key={row.key}
+                  data-layer={row.tone}
+                  data-topic={row.tone}
+                  style={accentStyle(row.accent)}
+                >
+                  <div className="favlist__row">
+                    <Link href={row.href} className="favlist__doc">
+                      {row.icon ? <span className="favlist__icon">{row.icon}</span> : null}
+                      <span className="favlist__main">
+                        <span className="favlist__name mono">{row.name}</span>
+                        {row.description ? (
+                          <span className="favlist__desc">{row.description}</span>
+                        ) : null}
+                      </span>
+                    </Link>
+
+                    {/* The count is the disclosure. "17 files" was already the
+                        right affordance and already in the right place; making
+                        it a button costs the row no width. A document has no
+                        children and keeps the plain label. */}
+                    {kids.length ? (
+                      <button
+                        type="button"
+                        className="favlist__layer favlist__toggle mono"
+                        aria-expanded={expanded}
+                        aria-controls={`${listId}-${row.key}`}
+                        onClick={() =>
+                          setOpen((was) =>
+                            was.includes(row.key)
+                              ? was.filter((k) => k !== row.key)
+                              : [...was, row.key],
+                          )
+                        }
+                      >
+                        <Icon className="favlist__chevron">
+                          <path d="M9 5l7 7-7 7" />
+                        </Icon>
+                        {row.tag}
+                      </button>
+                    ) : row.tag ? (
+                      <span className="favlist__layer mono">{row.tag}</span>
                     ) : null}
-                  </span>
-                  {row.tag ? <span className="favlist__layer mono">{row.tag}</span> : null}
-                </Link>
-                <FavoriteButton item={row} label={false} />
-              </li>
-            ))}
+
+                    <FavoriteButton item={row} label={false} />
+                  </div>
+
+                  {kids.length ? (
+                    <ul
+                      className="favlist__kids"
+                      id={`${listId}-${row.key}`}
+                      hidden={!expanded}
+                    >
+                      {kids.map((kid) => (
+                        <li key={kid.key} data-layer={kid.tone} style={accentStyle(kid.accent)}>
+                          <Link href={kid.href} className="favlist__kid">
+                            {kid.icon ? (
+                              <span className="favlist__icon">{kid.icon}</span>
+                            ) : null}
+                            <span className="favlist__name mono">{kid.name}</span>
+                            {kid.tag ? (
+                              <span className="favlist__layer mono">{kid.tag}</span>
+                            ) : null}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </li>
+              );
+            })}
           </ul>
         </section>
       ))}

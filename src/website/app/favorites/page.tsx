@@ -3,7 +3,7 @@ import { PageHead } from '@/domains/ui';
 import { LAYER_BY_ID, LayerIcon, docHref } from '@/domains/content';
 import { allDocs } from '@/domains/content/server';
 import { TOPICS } from '@/domains/topics';
-import { topicCounts } from '@/domains/topics/server';
+import { docsForTopic, topicCounts } from '@/domains/topics/server';
 import { FavoriteList, favoriteKey, type FavoriteGroup } from '@/domains/favorites';
 
 export const metadata: Metadata = {
@@ -17,6 +17,18 @@ export default function FavoritesPage() {
   // it with the marked keys — four fields and an icon per row, because that is
   // what a row renders.
   const counts = topicCounts();
+  // A document row, in the one shape the list renders. Used for the top-level
+  // Documents group and for the files inside a scenario alike.
+  const rowFor = (doc: ReturnType<typeof allDocs>[number]) => ({
+    key: favoriteKey(doc.layer, doc.slug),
+    name: doc.name,
+    description: doc.description,
+    href: docHref(doc),
+    tag: LAYER_BY_ID.get(doc.layer)?.label ?? doc.layer,
+    tone: doc.layer,
+    accent: LAYER_BY_ID.get(doc.layer),
+    icon: <LayerIcon layer={doc.layer} />,
+  });
   const groups: FavoriteGroup[] = [
     {
       label: 'Scenarios',
@@ -28,22 +40,14 @@ export default function FavoritesPage() {
         tag: `${counts[topic.id]} files`,
         tone: topic.id,
         accent: topic,
+        children: docsForTopic(topic.id).map(rowFor),
       })),
     },
     {
       label: 'Documents',
       rows: allDocs()
         .filter((d) => d.layer !== 'guides')
-        .map((doc) => ({
-          key: favoriteKey(doc.layer, doc.slug),
-          name: doc.name,
-          description: doc.description,
-          href: docHref(doc),
-          tag: LAYER_BY_ID.get(doc.layer)?.label ?? doc.layer,
-          tone: doc.layer,
-          accent: LAYER_BY_ID.get(doc.layer),
-          icon: <LayerIcon layer={doc.layer} />,
-        })),
+        .map(rowFor),
     },
   ];
 

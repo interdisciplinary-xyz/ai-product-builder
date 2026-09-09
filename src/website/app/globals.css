@@ -2879,10 +2879,13 @@ main:focus {
   padding: 0;
 }
 .favlist > li {
+  border-bottom: 1px solid var(--rule);
+}
+/* The row was the <li> itself until a scenario had to open underneath it. */
+.favlist__row {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  border-bottom: 1px solid var(--rule);
 }
 /* The row is a link and the star is a button; a button cannot live inside an
    anchor, so they are siblings and the link takes the free space. */
@@ -2928,6 +2931,67 @@ main:focus {
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--ink-faint);
+}
+
+/* A scenario is a group of documents, so its file count opens it. */
+.favlist__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: 0;
+  padding: 0.25rem 0;
+  /* No font-family here: the button carries `mono`, which sets it. */
+  cursor: pointer;
+}
+.favlist__toggle:hover {
+  color: var(--layer, var(--accent));
+}
+.favlist__chevron {
+  width: 0.9em;
+  height: 0.9em;
+  transition: transform 140ms ease;
+}
+.favlist__toggle[aria-expanded='true'] {
+  color: var(--layer, var(--accent));
+}
+.favlist__toggle[aria-expanded='true'] .favlist__chevron {
+  transform: rotate(90deg);
+}
+
+.favlist__kids {
+  list-style: none;
+  margin: 0 0 0.7rem;
+  /* Indented to the width of the parent's icon plus its gap, so a child name
+     starts where the parent name does. */
+  padding: 0 0 0 2.4rem;
+  border-left: 1px solid var(--rule);
+  margin-left: 0.55rem;
+}
+.favlist__kid {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.4rem 0;
+  text-decoration: none;
+  color: inherit;
+}
+.favlist__kid .favlist__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--text-xs);
+}
+.favlist__kid:hover .favlist__name {
+  color: var(--layer, var(--accent));
+}
+.favlist__kid .favlist__icon {
+  font-size: var(--text-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .favlist__chevron {
+    transition: none;
+  }
 }
 .favlist__missing {
   font-size: var(--text-xs);
