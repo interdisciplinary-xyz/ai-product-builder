@@ -122,3 +122,15 @@ export const LAYERS: Layer[] = [
 ];
 
 export const LAYER_BY_ID = new Map(LAYERS.map((l) => [l.id, l]));
+
+/**
+ * A MANAGER marks its sections with a bare uppercase line — `INITIALIZATION`,
+ * `WCAG TARGET & SCOPE` — rather than with `##`.
+ *
+ * Two places act on this: `remarkSectionLabels` promotes such a paragraph to a
+ * depth-2 heading when rendering, and `extractHeadings` in the corpus counts it
+ * when building the contents and the search index. They must agree exactly or
+ * the contents rail links to anchors that were never emitted, so the pattern
+ * lives here and neither owns it.
+ */
+export const SECTION_LABEL = /^[A-Z][A-Z0-9 &/()\'-]{2,60}$/;

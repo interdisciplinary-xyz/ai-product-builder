@@ -31,6 +31,15 @@ export type FavoriteRow = FavoriteItem & {
    * working and did nothing.
    */
   accent?: Accent;
+  /**
+   * What this row contains, if it contains anything. A scenario is a group of
+   * documents, and "17 files" was a number you could not open — the list is
+   * the reason you marked the scenario in the first place.
+   *
+   * Rows, not documents: this domain still never learns what a document is.
+   * The page builds them, the same way it builds the top-level ones.
+   */
+  children?: FavoriteRow[];
 };
 
 /** One heading's worth of rows on /favorites. */

@@ -41,8 +41,13 @@ other than `../..`.
   all 129 files placed on exactly one. `/topics`, and the grouping inside any layer index past a
   dozen files.
 - **Search from anywhere.** <kbd>⌘K</kbd> (or `/`) opens a palette over documents, the library's
-  1,223 **section headings**, and its tokens. A section is the unit that actually answers a
+  1,607 **section headings**, and its tokens. A section is the unit that actually answers a
   question, and it was previously unreachable except by scrolling.
+- **MANAGER sections are headings.** A manager marks its sections with a bare uppercase line
+  rather than `##`, so all 25 of them parsed to zero headings — no contents rail, no reading
+  position, no section rows in the palette, on the longest documents in the library. The
+  renderer promotes those lines and the corpus counts them: 110 pages had a contents rail
+  before, 265 do now.
 - **The `«token»` index** at `/tokens`: one token, and every document that wants it, joined to
   its glossary meaning. It also states the uncomfortable number — how many tokens have no row in
   `PLACEHOLDERS.md`, and so cannot be prompted for by `/ai-init`.
@@ -67,9 +72,10 @@ app/                      the routes — the composition root, and nothing else
 ├── design-system/        the tokens, type and components, read out of globals.css
 ├── brand-voice/          how the site writes, with the copy that shipped
 ├── browse/               the filterable index
+├── review/               the triage pass — /review, then /review/<layer>/<slug>
 ├── [layer]/page.tsx      one layer's ledger, grouped by topic past a dozen files
 ├── [layer]/[slug]/       one document
-├── search-index.json/    a static route handler — the palette's index, ~195 kB
+├── search-index.json/    a static route handler — the palette's index, ~234 kB
 └── globals.css           the whole design system, no framework
 domains/                  one directory per feature, one barrel each — see domains/README.md
 ├── ui/                   the base leaf: Link, Entry, Ledger, PageHead, the icon spec
@@ -80,6 +86,10 @@ domains/                  one directory per feature, one barrel each — see dom
 ├── topics/               the topic axis, hand-written, one topic per document
 ├── tokens/               «token» extraction, joined to the PLACEHOLDERS.md glossary
 ├── search/               ⌘K over documents, sections and tokens, plus /browse
+├── favorites/            the star, and the list in data/favorites.json
+│   └── server/           the committed list; the barrel stays client-safe
+├── review/               the triage pass — verdicts in data/reviews.json
+│   └── server/           the verdict file, and the queue built from the corpus
 ├── navigation/           masthead, the sibling rail, the in-page contents
 └── design/               the dev bar, and globals.css parsed at build time
 scripts/tools/
@@ -126,6 +136,28 @@ and the browser copy is the one that gets lost. The consequence is that this is 
 per reader**, which is right while the site has one reader and is the thing to replace on the day
 it does not.
 
+### Review
+
+`/review` runs a triage pass over the library: one question per document — does
+this earn its place, **keep** / **rework** / **cut**, and why. `/review/<layer>/<slug>`
+renders the document with a verdict console pinned to the bottom of the page, so the
+call is made against the text rather than against a description of it. <kbd>k</kbd>,
+<kbd>r</kbd> and <kbd>c</kbd> record a verdict and jump to the next undecided file;
+<kbd>n</kbd> and <kbd>p</kbd> move without deciding.
+
+The route is a catch-all rather than `/review/<slug>` because slugs are not unique:
+`MANAGER_A11Y_AUDIT` and `RUNBOOK_A11Y_AUDIT` both slugify to `a11y-audit`, as do
+`decision-log` and `payments-compliance`. Six files, three collisions.
+
+Verdicts are written to `data/reviews.json` on the same terms as the favorites list —
+committed to the repository, PUT-only endpoint, gone from a static build. That
+matters more here: reading 138 documents is hours of judgment, and the verdicts are
+the cheap, losable part. In a file the pass diffs, survives a closed tab, and
+`git log data/reviews.json` says when each call was made.
+
+When the pass is done the filter on `/review` is the deliverable: **Cut** is the list
+of files to delete, **Rework** is the next milestone.
+
 ### Typography
 
 The site implements [`RUNBOOK_TYPOGRAPHY`](../runbooks/RUNBOOK_TYPOGRAPHY.md). Three sans faces —
@@ -139,7 +171,7 @@ show a size the stylesheet does not have.
 
 ### The search index
 
-The palette searches section headings, which is 150 kB of index — far too much to inline into
+The palette searches section headings, which is 234 kB of index — far too much to inline into
 each of 159 pages. `app/search-index.json/route.ts` is a `force-static` route handler, the only
 way to emit a plain JSON file under `output: 'export'`; the palette fetches it on first open and
 the browser caches it from there. Adding a document to the library regenerates it; nothing needs

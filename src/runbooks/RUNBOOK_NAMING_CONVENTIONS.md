@@ -1,8 +1,8 @@
-# NAMING_CONVENTIONS.md — branches, PR titles, commits, merges, tags
+# NAMING_CONVENTIONS.md — branches, PR titles, commits, merges, tags, files
 
 > **Canonical / source-of-truth copy** — vendored at `docs/ai-product-builder/RUNBOOK_NAMING_CONVENTIONS.md`. Fill the `«placeholders»` in place via `/ai-init`.
 >
-> **Scope:** the single reference for **every string that names something in the release flow** — branches, PR titles, commit messages, merge-commit titles, tags. Pulled together so a contributor doesn't have to reconcile three documents. The rules themselves originate in `RUNBOOK_RELEASE_MANAGER.md` §1 (branches + PR titles) and `RUNBOOK_PULL_REQUEST_TEMPLATE.md` (PR body); this runbook is the *cheatsheet* + the *commitlint config* that enforces them.
+> **Scope:** the single reference for **every string that names something** — branches, PR titles, commit messages, merge-commit titles, tags, and the files and directories in the source tree. Pulled together so a contributor doesn't have to reconcile three documents. The rules themselves originate in `RUNBOOK_RELEASE_MANAGER.md` §1 (branches + PR titles) and `RUNBOOK_PULL_REQUEST_TEMPLATE.md` (PR body); this runbook is the *cheatsheet* + the *commitlint config* that enforces them.
 
 > **🔧 Reuse & local setup**
 >
@@ -11,6 +11,8 @@
 > **Reusability:** template-ready — every shape and every regex is generic; only `«PROJECT»` needs swapping.
 >
 > **Pairs with:** `RUNBOOK_RELEASE_MANAGER.md` (the branch-flow policy this cheatsheet indexes) and `RUNBOOK_PULL_REQUEST_TEMPLATE.md` (the PR body). Boundary: RELEASE_MANAGER owns *why*; PR_TEMPLATE owns *what a PR body looks like*; this runbook owns *the exact string shapes* + *how commitlint enforces them*.
+>
+> **Owns / defers to:** Owns the *shapes* — the exact string every name takes, and the commitlint config that enforces the git ones. Defers: branch-flow policy and *why* the flow is shaped that way → `RUNBOOK_RELEASE_MANAGER.md` §1; PR body contents → `RUNBOOK_PULL_REQUEST_TEMPLATE.md`; enforcement of the file and directory rules, and the component-folder convention they belong to → `RUNBOOK_DOMAIN_ARCHITECTURE.md` §4 and §6.
 >
 > **Local definitions to provide per repo:**
 > - `«PROJECT»` — the repo's human short name used as the PR-title prefix (e.g. `empatalk`, `respect.click`, `savei`) — NOT the owner/repo path
@@ -38,8 +40,14 @@
 | **Tag** | `vX.Y.Z` | `v1.35.0` | `release.yml` (auto) |
 | **Release commit** (auto by `release-please` / `standard-version`) | `chore(release): X.Y.Z` | `chore(release): 1.35.0` | commitlint allows (excluded from PR-title rule via the commit-message rule) |
 | **`.claude/ai-init.local.json`** answer-file key for `PROJECT` | bare string, human short-name | `respect.click` | — |
+| **Directory** (any, in the source tree) | `kebab-case` | `layer-icon/`, `command-palette/` | `audit-structure` — see §8 |
+| **Source file** | `kebab-case`, == its directory name | `layer-icon/layer-icon.tsx` | `audit-structure` — see §8 |
+| **Barrel** | `index.ts` | `layer-icon/index.ts` | `audit-structure` — see §8 |
+| **Component constants** | `<name>.constants.ts` | `layer-icon/layer-icon.constants.ts` | `audit-structure` — see §8 |
+| **Component test** | `<name>.spec.tsx`, beside the component | `layer-icon/layer-icon.spec.tsx` | `audit-structure` — see §8 |
+| **Exported identifier** | `PascalCase` for components/types, `camelCase` otherwise | `export function LayerIcon` | code review |
 
-**One-glance rule of thumb.** If the string is what a *human* pastes into a form (PR title, branch name), it's `«PROJECT» - <branch-name>` or `<type>/<slug>`. If it's what a *tool* generates or reads (commit message, merge commit, tag), it's Conventional Commits or `vX.Y.Z`.
+**One-glance rule of thumb.** If the string is what a *human* pastes into a form (PR title, branch name), it's `«PROJECT» - <branch-name>` or `<type>/<slug>`. If it's what a *tool* generates or reads (commit message, merge commit, tag), it's Conventional Commits or `vX.Y.Z`. If it's a path, it's kebab-case — **the filesystem has one casing rule and no exceptions**.
 
 ---
 
@@ -305,7 +313,34 @@ Where `<release PR title>` is `«PROJECT» - release/vX.Y.Z`.
 
 ---
 
-## 8. Anti-patterns
+## 8. Files and directories
+
+**Every directory and every file in the source tree is kebab-case.** `layer-icon/`, not `LayerIcon/` or `layer_icon/`. Routes, domains, component folders, scripts, config — one rule, no exceptions, because a tree with two casing rules is a tree you have to guess at before every import.
+
+```txt
+domains/
+└─ content/
+   └─ components/
+      └─ layer-icon/
+         ├─ layer-icon.tsx            ← filename == directory name
+         ├─ layer-icon.constants.ts
+         ├─ layer-icon.spec.tsx
+         └─ index.ts                  ← the barrel; the one fixed name
+```
+
+Three rules, and the reason for each:
+
+- **kebab-case.** macOS and Windows are case-insensitive and Linux is not, so `LayerIcon/` resolves locally and 404s in CI — a class of bug that only ever appears after merge. Lowercase removes it. Underscores would do the same job; kebab wins because URLs, npm packages and most routers already use it, so the path and the route read the same.
+- **Filename equals directory name.** `layer-icon/layer-icon.tsx`, never `layer-icon/index.tsx` for the component itself. A stack trace of `index.tsx` frames names nothing; a trace of `layer-icon.tsx` names the file you need to open.
+- **`index.ts` is the one exception, and only ever a barrel.** It re-exports; it holds no logic. That is what lets a component move inside its domain without any consumer noticing.
+
+**Exported identifiers keep JavaScript's conventions** — `export function LayerIcon`, `const layerAccent`. Casing in the module system is not casing on disk, and conflating the two is what produces `LayerIcon/layer-icon.tsx`.
+
+**Enforcement is `RUNBOOK_DOMAIN_ARCHITECTURE.md` §4 and §6**, not this runbook: the audit there already walks every component folder to check the barrel and the four-file shape, and casing is one more assertion on a walk it is doing anyway. This section is the cheatsheet entry; that runbook is the rule and the gate. Where they appear to disagree, DOMAIN_ARCHITECTURE is correct and this document is stale.
+
+---
+
+## 9. Anti-patterns
 
 - **PR title starts with a Conventional Commit type** (`feat: ...` as a PR title). That's a commit-message shape, not a PR-title shape. Use `«PROJECT» - <branch-name>` and let the individual commits carry the `feat:`/`fix:` type.
 - **Branch name doesn't include `v`** (`scope/1.35.0` instead of `scope/v1.35.0`). Legacy repos may have both; new work is always `v`-prefixed. The CI guards key off `scope/` and `release/**` so the `v` isn't load-bearing for CI, but consistency matters for humans.
@@ -314,10 +349,11 @@ Where `<release PR title>` is `«PROJECT» - release/vX.Y.Z`.
 - **Merge-committing the scope → release** promotion. Pollutes the release branch with intra-cycle noise.
 - **A commitlint config without the promotion-squash carve-out.** The first `release/* → main` merge will fail on trunk, and the fix is invisible (looks like a "bad commit message" rather than a policy problem).
 - **Tagging manually.** Breaks the automation's invariants.
+- **A tree with two casing rules.** `LayerIcon/layer-icon.tsx`, or kebab routes beside PascalCase component folders. Every import becomes a guess, and the ones that guess wrong only fail on Linux — which means they fail in CI, after review. See §8.
 
 ---
 
-## 9. Verification checklist
+## 10. Verification checklist
 
 - [ ] `«COMMITLINT_CONFIG»` includes all four accepted shapes (§5).
 - [ ] `.husky/commit-msg` runs commitlint on every commit locally.
@@ -326,11 +362,12 @@ Where `<release PR title>` is `«PROJECT» - release/vX.Y.Z`.
 - [ ] Squash-merge is the default for scope-into-release PRs; merge-commit is the default for release-into-`«TRUNK»`.
 - [ ] Tag creation is automated (no `git tag -a` in any operator's habits).
 - [ ] Every open PR right now has a title matching `«PROJECT» - <branch-name>` (a periodic `gh pr list --json title` check catches drift).
+- [ ] Every directory and file in the source tree is kebab-case, and every component file matches its directory name — `audit-structure` fails the build otherwise (see §8).
 
-## 10. Related
+## 11. Related
 
 - Branch flow + CI cost policy: [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §1, §3
 - PR body template: [`PULL_REQUEST_TEMPLATE.md`](./PULL_REQUEST_TEMPLATE.md)
 - CI implementation: [`GITHUB_ACTIONS.md`](./GITHUB_ACTIONS.md)
-- The domain-boundary check that gates scope-into-release: `commands/audit-structure.md`, [`DOMAIN_ARCHITECTURE.md`](./DOMAIN_ARCHITECTURE.md)
+- The domain-boundary check that gates scope-into-release, and the enforcement behind §8: `commands/audit-structure.md`, [`DOMAIN_ARCHITECTURE.md`](./DOMAIN_ARCHITECTURE.md) §4, §6
 - Why the promotion-squash carve-out is load-bearing (rationale-as-comments): [[rationale-comments]] — `SKILL_RATIONALE_COMMENTS.md`

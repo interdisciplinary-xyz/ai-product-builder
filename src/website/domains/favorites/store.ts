@@ -39,11 +39,18 @@ function sanitise(keys: readonly string[]): readonly FavoriteKey[] {
 /**
  * Called during the render of the layout's hydrator, on the server and again on
  * the client, so both produce the same first snapshot and hydration matches.
- * Idempotent: once a click has changed the list, the file's version is stale
- * and must not overwrite it.
+ *
+ * `force` is only ever true on the server, and it has to be: this module is one
+ * instance for the life of the server process, so without it the first request
+ * decided what every later render would show. A star clicked in one tab, or a
+ * favorites.json edited on disk, was in the file and in the props and still
+ * rendered unstarred in a freshly loaded tab.
+ *
+ * On the client the guard stays. Once a click has changed the list, the file's
+ * copy is the stale one and must not overwrite it.
  */
-export function seed(keys: readonly string[]) {
-  if (seeded) return;
+export function seed(keys: readonly string[], force = false) {
+  if (seeded && !force) return;
   snapshot = sanitise(keys);
   seeded = true;
 }
