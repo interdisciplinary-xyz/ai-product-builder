@@ -14,7 +14,7 @@
 >
 > **Pairs with:** `RUNBOOK_DATA_MODEL_GUIDE.md` (data-model detail), `RUNBOOK_DECISION_LOG.md` (decision records), and `RUNBOOK_DOMAIN_ARCHITECTURE.md` (the mechanism — barrels, `/server` split, AST-audit script with the `ALLOWED` map, the ratchet, and the 4-file component convention). Boundary: this MANAGER owns *policy* (create/verify/audit); DOMAIN_ARCHITECTURE owns *mechanism*; DATA_MODEL_GUIDE owns *data-model content shape*.
 >
-> **Owns / defers to:** Owns the repository architecture map (stack, structure, boundaries, system flows). Defers: how code is written → `MANAGER_ENGINEERING_STANDARDS`; decision records → `MANAGER_DECISION_LOG`; deployment policy → `RUNBOOK_RELEASE_MANAGER`.
+> **Owns / defers to:** Owns the repository architecture map (stack, structure, boundaries, system flows) and the two structural invariants it declares REQUIRED — domain boundaries, and data ownership (a user reaches their own content and nothing else). Defers: how code is written → `MANAGER_ENGINEERING_STANDARDS`; decision records → `MANAGER_DECISION_LOG`; deployment policy → `RUNBOOK_RELEASE_MANAGER`; the access-control mechanism that makes data ownership true — permission matrix, access module, tenant isolation, IDOR negative tests → `RUNBOOK_SECURITY_MODEL`, audited by `MANAGER_SECURITY`.
 
 Please act as an Architecture Manager for this repository.
 
@@ -82,10 +82,13 @@ synchronisation. Avoid global state nothing global reads, duplicated state logic
 nobody can predict.
 
 **Auth.** Flow, authorization boundaries, session and token handling, protected routes, roles
-and permissions. This one drifts silently. Check it against the code, not the intent.
+and permissions. This one drifts silently. Check it against the code, not the intent, and
+against §DATA OWNERSHIP below — authentication that works says nothing about whether one
+user can read another's rows.
 
 **Database.** Architecture, ORM or query approach, schema philosophy and evolution,
-migrations, data ownership, indexing and performance assumptions.
+migrations, which module owns which table, indexing and performance assumptions. Confirm every
+user-owned table carries the owner column §DATA OWNERSHIP requires.
 
 **Environment and infrastructure.** Local setup, required runtimes and tools, environment
 variables, deployment environments, CI/CD structure, cloud services, staging versus
@@ -115,6 +118,46 @@ This is the **canonical** definition of how domains depend on each other. **REQU
 This is what makes domain-scoped testing (`RELEASE_MANAGER.md` §4.2) sound: if domains only touch each other through public barrels and never cycle, the set of domains affected by a change is computable from the diff, so scoping E2E to those domains cannot miss breakage.
 
 **Implementation** — the layout, the barrel + `/server` split, the AST-based audit script with the `ALLOWED` map + ratchet, the local ESLint rule, the 4-file component convention, and the reference implementations (`empatalk-app` 14 domains, `respect.click` 8 domains) are documented in [`DOMAIN_ARCHITECTURE.md`](./DOMAIN_ARCHITECTURE.md). Read it before writing the audit script — a text `grep` for `@/domains/x` false-flags comments and string literals.
+
+_________
+
+DATA OWNERSHIP (REQUIRED)
+
+**A user reaches their own content and nothing else.** Every read, write, list, export and
+search returns only what the authenticated principal owns or has been explicitly granted.
+Another user's row is not merely hidden from the UI — it is unreachable, and a request for it
+by id is refused.
+
+This is architecture rather than a security checklist item because the structure is what
+decides it. A rule applied route by route is a rule that holds until someone adds a route.
+
+**REQUIRED:**
+
+- **Ownership is in the data model.** Every user-owned record carries an owner id, set on
+  create and immutable after it. Ownership is keyed on that id, never on an email or a handle,
+  because those change hands and a re-registered address must not inherit a stranger's data.
+- **The check lives in the data-access layer, not in each route.** Every query is scoped by
+  the principal at the point the data is fetched. A route is free to forget; a repository that
+  cannot express an unscoped query has nothing to forget.
+- **Deny by default.** An unscoped read is a mistake that has to be written deliberately and
+  is visible in review — never the thing you get by leaving something out.
+- **Refuse without confirming.** A non-owner's request for an id they do not own answers the
+  same way as one for an id that does not exist. A 403 where a 404 belongs tells an attacker
+  which ids are real.
+- **Every surface, not just the API.** Server actions, background jobs, exports, webhooks,
+  cache keys, search indexes and the context assembled for an AI feature each carry the same
+  scoping. Cache keys and prompt context are where this is usually lost: a key missing the
+  owner id serves one user's data to the next, and a prompt built from an unscoped query
+  leaks it in prose rather than in JSON.
+- **Elevated access is explicit and audited.** Admin and support impersonation are named
+  paths with their own authorization and an audit record — never an ambient capability that
+  ordinary code can reach.
+
+**Mechanism, not policy** — the per-collection permission matrix, the shared access module
+(`«isAdminOrSelf»` and friends), tenant isolation, and the REQUIRED IDOR negative test on every
+owner-scoped route are owned by [`SECURITY_MODEL.md`](./SECURITY_MODEL.md); the audit that
+verifies them is `MANAGER_SECURITY`. This section states the invariant the architecture must
+make true. Where the two appear to disagree, SECURITY_MODEL is the source of truth for *how*.
 
 _________
 

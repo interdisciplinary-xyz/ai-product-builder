@@ -82,6 +82,10 @@ Filtering happens at query time in the `«READ_ENDPOINT»` endpoint. A `«viewer
 
 ### Ownership-Based Security (`«access module»`)
 
+This section is the *mechanism* for the invariant `MANAGER_ARCHITECTURE.md` §DATA OWNERSHIP
+declares REQUIRED: a user reaches their own content and nothing else. That document states
+what must be true of the architecture; this one states how it is enforced.
+
 All data-layer operations enforce ownership via token verification. A shared access module typically provides helpers like:
 
 | Helper                | Purpose                                                                                |
