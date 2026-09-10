@@ -84,7 +84,7 @@ together without paying for a browser.
 workflows, regression-prone flows, and anything unit and integration cannot be trusted to
 cover. Limited, valuable and stable. Never the default validation layer for every change.
 
-**REQUIRED — domain-scoped E2E at release.** Domain-scoped E2E is **required** at the `release/* → «TRUNK»` merge: run only the E2E of the domains whose files changed (union when several), and fall back to the **full** E2E suite when a `«SHARED_PATHS»` file or a cross-domain contract/shared fixture changes. This requires E2E specs to be **domain-mapped** — by path (`e2e/<domain>/**`) or tag (`@<domain>`). Mechanism: `RELEASE_MANAGER.md` §4.2. CI implementation: `github-actions-minutes-workflow.md`.
+**REQUIRED — domain-scoped E2E at release.** Domain-scoped E2E is **required** at the `release/* → «TRUNK»` merge: run only the E2E of the domains whose files changed (union when several), and fall back to the **full** E2E suite when a `«SHARED_PATHS»` file or a cross-domain contract/shared fixture changes. This requires E2E specs to be **domain-mapped** — by path (`«DOMAIN_PATHS»/<domain>/e2e/**`, colocated with the domain) or tag (`@<domain>`), with cross-cutting specs in `«DOMAIN_PATHS»/e2e/**` covered by the full-suite fallback. Placement and categories: `RUNBOOK_E2E.md` §Spec placement. Mechanism: `RELEASE_MANAGER.md` §4.2. CI implementation: `github-actions-minutes-workflow.md`.
 
 _________
 
@@ -148,7 +148,7 @@ business logic, missing regression coverage, auth and API gaps, fragile E2E flow
 over- and under-testing. Recommend the smallest set of high-impact tests.
 
 Please also **verify** (REQUIRED) that the repo:
-- (a) maps E2E specs to domains by path (`e2e/<domain>/**`) or tag (`@<domain>`);
+- (a) maps E2E specs to domains by path (`«DOMAIN_PATHS»/<domain>/e2e/**`) or tag (`@<domain>`), with cross-cutting specs bucketed separately;
 - (b) runs domain-scoped E2E at the `release/* → «TRUNK»` merge with full-suite fallback on `«SHARED_PATHS»` / cross-domain contract / shared-fixture changes;
 - (c) runs **domain-scoped unit/integration on `feat/*`/`fix/*` PRs** (affected/import-graph, the `unit-gate` check; full suite on `«SHARED_PATHS»` changes);
 - (d) runs **domain-scoped visual-regression + a11y at release** (same mechanism as E2E; `KNOWN_VIOLATIONS` shrinks, not grows);

@@ -30,7 +30,7 @@
 > - `«TEST_CMD»` + its **affected/changed-only** mode — unit/integration runner for scoped runs (e.g. `vitest related` / `vitest --changed`, `jest --changedSince`, `turbo ...[ref]`, `nx affected`); **REQUIRED on `feat/*`/`fix/*` PRs** (the `unit-gate` check) — §4.1.
 > - `«DOMAIN_PATHS»` — where domains live, for path-based scoping (e.g. `src/domains/<d>/**`) — §4.1.
 > - `«SHARED_PATHS»` — cross-cutting paths that force a **full** test run when changed (e.g. `src/lib`, `packages/shared`, design system, config, lockfile, CI) — §4.1, §4.2.
-> - E2E↔domain mapping — how specs map to domains: path (`e2e/<domain>/**`) or tag (`@<domain>`), plus the diff base (`origin/«TRUNK»`) — §4.2.
+> - E2E↔domain mapping — how specs map to domains: path (`«DOMAIN_PATHS»/<domain>/e2e/**`) or tag (`@<domain>`), plus the diff base (`origin/«TRUNK»`) — §4.2.
 > - CI workflow names + triggers — `ci.yml`, `release.yml`, the performance/Lighthouse workflow — §3.
 > - Per-repo open P1/P2 blockers (issue numbers + impact) or `gh issue list --label audit` — §7.
 > - Issue labels — `audit` + a `priority:` label — §7.
@@ -305,8 +305,12 @@ CHANGED_DOMAINS=$(git diff --name-only origin/«TRUNK»...HEAD \
 **2. Run only those domains' E2E** — pick the convention your specs use:
 
 ```bash
-# Path-organized specs (e2e/<domain>/** or src/domains/<domain>/e2e/**):
-«E2E_CMD» $(echo "$CHANGED_DOMAINS" | sed 's#^#e2e/#')      # e.g. playwright test e2e/auth e2e/headless
+# Path-organized specs, colocated with the domain (the preferred layout —
+# E2E.md §Spec placement). Build the path the specs actually live at; the
+# domain name alone is not a directory Playwright can find.
+«E2E_CMD» $(echo "$CHANGED_DOMAINS" | sed 's#^#src/domains/#; s#$#/e2e#')
+#   e.g. playwright test src/domains/auth/e2e src/domains/headless/e2e
+# A flat e2e/<domain>/** tree instead? Then: sed 's#^#e2e/#'
 
 # Tag-organized specs (each spec tagged @<domain>):
 GREP=$(echo "$CHANGED_DOMAINS" | paste -sd'|' -)            # auth|headless

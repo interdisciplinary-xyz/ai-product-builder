@@ -138,7 +138,7 @@ Merge into `main` only after:
 - blocker review;
 - QA verification.
 
-**REQUIRED** at the `release/* → «TRUNK»` merge: domain-scoped E2E — run only the changed domains' E2E (union when several), with **full**-suite fallback on `«SHARED_PATHS»` / cross-domain contract / shared-fixture changes; E2E specs must be domain-mapped by path (`e2e/<domain>/**`) or tag (`@<domain>`). Mechanism: `RELEASE_MANAGER.md` §4.2; CI implementation: `github-actions-minutes-workflow.md`.
+**REQUIRED** at the `release/* → «TRUNK»` merge: domain-scoped E2E — run only the changed domains' E2E (union when several), with **full**-suite fallback on `«SHARED_PATHS»` / cross-domain contract / shared-fixture changes; E2E specs must be domain-mapped by path (`«DOMAIN_PATHS»/<domain>/e2e/**`) or tag (`@<domain>`). Mechanism: `RELEASE_MANAGER.md` §4.2; CI implementation: `github-actions-minutes-workflow.md`.
 
 _________
 

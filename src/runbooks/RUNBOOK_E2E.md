@@ -17,7 +17,7 @@
 > - `«ENV_GATES»` — credentialed-setup gating helpers + the services they gate (e.g. «AUTH», «DB_CMS», «PAYMENTS»-test-mode, AI key, billing-test DB URI, cron secret, integration signing secret)
 > - `«TEST_HELPERS»` — mandatory per-flow helpers (e.g. a cookie-consent dismissal helper)
 > - `«OUT_OF_SCOPE»` — what's deliberately not asserted by the e2e runner (e.g. Playwright): visual regression specifics, email rendering, perf budgets
-> - E2E↔domain mapping — **REQUIRED**: how each spec maps to a domain, by path (`e2e/<domain>/**`) or tag (`@<domain>`), so the release merge can scope E2E to the changed domains (see "Domain-mapping" below)
+> - E2E↔domain mapping — **REQUIRED**: how each spec maps to a domain, by path (`«DOMAIN_PATHS»/<domain>/e2e/**`) or tag (`@<domain>`), so the release merge can scope E2E to the changed domains (see "Domain-mapping" below)
 > - `«DOMAIN_PATHS»` — where feature domains live, for deriving changed domains from the diff (e.g. `src/domains/<d>/**`)
 > - `«SHARED_PATHS»` — cross-cutting paths that force the **full** E2E suite when changed (e.g. `src/lib`, `packages/shared`, design system, config, lockfile, CI, cross-domain contracts/shared fixtures)
 
@@ -45,11 +45,15 @@ runner doesn't provide.
 E2E specs **MUST be domain-mapped** so the release merge can run only the
 changed domains' E2E instead of the whole suite. Map each spec to a domain by:
 
-- **path** — `e2e/<domain>/**` (or `«DOMAIN_PATHS»/<domain>/e2e/**`), **or**
+- **path** — `«DOMAIN_PATHS»/<domain>/e2e/**` (preferred; see "Spec placement"
+  below), **or**
 - **tag** — `@<domain>` on the `describe`/`test`.
 
 Pick **one** convention and apply it to every spec; the Spec inventory's CP
-column should make each spec's domain unambiguous.
+column should make each spec's domain unambiguous. Prefer path: a colocated
+spec is already inside `«DOMAIN_PATHS»`, so the changed-domain set falls out of
+the diff with no extra map to maintain, and a tag can be forgotten on a new
+`describe` without anything noticing.
 
 **Required at the `release/* → «TRUNK»` merge:** run only the E2E of the
 domains whose files changed (union when several), and **fall back to the full
@@ -60,10 +64,77 @@ fixture changes. Mechanism (diff → changed domains → scoped run + fallback):
 here — cross-reference it.
 
 **Visual-regression + a11y specs are domain-mapped too (REQUIRED).** Screenshot/visual-
-regression and a11y (axe) specs MUST follow the **same** domain-mapping (path `e2e/<domain>/**`
-or tag `@<domain>`) as E2E, so the release merge can scope them to the changed domains with a
+regression and a11y (axe) specs MUST follow the **same** domain-mapping (path
+`«DOMAIN_PATHS»/<domain>/e2e/**` or tag `@<domain>`) as E2E — or sit in the cross-cutting
+bucket, which the full-suite fallback already covers — so the release merge can scope them to the changed domains with a
 full-suite fallback on `«SHARED_PATHS»` changes — same diff→changed-domains→scoped-run+fallback
 mechanism: [`RELEASE_MANAGER.md`](./RELEASE_MANAGER.md) §4.2.
+
+---
+
+## Spec placement (REQUIRED)
+
+Two buckets, and every spec is in exactly one.
+
+```txt
+«DOMAIN_PATHS»/
+├─ <domain>/e2e/**        ← journeys owned by one domain
+└─ e2e/**                 ← cross-cutting specs + shared e2e infrastructure
+```
+
+**Domain-owned** — the journey belongs to a single domain and moves with it.
+Colocated, so a domain is a directory you can delete: its specs go with it, and
+the changed-domain set for a scoped release run falls out of the diff.
+
+**Cross-cutting** — the spec asserts something about the app as a whole and
+belongs to no one domain. In the reference implementations this bucket holds:
+
+| Category | Asserts |
+| --- | --- |
+| Smoke | health, critical paths, navigation and layout, responsive |
+| Accessibility | axe over the pages that matter |
+| Security | headers, input validation, error responses, CSP violations |
+| SEO | metadata, sitemap, redirects, preconnect hints |
+| Legal / compliance | required pages, consent gating, claims the copy may not make |
+| Resilience | deploy-skew recovery, SSR concurrency, chunk URL encoding |
+| Visual regression | screenshot baselines |
+
+The same directory holds the **shared e2e infrastructure** — helpers, fixtures,
+`global-setup` / `global-teardown`, the CI start script and the seed. Those are
+not specs and must not be collected as ones.
+
+Reference: `empatalk-app` 54 specs (40 domain-owned across 9 domains, 14
+cross-cutting); `respect.click` 48 specs (28 domain-owned across 5 domains, 20
+cross-cutting).
+
+### Separate the runners (REQUIRED)
+
+The unit runner and the e2e runner must not collect each other's files. A
+Playwright spec picked up by Vitest fails in a way that reads like a broken
+test rather than a misconfigured glob. Separate by **one** of:
+
+- **Extension** — e2e specs are `*.e2e.ts`; the unit runner matches
+  `*.spec.{ts,tsx}`. (`respect.click`.)
+- **Directory** — e2e specs are `e2e/**/*.spec.ts`; the unit runner's files are
+  `*.test.ts` and live elsewhere. (`empatalk-app`.)
+
+Either works. What does not work is letting both runners default: `testDir` and
+`testMatch` must be narrow enough that the two sets cannot overlap.
+
+### Gate on the environment, not on `testIgnore`
+
+A spec that needs credentials or a seeded database is gated **inside the spec**,
+on the env var it actually needs, so it reports as **skipped**. Reach for
+`testIgnore` only for a spec that cannot run on the platform at all — committed
+screenshot baselines for one OS, say.
+
+An ignored file is invisible in every report: neither passed nor skipped, just
+absent, and nobody notices it has stopped covering anything. `empatalk-app`
+moved its billing suite out of `testIgnore` for exactly this reason. Worse, an
+ignore entry for a **deleted** file is silent too — `respect.click` carried two
+that pointed at nothing, quietly overstating how much of the suite CI skipped.
+If a spec must be ignored, say why in a comment and link the issue that will
+un-ignore it.
 
 ---
 
@@ -120,9 +191,10 @@ _(Alphabetical. One row per `e2e/*.spec.ts` file: its name, the critical path(s)
    inside the existing `describe` block where the journey matches.
 2. If the scenario doesn't fit anywhere, file a new `*.spec.ts` with
    the journey name (e.g. `«journey-name».spec.ts`) and add
-   an entry to the inventory in this doc. **Domain-map it** (path
-   `e2e/<domain>/**` or tag `@<domain>`) — an unmapped spec breaks
-   release-time domain-scoping (see "Domain-mapping" above).
+   an entry to the inventory in this doc. **Place it** in the domain that owns
+   the journey (`«DOMAIN_PATHS»/<domain>/e2e/**`) or, if it belongs to no single
+   domain, in the cross-cutting bucket (`«DOMAIN_PATHS»/e2e/**`) — see "Spec
+   placement". An unplaced, untagged spec breaks release-time domain-scoping.
 3. Keep specs CI-safe by default. If the test needs credentialed setup
    («ENV_GATES»: «AUTH» / «PAYMENTS»-test-mode / «DB_CMS» seed data),
    gate it behind the repo's `«ENV_GATES»` helpers (e.g. an

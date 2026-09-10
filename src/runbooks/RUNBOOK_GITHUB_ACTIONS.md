@@ -21,7 +21,7 @@ How we use branches and CI to keep GitHub Actions spend low while still gating p
 > - `«DOMAIN_PATHS»` — where domains live, for change detection (e.g. `src/domains/[^/]+`) — see Domain-scoped E2E.
 > - `«SHARED_PATHS»` — cross-cutting paths that force the FULL suite; a **single committed list** (e.g. `.github/shared-paths.txt`) read by `detect` and the docs (no restating).
 > - `«API_ROUTES»` — API route glob for the OpenAPI/route-security parity gate (e.g. `app/api/**/route.ts`).
-> - E2E↔domain mapping — how specs map to domains: path (`e2e/<domain>/**`) or tag (`@<domain>`).
+> - E2E↔domain mapping — how specs map to domains: path (`«DOMAIN_PATHS»/<domain>/e2e/**`) or tag (`@<domain>`).
 > - `«WORKFLOW_FILES»` — paths under `.github/workflows/` (`ci.yml`, `release.yml`, `page-speed-insights.yml`) and the CI secrets they need (e.g. database-cluster credentials, tunnel/ingress secrets).
 > - `«CURRENT_RELEASE_DOC»` — link to the active release/progress doc (e.g. `docs/v«X.Y.Z»-progress.md`).
 
